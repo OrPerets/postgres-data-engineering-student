@@ -1,0 +1,139 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Data Engineering — Algorithm Explorers</title>
+<style>
+:root{font-family:Inter,system-ui,-apple-system,sans-serif;color:#e8eef6;background:#0b1220}
+*{box-sizing:border-box}body{margin:0}main{max-width:1080px;margin:auto;padding:32px 18px 70px}
+h1{font-size:clamp(1.7rem,4vw,2.6rem);margin:8px 0}h2{font-size:1.4rem}p{color:#a7b6cb;line-height:1.6}
+.top{display:flex;justify-content:space-between;align-items:center;gap:14px;flex-wrap:wrap}
+.tag{color:#79dbc9;font-size:.78rem;text-transform:uppercase;letter-spacing:.12em}
+.tabs,.controls{display:flex;gap:10px;flex-wrap:wrap;margin:20px 0}button,select,input,textarea{font:inherit}
+button{border:1px solid #4b607b;background:#1a293f;color:#e7f2fc;border-radius:10px;padding:10px 14px;cursor:pointer}
+button.primary,.active{background:#137b75;border-color:#36b7a8}button:disabled{opacity:.4;cursor:not-allowed}
+.panel{background:#111c30;border:1px solid #30435d;border-radius:16px;padding:22px;margin:17px 0}
+.layout{display:grid;grid-template-columns:minmax(270px,330px) minmax(0,1fr);gap:20px}
+label{display:block;font-size:.85rem;color:#bfcde0;margin:12px 0 6px}
+textarea,input[type=text],input[type=number],select{background:#091526;color:#eaf2fa;border:1px solid #425873;border-radius:9px;padding:10px;width:100%}
+textarea{min-height:122px;resize:vertical}input[type=range]{width:100%}
+small,.muted{color:#99aac0}.status{color:#84dec5;font-size:.87rem}.error{color:#ffb9a9;white-space:pre-wrap}
+pre{white-space:pre-wrap;word-break:break-word;background:#091526;padding:16px;border-radius:10px;color:#c7eddc;font-size:.94rem;line-height:1.65}
+.progress{height:6px;background:#304058;border-radius:20px;overflow:hidden;margin:14px 0}.progress>div{height:100%;background:#24b7a6;transition:width .2s}
+table{width:100%;border-collapse:collapse;font-size:.87rem}td,th{padding:9px;text-align:left;border-bottom:1px solid #304058}td:last-child{text-align:right}
+svg{max-width:100%;height:auto}.note{font-size:.83rem;color:#a7b6cb}
+@media(max-width:700px){.layout{grid-template-columns:1fr}main{padding-top:20px}.panel{padding:15px}}
+</style></head><body><main>
+<div class="top"><div><div class="tag">Data Engineering • Student Lab</div><h1>Algorithm Explorers</h1><p>Predict → Step through → Change parameters → Explain.</p></div><a href="https://github.com/OrPerets/postgres-data-engineering-student" style="color:#80dcd0">Course repository ↗</a></div>
+<div class="tabs"><button id="tabMr" class="active">MapReduce</button><button id="tabPr">PageRank</button><button id="selfTest">Run self-checks</button></div><div id="testResult" class="status" aria-live="polite"></div>
+<section id="mr">
+<div class="layout"><div class="panel"><h2>MapReduce lab</h2><p>One input record per line. Each character emits (letter, 1).</p>
+<label for="records">Input records</label><textarea id="records">ABR
+CCR
+ACB</textarea><label for="reducers">Reducers: <strong id="reducerNum">3</strong></label><input id="reducers" type="range" min="1" max="5" value="3">
+<label><input id="combine" type="checkbox"> Apply local combiner (per input record)</label>
+<div class="controls"><button id="mrRecalc">Recompute</button><button id="mrPrev">← Previous</button><button class="primary" id="mrNext">Next →</button></div><p class="note">This is a logical single-browser simulation, not a Hadoop cluster. Reducer routing uses deterministic character codes.</p></div>
+<div class="panel"><div class="top"><h2 id="mrHeading">Input</h2><small id="mrStep">1 / 4</small></div><div class="progress"><div id="mrProgress"></div></div><div id="mrDisplay"></div><p id="mrStats" class="status"></p></div></div>
+</section>
+<section id="pr" hidden><div class="layout"><div class="panel"><h2>PageRank lab</h2><p>Enter edges as <code>A B</code> (A links to B), one per line. Include isolated/dangling pages in Nodes.</p>
+<label for="nodes">Nodes (comma-separated)</label><input id="nodes" type="text" value="A,B,C,D">
+<label for="edges">Directed links</label><textarea id="edges">A B
+A C
+B C
+C A</textarea>
+<label for="damping">Damping: <strong id="dampingNum">0.85</strong></label><input id="damping" type="range" min="0.5" max="0.95" step="0.05" value="0.85">
+<div class="controls"><button id="prRecalc">Apply graph</button><button id="prPrev">← Previous</button><button class="primary" id="prNext">Next iteration →</button><button id="prReset">Reset</button></div>
+<p id="prError" class="error"></p><p class="note">All nodes start with equal rank. Dangling mass is redistributed uniformly; total rank stays close to 1.</p></div>
+<div class="panel"><div class="top"><h2 id="prHeading">Iteration 0</h2><small id="prDistance"></small></div><div id="prGraph"></div><div id="prTable"></div><p class="status" id="prMass"></p></div></div></section>
+<p class="note">Educational preview only. No telemetry, user accounts, or remote code execution. No student input is sent to a server.</p>
+</main><script>
+'use strict';
+const $ = id => document.getElementById(id);
+function escapeHtml(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+const show=(id,visible)=>$(id).hidden=!visible;
+$('tabMr').onclick=()=>{show('mr',true);show('pr',false);$('tabMr').className='active';$('tabPr').className='';};
+$('tabPr').onclick=()=>{show('mr',false);show('pr',true);$('tabMr').className='';$('tabPr').className='active';};
+
+let mrStep=0,mrData;
+function calculateMR(){
+ const lines=$('records').value.split(/\r?\n/).map(s=>s.trim().toUpperCase().replace(/[^A-Z]/g,'')).filter(Boolean);
+ if(lines.join('').length>3000)throw Error('Please use at most 3,000 letters.');
+ const reducers=Number($('reducers').value),useCombiner=$('combine').checked;
+ const mapped=lines.map(line=>[...line].map(c=>[c,1]));
+ const local=mapped.map(pairs=>{if(!useCombiner)return pairs;const counts={};for(const [key,n] of pairs)counts[key]=(counts[key]||0)+n;return Object.entries(counts);});
+ const grouped={};for(const pairs of local)for(const [key,n] of pairs)(grouped[key]??=[]).push(n);
+ const buckets=Array.from({length:reducers},()=>({}));
+ for(const [key,values] of Object.entries(grouped).sort()){buckets[(key.charCodeAt(0)-65)%reducers][key]=values;}
+ const reduced=Object.fromEntries(Object.entries(grouped).map(([k,v])=>[k,v.reduce((a,b)=>a+b,0)]).sort());
+ return {lines,mapped,local,buckets,reduced,mappedCount:mapped.flat().length,shuffleCount:local.flat().length};
+}
+function renderMR(){
+ $('reducerNum').textContent=$('reducers').value;
+ try{mrData=calculateMR();$('mrNext').disabled=mrStep===3;$('mrPrev').disabled=mrStep===0;
+ const names=['Input','Map','Shuffle and partition','Reduce'];
+ $('mrHeading').textContent=names[mrStep];$('mrStep').textContent=(mrStep+1)+' / 4';$('mrProgress').style.width=((mrStep+1)*25)+'%';
+ const d=mrData;let content='';
+ if(mrStep===0)content='<pre>'+escapeHtml(d.lines.join('\n')||'(no records)')+'</pre>';
+ if(mrStep===1)content='<pre>'+d.mapped.map((arr,i)=>escapeHtml(d.lines[i]+': '+arr.map(p=>'('+p.join(',')+')').join(', '))).join('\n')+'</pre>';
+ if(mrStep===2)content='<pre>'+d.buckets.map((b,i)=>escapeHtml('Reducer '+(i+1)+': '+JSON.stringify(b))).join('\n')+'</pre>';
+ if(mrStep===3)content='<table><thead><tr><th>Key</th><th>Total</th></tr></thead><tbody>'+Object.entries(d.reduced).map(([k,v])=>'<tr><td>'+escapeHtml(k)+'</td><td>'+v+'</td></tr>').join('')+'</tbody></table>';
+ $('mrDisplay').innerHTML=content;$('mrStats').textContent='Mapper pairs: '+d.mappedCount+'  •  Sent to shuffle after combiner: '+d.shuffleCount+'  •  Reducers: '+d.buckets.length;
+ }catch(e){$('mrDisplay').textContent=e.message;}
+}
+$('mrRecalc').onclick=()=>{mrStep=0;renderMR();};$('mrNext').onclick=()=>{mrStep=Math.min(3,mrStep+1);renderMR();};$('mrPrev').onclick=()=>{mrStep=Math.max(0,mrStep-1);renderMR();};$('reducers').oninput=renderMR;$('combine').onchange=renderMR;
+
+function parseGraph(nodesString,edgeString){
+ const nodes=[...new Set(nodesString.split(',').map(s=>s.trim()).filter(Boolean))];
+ if(!nodes.length||nodes.length>12)throw Error('Enter 1–12 unique node names.');
+ if(nodes.some(s=>!/^[A-Za-z0-9_]{1,12}$/.test(s)))throw Error('Node names must use letters, numbers or underscores.');
+ const graph=Object.fromEntries(nodes.map(n=>[n,[]]));
+ for(const line of edgeString.split(/\r?\n/).map(s=>s.trim()).filter(Boolean)){
+ const pair=line.split(/\s+/);if(pair.length!==2||!graph[pair[0]]||!graph[pair[1]])throw Error('Invalid edge: '+line);
+ if(!graph[pair[0]].includes(pair[1]))graph[pair[0]].push(pair[1]);
+ }
+ return graph;
+}
+function pageRankStep(g,rank,d){
+ const names=Object.keys(g),n=names.length,dangling=names.filter(p=>!g[p].length).reduce((s,p)=>s+rank[p],0);
+ const next=Object.fromEntries(names.map(p=>[p,(1-d)/n+d*dangling/n]));
+ for(const p of names)for(const q of g[p])next[q]+=d*rank[p]/g[p].length;
+ return next;
+}
+let graph={},prHistory=[],prStep=0;
+function resetPR(){
+ try{graph=parseGraph($('nodes').value,$('edges').value);const n=Object.keys(graph).length;
+ prHistory=[Object.fromEntries(Object.keys(graph).map(k=>[k,1/n]))];prStep=0;$('prError').textContent='';renderPR();
+ }catch(e){$('prError').textContent=e.message;}
+}
+function renderPR(){
+ const d=Number($('damping').value);$('dampingNum').textContent=d.toFixed(2);
+ const names=Object.keys(graph);const rank=prHistory[prStep];if(!rank)return;
+ $('prHeading').textContent='Iteration '+prStep;
+ let sum=Object.values(rank).reduce((a,b)=>a+b,0);
+ $('prMass').textContent='Total rank: '+sum.toFixed(8);
+ $('prDistance').textContent=prStep===0?'Uniform start':'L1 change: '+names.reduce((s,p)=>s+Math.abs(rank[p]-prHistory[prStep-1][p]),0).toExponential(2);
+ $('prPrev').disabled=prStep===0;$('prNext').disabled=prStep>=100;
+ const positions=Object.fromEntries(names.map((p,i)=>{const angle=2*Math.PI*i/names.length-Math.PI/2;return [p,{x:230+150*Math.cos(angle),y:190+135*Math.sin(angle)}]}));
+ let svg='<svg viewBox="0 0 460 380" role="img" aria-label="Directed PageRank graph"><defs><marker id="arr" markerWidth="7" markerHeight="7" refX="6" refY="3" orient="auto"><path d="M0 0 L6 3 L0 6Z" fill="#7e99b3"/></marker></defs>';
+ for(const [source,targets] of Object.entries(graph))for(const target of targets){const a=positions[source],b=positions[target];if(source===target){svg+='<path d="M'+(a.x+16)+' '+(a.y-12)+' q 50 -50 20 15" fill="none" stroke="#7e99b3" marker-end="url(#arr)"/>';continue;}
+ const dx=b.x-a.x,dy=b.y-a.y,len=Math.hypot(dx,dy)||1;svg+='<line x1="'+(a.x+dx/len*26)+'" y1="'+(a.y+dy/len*26)+'" x2="'+(b.x-dx/len*30)+'" y2="'+(b.y-dy/len*30)+'" stroke="#7e99b3" stroke-width="1.7" marker-end="url(#arr)"/>';
+ }
+ for(const p of names){const a=positions[p],v=rank[p],r=20+v*36;svg+='<circle cx="'+a.x+'" cy="'+a.y+'" r="'+r+'" fill="#168778" fill-opacity="'+Math.min(.85,.2+v)+'" stroke="#50dbb5" stroke-width="2"/><text x="'+a.x+'" y="'+(a.y-4)+'" fill="#fff" font-size="13" text-anchor="middle">'+escapeHtml(p)+'</text><text x="'+a.x+'" y="'+(a.y+12)+'" fill="#fff" font-size="11" text-anchor="middle">'+v.toFixed(3)+'</text>';}
+ $('prGraph').innerHTML=svg+'</svg>';
+ $('prTable').innerHTML='<table><thead><tr><th>Page</th><th>Outlinks</th><th>Rank</th></tr></thead><tbody>'+names.map(p=>'<tr><td>'+escapeHtml(p)+'</td><td>'+escapeHtml(graph[p].join(', ')||'∅')+'</td><td>'+rank[p].toFixed(6)+'</td></tr>').join('')+'</tbody></table>';
+}
+$('prRecalc').onclick=resetPR;$('prReset').onclick=resetPR;$('prPrev').onclick=()=>{prStep=Math.max(0,prStep-1);renderPR();};
+$('prNext').onclick=()=>{if(prStep>=100)return;prStep++;if(!prHistory[prStep])prHistory.push(pageRankStep(graph,prHistory[prStep-1],Number($('damping').value)));renderPR();};
+$('damping').oninput=resetPR;
+$('selfTest').onclick=()=>{
+ const failures=[];const eq=(a,b)=>Math.abs(a-b)<1e-9;
+ const oldRecords=$('records').value,oldReducers=$('reducers').value,oldCombiner=$('combine').checked;
+ try{$('records').value='ABR\nCCR\nACB';$('reducers').value=3;$('combine').checked=false;
+ const expected={A:2,B:2,C:3,R:2};if(JSON.stringify(calculateMR().reduced)!==JSON.stringify(expected))failures.push('MapReduce counts');
+ $('combine').checked=true;if(JSON.stringify(calculateMR().reduced)!==JSON.stringify(expected))failures.push('Combiner correctness');
+ const g={A:['B','C'],B:['C'],C:['A'],D:[]},r={A:.25,B:.25,C:.25,D:.25};const n=pageRankStep(g,r,.85);
+ for(const [k,v] of Object.entries({A:.303125,B:.196875,C:.409375,D:.090625}))if(!eq(n[k],v))failures.push('PageRank '+k);
+ if(!eq(Object.values(n).reduce((s,x)=>s+x,0),1))failures.push('Rank conservation');
+ }catch(e){failures.push(e.message)}finally{$('records').value=oldRecords;$('reducers').value=oldReducers;$('combine').checked=oldCombiner;renderMR();}
+ $('testResult').textContent=failures.length?'Self-check failed: '+failures.join(', '):'✓ Self-check passed: MapReduce, Combiner, PageRank, conservation';
+};
+renderMR();resetPR();
+</script></body></html>

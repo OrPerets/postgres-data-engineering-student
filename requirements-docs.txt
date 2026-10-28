@@ -1,0 +1,2 @@
+# Documentation site generator and bundled search/Mermaid support.
+mkdocs-material==9.8.0

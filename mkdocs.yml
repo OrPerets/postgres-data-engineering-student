@@ -1,0 +1,52 @@
+site_name: Data Engineering — Hands-on Laboratory Course
+site_description: Workshops in SQL, PostgreSQL, data warehousing and distributed processing.
+docs_dir: docs/gitbook
+# The GitBook navigation and authoring notes are not student-facing pages.
+exclude_docs: |
+  /SUMMARY.md
+  /BRAND_GUIDE.md
+  /CONNECT_GITBOOK.md
+
+theme:
+  name: material
+  features:
+    - navigation.sections
+    - navigation.top
+    - search.highlight
+    - search.suggest
+    - content.code.copy
+  palette:
+    primary: indigo
+    accent: teal
+
+plugins:
+  - search
+
+markdown_extensions:
+  - admonition
+  - tables
+  - attr_list
+  - pymdownx.highlight
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+
+nav:
+  - Getting Started:
+      - Data Engineering: README.md
+      - Environment Setup: getting-started.md
+      - How to Work Through a Lab: how-to-learn.md
+      - Course Map: course-map.md
+  - Relational Data Engineering:
+      - Lab 01 — Relational SQL & Query Optimization: labs/01-relational-sql.md
+      - Lab 02 — Partitioning & Replication: labs/02-partitions-replicas.md
+      - Lab 03 — Data Warehouse & ETL: labs/03-dwh-etl.md
+  - Distributed Data Processing:
+      - Lab 04 — MapReduce: labs/04-mapreduce.md
+      - Lab 05 — PageRank: labs/05-pagerank.md
+      - Lab 06 — Regex & TF-IDF: labs/06-tfidf.md
+  - Resources:
+      - Troubleshooting: troubleshooting.md
+      - Glossary: glossary.md

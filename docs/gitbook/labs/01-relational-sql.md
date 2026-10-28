@@ -1,0 +1,160 @@
+# Lab 01 — Relational SQL & Query Optimization
+
+> **Your mission:** Turn customer orders into reliable business insights, and discover why two queries returning identical results can have very different execution costs.
+
+**You will practice:** JOINs, aggregation, correlated subqueries, NULL handling, window functions and query plans.
+
+**Environment:** PostgreSQL in GitHub Codespaces. No local Docker installation is required.
+
+## 1. Get ready
+
+Open the [course repository](https://github.com/OrPerets/postgres-data-engineering-student) in Codespaces. In the terminal, **from the repository root**, run:
+
+```bash
+make lab-sql
+```
+
+When the initializer finishes, open the [student answer file](https://github.com/OrPerets/postgres-data-engineering-student/blob/main/labs/01-relational-sql/sql/student_answers.sql). It contains all 15 questions with empty answer sections.
+
+### Checkpoint — Can you access the data?
+
+```bash
+cd labs/01-relational-sql
+docker compose exec postgres psql -U student -d query_lab
+```
+
+Inside PostgreSQL:
+
+```sql
+SELECT COUNT(*) FROM customers;
+SELECT * FROM orders LIMIT 5;
+```
+
+Exit with `\q`.
+
+**Expected:** SQL runs and returns records. If the service is unavailable, see [Troubleshooting](../troubleshooting.md).
+
+## 2. Understand the data
+
+You are analyzing three related tables:
+
+| Table | What one row represents |
+|---|---|
+| `customers` | One customer |
+| `orders` | One order, with date and status |
+| `order_items` | One product line inside an order |
+
+The lab uses **synthetic data** designed to expose common SQL mistakes.
+
+### Business rules
+
+- Count only `completed` orders in revenue unless the question says otherwise.
+- Exclude cancelled and returned orders from revenue; a returned order represents a full return.
+- A `NULL` discount means no discount.
+- Net revenue for one order line is:
+
+```sql
+quantity * unit_price * (1 - COALESCE(discount_pct, 0) / 100.0)
+```
+
+### Think before coding
+
+**Question:** Does a completed order with a 100% discount count as a completed order? Does it contribute revenue?
+
+Write your prediction, then test it with SQL.
+
+## 3. Complete the 15 SQL questions
+
+Open `labs/01-relational-sql/sql/student_answers.sql`. Write SQL beneath each numbered question.
+
+Work in this sequence:
+
+1. **Queries 1–5:** Filters, JOINs, grouping and business metrics.
+2. **Queries 6–7:** Debugging aggregation and `NOT IN` / `NULL` behavior.
+3. **Queries 8–11:** Ranking, previous values, running totals and monthly comparisons.
+4. **Queries 12–15:** More advanced relational logic, product pairs and window-frame semantics.
+
+### Checkpoint — Is the output actually correct?
+
+Before moving on, ask:
+
+- Does my JOIN accidentally multiply order counts?
+- Do customers with no orders still appear when required?
+- Does my calculation handle `NULL` correctly?
+- Is my `ORDER BY` deterministic when dates or amounts tie?
+
+**Hint:** When an order has several items, calculate *per-order* metrics at the order grain before joining them to per-customer summaries.
+
+## 4. Experiment — Why can a Window Function be faster?
+
+**Goal:** Calculate each customer's running total without recomputing all previous transactions.
+
+First predict which version will be faster: a correlated subquery or `SUM(...) OVER (...)`. Both should return the same answers.
+
+Run the benchmark setup:
+
+```bash
+docker compose exec -T postgres psql -U student -d query_lab < benchmarks/01_seed_running_total.sql
+```
+
+Now run the **compact comparison**:
+
+```bash
+docker compose exec -T postgres psql -U student -d query_lab < benchmarks/03_compact_report.sql
+```
+
+You'll see:
+
+- Number of sequential scan executions.
+- Aggregate/Window and sort executions.
+- Shared buffer hits.
+- Total runtime for both approaches.
+- Side-by-side sample outputs and a full-data `MATCH` / `MISMATCH` check.
+
+### Understand the result
+
+The correlated subquery may repeatedly scan the table for each transaction. The window plan can sort and process the ordered rows with incremental running aggregation.
+
+**Important:** A Window Function is not always faster. This benchmark deliberately uses a case where repeated work is expensive. Indexes, table size and caching can change the result.
+
+### Optional challenge
+
+Read the [performance challenge](https://github.com/OrPerets/postgres-data-engineering-student/blob/main/labs/01-relational-sql/benchmarks/STUDENT_CHALLENGE.md). Add a composite index and compare again.
+
+## 5. Reflect and finish
+
+Before leaving the lab, be ready to explain:
+
+1. Why a LEFT JOIN followed by a WHERE filter can accidentally remove customers without orders.
+2. Why `ROWS` and `RANGE` may produce different cumulative results when dates tie.
+3. Why your two running-total queries produce identical outputs but different execution plans.
+
+**Deliverable:** Your completed `student_answers.sql`, together with any explanation or benchmark evidence requested by your instructor.
+
+**Next:** [Lab 02 — Partitions & Replication](02-partitions-replicas.md).
+
+
+## Visual checkpoint — One result, two query plans
+
+The running-total benchmark computes identical per-row results using two approaches.
+
+| Stage | Correlated subquery | Window function |
+|---|---|---|
+| Read sales | Outer scan, then repeated inner scans | One main scan |
+| Order rows | No explicit sort in original plan | Sort by customer, date, sale ID |
+| Calculate cumulative sum | Repeated aggregate per sale | One WindowAgg plan node |
+| Verify | Compare every output row | Compare every output row |
+
+### Five-row illustration (not a timing measurement)
+
+| Sale ID | Amount | Running total |
+|---|---:|---:|
+| 1 | 10 | 10 |
+| 2 | 20 | 30 |
+| 3 | 30 | 60 |
+| 4 | 40 | 100 |
+| 5 | 50 | 150 |
+
+**Predict:** How many previous values would the naive correlated approach revisit for the fifth row? How many new values does an incremental running sum need to add when moving from row four to row five?
+
+**Try it:** Run `benchmarks/03_compact_report.sql` and compare the real execution counts. The five-row table is only an illustrative example; the benchmark itself uses a larger synthetic dataset.

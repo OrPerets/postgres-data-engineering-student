@@ -1,0 +1,42 @@
+services:
+  primary:
+    image: postgres:16
+    environment:
+      POSTGRES_USER: lab
+      POSTGRES_PASSWORD: labpass
+      POSTGRES_DB: engineering
+      REPLICATION_PASSWORD: replpass
+    command: ["postgres", "-c", "wal_level=replica", "-c", "max_wal_senders=10", "-c", "max_replication_slots=10", "-c", "wal_keep_size=256MB"]
+    ports:
+      - "127.0.0.1:5432:5432"
+    volumes:
+      - primary_data:/var/lib/postgresql/data
+      - ./docker/primary-init:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U lab -d engineering"]
+      interval: 3s
+      timeout: 3s
+      retries: 30
+  replica:
+    image: postgres:16
+    user: postgres
+    environment:
+      PGDATA: /var/lib/postgresql/data/pgdata
+      REPLICATION_PASSWORD: replpass
+    entrypoint: ["/bin/bash", "/scripts/start-replica.sh"]
+    ports:
+      - "127.0.0.1:5433:5432"
+    volumes:
+      - replica_data:/var/lib/postgresql/data
+      - ./docker/replica:/scripts:ro
+    depends_on:
+      primary:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U lab -d engineering && psql -U lab -d engineering -tAc 'SELECT pg_is_in_recovery()' | grep -q t"]
+      interval: 5s
+      timeout: 3s
+      retries: 30
+volumes:
+  primary_data:
+  replica_data:

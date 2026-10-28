@@ -1,0 +1,13 @@
+-- Lab 03. Students: write your own SQL here. Do not edit provided 01_stage.sql and 02_dwh.sql.
+-- S1 Inspect raw vs cleaned rows from each source.
+-- S2 Find records with missing cost; distinguish NULL from zero.
+-- S3 Validate token consistency; distinguish FALSE and UNKNOWN.
+-- S4 Map stage natural keys to DWH dimension surrogate keys.
+-- S5 Explain and query fact grain using (batch_id,row_no).
+-- S6 Compare row counts across raw, unified stage, and facts.
+-- S7 Detect quality flags by source (count each issue separately).
+-- S8 Write an analytical query: cost by month and source, exposing number of priced rows.
+-- S9 Write an analytical query: top 3 users per source by known cost with deterministic ties.
+-- S10 Run provided load twice and prove fact counts unchanged (idempotency).
+-- S11 Why will changing a raw cost after initial load not automatically update the fact?
+-- S12 What can and cannot be inferred from missing success status or incomplete coverage?
