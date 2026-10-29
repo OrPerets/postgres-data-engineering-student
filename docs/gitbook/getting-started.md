@@ -2,6 +2,8 @@
 
 **Goal:** Open a ready-to-use cloud development environment without installing PostgreSQL or Docker locally.
 
+For a step-by-step first SQL workshop, follow [Start here: your first SQL lab](start-lab01.md).
+
 ## Step 1 — Open the course code
 Open the [student repository](https://github.com/OrPerets/postgres-data-engineering-student), then select **Code → Codespaces → Create codespace on main**. Codespaces availability and quotas depend on your GitHub account.
 

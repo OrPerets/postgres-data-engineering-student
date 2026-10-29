@@ -8,6 +8,8 @@
 
 ## 1. Get ready
 
+New to Codespaces? Follow the illustrated [first SQL lab walkthrough](../start-lab01.md).
+
 Open the [course repository](https://github.com/OrPerets/postgres-data-engineering-student) in Codespaces. In the terminal, **from the repository root**, run:
 
 ```bash

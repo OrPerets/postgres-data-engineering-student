@@ -59,6 +59,7 @@ nav:
   - Getting Started:
       - Data Engineering: README.md
       - Environment Setup: getting-started.md
+      - First SQL lab: start-lab01.md
       - How to Work Through a Lab: how-to-learn.md
       - Course Map: course-map.md
   - Relational Data Engineering:

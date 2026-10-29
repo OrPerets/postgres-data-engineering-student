@@ -36,6 +36,10 @@ class SiteVisibilityTests(unittest.TestCase):
             search = (out / "search/search_index.json").read_text()
             getting = (out / "getting-started/index.html").read_text()
             all_pages = "\n".join(p.read_text() for p in out.rglob("*.html")) + search
+            self.assertEqual((out / "start-lab01" / "index.html").exists(), "01" in active)
+            if "01" not in active:
+                self.assertNotIn("start-lab01/", all_pages)
+                self.assertFalse((out / "images" / "setup" / "01-github-codespaces.png").exists())
             practice_page = out / "activities" / "lab01-learning-pack" / "index.html"
             self.assertEqual(practice_page.exists(), "01" in active)
             if "01" not in active:

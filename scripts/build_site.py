@@ -49,6 +49,8 @@ def filter_docs(directory: Path, enabled: dict[str, bool]) -> None:
         (directory / "labs" / LABS[number][0]).unlink()
     if "01" in hidden:
         (directory / "activities" / "lab01-learning-pack.md").unlink()
+        (directory / "start-lab01.md").unlink()
+        (directory / "images" / "setup" / "01-github-codespaces.png").unlink()
         for asset in ("javascripts/lab01-join.js", "javascripts/lab01-quiz.js",
                       "stylesheets/lab01-join.css", "stylesheets/lab01-quiz.css"):
             (directory / asset).unlink()
@@ -98,6 +100,8 @@ def filter_docs(directory: Path, enabled: dict[str, bool]) -> None:
 
     getting = directory / "getting-started.md"
     text = getting.read_text(encoding="utf-8")
+    if "01" in hidden:
+        text = require_replace(text, "For a step-by-step first SQL workshop, follow [Start here: your first SQL lab](start-lab01.md).\n\n", "", "Lab 01 walkthrough link")
     for number in hidden:
         line = f"| {LABS[number][3]} | `make {LABS[number][2]}` |\n"
         text = require_replace(text, line, "", f"Lab {number} starter")
@@ -145,6 +149,7 @@ def filtered_config(text: str, enabled: dict[str, bool]) -> str:
             if count != 1:
                 raise ValueError(f"Expected one navigation entry for Lab {number}; found {count}.")
     if not enabled["01"]:
+        text = require_replace(text, "      - First SQL lab: start-lab01.md\n", "", "Lab 01 walkthrough nav")
         text = require_replace(text, "      - SQL practice & quiz: activities/lab01-learning-pack.md\n", "", "Lab 01 practice nav")
         for asset in ("stylesheets/lab01-join.css", "stylesheets/lab01-quiz.css",
                       "javascripts/lab01-join.js", "javascripts/lab01-quiz.js"):
