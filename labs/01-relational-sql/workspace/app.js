@@ -8,7 +8,8 @@
     prev: $('previous-button'), next: $('next-button'), run: $('run-button'),
     save: $('save-button'), download: $('export-button'), status: $('save-status'),
     results: $('results'), loadError: $('load-error'), saveError: $('save-error'), hintContainer: $('hint-container'),
-    hintToggle: $('hint-toggle'), hintText: $('hint-text')
+    hintToggle: $('hint-toggle'), hintText: $('hint-text'),
+    schema: $('schema-content'), schemaRefresh: $('schema-refresh'), schemaDisclosure: $('schema-disclosure')
   };
   let questions = [];
   let answers = {};
@@ -156,6 +157,90 @@
     elements.results.append(table, summary);
   }
 
+  function renderSchema(data) {
+    if (!Array.isArray(data.tables)) throw new Error('The table structure could not be read.');
+    elements.schema.replaceChildren();
+    if (!data.tables.length) {
+      const message = document.createElement('p');
+      message.className = 'schema-message';
+      message.textContent = 'No lab tables found. Run make lab-sql, then refresh.';
+      elements.schema.append(message);
+      return;
+    }
+    const present = new Set(data.tables.map(table => table.name));
+    const missing = ['customers', 'orders', 'order_items'].filter(name => !present.has(name));
+    if (missing.length) {
+      const warning = document.createElement('p');
+      warning.className = 'schema-message schema-error';
+      warning.textContent = `Missing lab tables: ${missing.join(', ')}. Run make lab-sql and follow its recovery guidance, then refresh.`;
+      elements.schema.append(warning);
+    }
+    data.tables.forEach(table => {
+      if (typeof table.name !== 'string' || !Array.isArray(table.columns)) throw new Error('The table structure could not be read.');
+      const section = document.createElement('section');
+      section.className = 'schema-table';
+      const title = document.createElement('h3');
+      title.className = 'schema-table-name';
+      title.textContent = table.name;
+      const list = document.createElement('ul');
+      list.className = 'schema-column-list';
+      table.columns.forEach(column => {
+        if (typeof column.name !== 'string' || typeof column.type !== 'string' || !Array.isArray(column.references)) throw new Error('The table structure could not be read.');
+        const item = document.createElement('li');
+        const top = document.createElement('div');
+        top.className = 'schema-column-top';
+        const name = document.createElement('code');
+        name.className = 'schema-column-name';
+        name.textContent = column.name;
+        const badges = document.createElement('span');
+        badges.className = 'schema-badges';
+        if (column.primary_key) badges.append(schemaBadge('PK', 'Primary key'));
+        if (column.references.length) badges.append(schemaBadge('FK', 'Foreign key'));
+        top.append(name, badges);
+        const metadata = document.createElement('span');
+        metadata.className = 'schema-column-type';
+        metadata.textContent = column.type + (column.nullable ? ' · nullable' : '');
+        item.append(top, metadata);
+        column.references.forEach(reference => {
+          if (typeof reference.table !== 'string' || typeof reference.column !== 'string') throw new Error('The table structure could not be read.');
+          const target = document.createElement('span');
+          target.className = 'schema-reference';
+          target.textContent = `References ${reference.table}.${reference.column}`;
+          item.append(target);
+        });
+        list.append(item);
+      });
+      section.append(title, list);
+      elements.schema.append(section);
+    });
+  }
+
+  function schemaBadge(label, meaning) {
+    const badge = document.createElement('abbr');
+    badge.className = 'schema-key';
+    badge.title = meaning;
+    badge.textContent = label;
+    return badge;
+  }
+
+  async function loadSchema() {
+    elements.schemaRefresh.disabled = true;
+    elements.schema.replaceChildren();
+    const message = document.createElement('p');
+    message.className = 'schema-message';
+    message.textContent = 'Loading table structure…';
+    elements.schema.append(message);
+    try {
+      renderSchema(await request('/api/schema'));
+    } catch (error) {
+      message.className = 'schema-message schema-error';
+      message.textContent = `Table structure unavailable: ${error.message} Start the lab database and refresh.`;
+      elements.schema.replaceChildren(message);
+    } finally {
+      elements.schemaRefresh.disabled = false;
+    }
+  }
+
   async function runQuery() {
     if (busy || !questions.length) return;
     const {selectionStart, selectionEnd, value} = elements.input;
@@ -265,6 +350,7 @@
   elements.run.addEventListener('click', runQuery);
   elements.save.addEventListener('click', saveAnswers);
   elements.download.addEventListener('click', downloadAnswers);
+  elements.schemaRefresh.addEventListener('click', loadSchema);
   elements.input.addEventListener('input', () => {
     if (!questions.length) return;
     const key = String(selected().id);
@@ -276,5 +362,7 @@
   window.addEventListener('beforeunload', event => {
     if (dirty()) { event.preventDefault(); event.returnValue = ''; }
   });
+  elements.schemaDisclosure.open = window.matchMedia('(min-width: 1001px)').matches;
   initialize();
+  loadSchema();
 })();

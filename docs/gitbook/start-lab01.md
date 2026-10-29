@@ -67,6 +67,8 @@ make lab-sql-workspace
 
 Keep the terminal running. Open the **Ports** tab in the Codespace, find port **8765**, and use **Open in Browser**. Keep the forwarded port private. Enter your SQL, choose **Run query** to see results or an error, and use **Save answers** to save your drafts in the Codespace. Edits are not saved automatically. The pilot runs read-only SQL; it does not grade the answers.
 
+The **Table structure** panel shows the current columns and keys; use **Refresh** if the database has just started.
+
 Use **Download SQL** to download your answers as a `.sql` file and keep that copy outside the Codespace. Saved workspace drafts and the original SQL worksheet are separate; the workspace does not overwrite the worksheet. Follow your instructor's submission instructions and include any required explanations and query-plan evidence.
 
 ### Option B: SQL worksheet

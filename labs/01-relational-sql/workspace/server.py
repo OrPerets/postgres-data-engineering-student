@@ -26,6 +26,7 @@ MAX_SQL = 50_000
 MAX_ROWS = 200
 MAX_CELL = 2000
 QUESTION_COUNT = 15
+SCHEMA_TABLES = ("customers", "orders", "order_items")
 LOCK = threading.Lock()
 
 
@@ -152,6 +153,80 @@ def _cell(value):
     return text if len(text) <= MAX_CELL else text[:MAX_CELL] + "…"
 
 
+def load_schema() -> dict:
+    """Read the current lab tables and key relationships, without changing them."""
+    try:
+        import psycopg
+    except ImportError as exc:
+        raise RuntimeError("The SQL driver is missing. From the repository root, run: python -m pip install -r labs/02-partitioning-replication/requirements.txt") from exc
+
+    # Align each local FK attribute with the referenced attribute by position;
+    # matching names or joining the two arrays independently breaks composite FKs.
+    sql = """
+        SELECT rel.relname, attr.attname,
+               pg_catalog.format_type(attr.atttypid, attr.atttypmod),
+               NOT attr.attnotnull,
+               EXISTS (
+                   SELECT 1 FROM pg_catalog.pg_constraint pk
+                   WHERE pk.conrelid = rel.oid AND pk.contype = 'p'
+                     AND attr.attnum = ANY(pk.conkey)
+               ), refs.schema_name, refs.table_name, refs.column_name
+        FROM pg_catalog.pg_class rel
+        JOIN pg_catalog.pg_namespace ns ON ns.oid = rel.relnamespace
+        JOIN pg_catalog.pg_attribute attr ON attr.attrelid = rel.oid
+        LEFT JOIN LATERAL (
+            SELECT remote_ns.nspname AS schema_name, remote.relname AS table_name,
+                   remote_attr.attname AS column_name
+            FROM pg_catalog.pg_constraint fk
+            JOIN LATERAL unnest(fk.conkey, fk.confkey)
+                AS pair(local_num, remote_num) ON true
+            JOIN pg_catalog.pg_class remote ON remote.oid = fk.confrelid
+            JOIN pg_catalog.pg_namespace remote_ns ON remote_ns.oid = remote.relnamespace
+            JOIN pg_catalog.pg_attribute remote_attr
+                ON remote_attr.attrelid = remote.oid AND remote_attr.attnum = pair.remote_num
+            WHERE fk.contype = 'f' AND fk.conrelid = rel.oid AND pair.local_num = attr.attnum
+        ) refs ON true
+        WHERE ns.nspname = 'public' AND rel.relkind IN ('r', 'p')
+          AND rel.relname = ANY(%s) AND attr.attnum > 0 AND NOT attr.attisdropped
+        ORDER BY array_position(%s::text[], rel.relname::text), attr.attnum,
+                 refs.schema_name, refs.table_name, refs.column_name
+    """
+    try:
+        with psycopg.connect(host="127.0.0.1", port=55432, dbname="query_lab", user="student",
+                             password="studentpass", connect_timeout=5,
+                             options="-c default_transaction_read_only=on -c statement_timeout=7000") as conn:
+            conn.read_only = True
+            with conn.cursor() as cur:
+                cur.execute(sql, (list(SCHEMA_TABLES), list(SCHEMA_TABLES)))
+                rows = cur.fetchall()
+            conn.rollback()
+    except psycopg.OperationalError as exc:
+        raise RuntimeError("Cannot connect to the Lab 01 database. From the repository root, run make lab-sql and wait for READY.") from exc
+    except psycopg.Error as exc:
+        raise RuntimeError("Could not load the database schema. Check that the Lab 01 database is ready.") from exc
+
+    tables = []
+    by_name = {}
+    for table, name, typ, nullable, primary_key, ref_schema, ref_table, ref_column in rows:
+        table, name, typ = _cell(table), _cell(name), _cell(typ)
+        if table not in by_name:
+            by_name[table] = {"name": table, "columns": [], "_columns": {}}
+            tables.append(by_name[table])
+        entry = by_name[table]
+        if name not in entry["_columns"]:
+            column = {"name": name, "type": typ, "nullable": nullable,
+                      "primary_key": primary_key, "references": []}
+            entry["_columns"][name] = column
+            entry["columns"].append(column)
+        if ref_table is not None:
+            entry["_columns"][name]["references"].append({
+                "schema": _cell(ref_schema), "table": _cell(ref_table), "column": _cell(ref_column)
+            })
+    for table in tables:
+        del table["_columns"]
+    return {"tables": tables}
+
+
 class Handler(BaseHTTPRequestHandler):
     server_version = "LabWorkspace/1.0"
 
@@ -188,6 +263,11 @@ class Handler(BaseHTTPRequestHandler):
         try:
             if path == "/api/questions":
                 self._json(HTTPStatus.OK, {"questions": questions_from_worksheet()})
+            elif path == "/api/schema":
+                try:
+                    self._json(HTTPStatus.OK, load_schema())
+                except RuntimeError as exc:
+                    self._json(HTTPStatus.SERVICE_UNAVAILABLE, {"error": str(exc)})
             elif path == "/api/answers":
                 with LOCK:
                     answers = load_answers()

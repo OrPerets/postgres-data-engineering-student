@@ -34,6 +34,17 @@
         <div class="sidebar-note sidebar-bottom"><strong>Your work stays yours.</strong><br>Save regularly and download a copy outside the Codespace.</div>
       </aside>
 
+      <aside class="schema-panel" aria-label="Database schema reference">
+        <details id="schema-disclosure" class="schema-disclosure">
+          <summary class="schema-summary"><span><span class="eyebrow schema-eyebrow">REFERENCE</span><span class="schema-title">Table structure</span></span><span class="schema-chevron" aria-hidden="true">⌄</span></summary>
+          <div class="schema-body">
+            <p class="schema-intro">Columns and keys from your lab database.</p>
+            <div class="schema-toolbar"><span class="schema-legend"><abbr title="Primary key">PK</abbr> Primary key · <abbr title="Foreign key">FK</abbr> Foreign key<br>Multiple PK columns form one key. Nullable columns allow NULL.</span><button id="schema-refresh" class="schema-refresh" type="button">Refresh</button></div>
+            <div id="schema-content" class="schema-content" aria-live="polite"><p class="schema-message">Loading table structure…</p></div>
+          </div>
+        </details>
+      </aside>
+
       <div class="content-column">
         <section class="question-card" aria-labelledby="question-title">
           <div class="question-meta"><p class="eyebrow">THE QUESTION</p><span id="question-counter" class="question-counter">—</span></div>

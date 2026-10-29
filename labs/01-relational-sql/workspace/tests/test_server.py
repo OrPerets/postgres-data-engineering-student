@@ -18,6 +18,47 @@ spec.loader.exec_module(server)
 
 
 class WorkspaceTests(unittest.TestCase):
+    def test_schema_maps_each_foreign_key_to_its_own_column(self):
+        recorded = {}
+        rows = [
+            (b'customers', b'customer_id', b'integer', False, True, None, None, None),
+            (b'customers', b'city', b'character varying(80)', True, False, None, None, None),
+            (b'orders', b'customer_id', b'integer', False, False, b'public', b'customers', b'customer_id'),
+            (b'order_items', b'order_id', b'integer', False, True, b'public', b'orders', b'order_id'),
+            (b'order_items', b'line_no', b'integer', False, True, None, None, None),
+            (b'order_items', b'discount_pct', b'numeric(5,2)', True, False, None, None, None),
+        ]
+        class Cursor:
+            def __enter__(self): return self
+            def __exit__(self, *args): pass
+            def execute(self, query, params): recorded['query'] = query; recorded['params'] = params
+            def fetchall(self): return rows
+        class Connection:
+            read_only = None
+            def __enter__(self): return self
+            def __exit__(self, *args): pass
+            def cursor(self): return Cursor()
+            def rollback(self): recorded['rollback'] = True
+        connection = Connection()
+        def connect(**kwargs): recorded['connect'] = kwargs; return connection
+        fake = types.SimpleNamespace(connect=connect, OperationalError=type('OperationalError',(Exception,),{}), Error=type('Error',(Exception,),{}))
+        with patch.dict(sys.modules, {'psycopg': fake}):
+            result = server.load_schema()
+        self.assertTrue(connection.read_only)
+        self.assertIn('statement_timeout=7000', recorded['connect']['options'])
+        self.assertEqual(recorded['params'], (list(server.SCHEMA_TABLES), list(server.SCHEMA_TABLES)))
+        self.assertIn('unnest(fk.conkey, fk.confkey)', recorded['query'])
+        self.assertTrue(recorded['rollback'])
+        tables = {table['name']: {col['name']: col for col in table['columns']} for table in result['tables']}
+        self.assertTrue(tables['customers']['city']['nullable'])
+        self.assertEqual(tables['customers']['city']['type'], 'character varying(80)')
+        self.assertEqual(tables['orders']['customer_id']['references'], [{'schema':'public','table':'customers','column':'customer_id'}])
+        self.assertTrue(tables['order_items']['order_id']['primary_key'])
+        self.assertEqual(tables['order_items']['order_id']['references'][0]['column'], 'order_id')
+        self.assertTrue(tables['order_items']['line_no']['primary_key'])
+        self.assertEqual(tables['order_items']['line_no']['references'], [])
+        self.assertEqual(tables['order_items']['discount_pct']['type'], 'numeric(5,2)')
+
     def test_questions_come_from_source_and_include_supplied_sql(self):
         questions = server.questions_from_worksheet()
         self.assertEqual([item['id'] for item in questions], list(range(1, 16)))
@@ -121,6 +162,17 @@ class HttpTests(unittest.TestCase):
         with patch.object(server, 'query_database', side_effect=RuntimeError('Database is offline.')):
             status, body = self.request('POST', '/api/query', json.dumps({'sql':'SELECT 1'}),
                                         {'Content-Type': 'application/json'})
+        self.assertEqual(status, 503)
+        self.assertEqual(json.loads(body)['error'], 'Database is offline.')
+
+    def test_schema_endpoint_returns_data_and_graceful_offline_error(self):
+        payload = {'tables': [{'name': 'customers', 'columns': []}]}
+        with patch.object(server, 'load_schema', return_value=payload):
+            status, body = self.request('GET', '/api/schema')
+        self.assertEqual(status, 200)
+        self.assertEqual(json.loads(body), payload)
+        with patch.object(server, 'load_schema', side_effect=RuntimeError('Database is offline.')):
+            status, body = self.request('GET', '/api/schema')
         self.assertEqual(status, 503)
         self.assertEqual(json.loads(body)['error'], 'Database is offline.')
 
