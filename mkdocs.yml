@@ -23,10 +23,14 @@ extra_css:
   - stylesheets/extra.css
   - stylesheets/lab01-join.css
   - stylesheets/lab01-quiz.css
+  - stylesheets/lab02-explorer.css
+  - stylesheets/lab02-quiz.css
 
 extra_javascript:
   - javascripts/lab01-join.js
   - javascripts/lab01-quiz.js
+  - javascripts/lab02-explorer.js
+  - javascripts/lab02-quiz.js
 
 plugins:
   - search
@@ -53,6 +57,7 @@ nav:
       - Lab 01 — Relational SQL & Query Optimization: labs/01-relational-sql.md
       - SQL practice & quiz: activities/lab01-learning-pack.md
       - Lab 02 — Partitioning & Replication: labs/02-partitions-replicas.md
+      - Partitioning practice & quiz: activities/lab02-learning-pack.md
       - Lab 03 — Data Warehouse & ETL: labs/03-dwh-etl.md
   - Distributed Data Processing:
       - Lab 04 — MapReduce: labs/04-mapreduce.md
