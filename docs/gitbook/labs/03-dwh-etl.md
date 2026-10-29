@@ -4,6 +4,25 @@
 
 **You will practice:** Source-to-target mapping, staging, data quality, dimensional modeling, fact grain and repeatable loads.
 
+!!! info "Your work"
+
+    **Edit in Codespaces:** In Explorer, open `labs → 03-dwh-etl → sql → student_exercises.sql` and write your SQL answers there. Keep your explanations in a separate Markdown or PDF report. The provided `01_stage.sql` and `02_dwh.sql` are lab setup scripts; do not edit them for your answers.
+
+    **Start and check:** From the repository root, run `make lab-dwh` to initialize the sample, then `make test LAB=03-dwh-etl` to inspect sample data and check that the source and fact tables are nonempty. This check **does not grade your answers**.
+
+    **Run your SQL:** From the repository root, open a SQL prompt:
+
+    ```bash
+    cd labs/03-dwh-etl
+    docker compose exec postgres psql -U student -d dwh_etl_lab
+    ```
+
+    Run your queries in the prompt and compare the output with the assignment. Exit with `\q`. For the repeated-load exercises, preserve your work first; test any unsafe insert only in an isolated disposable setup.
+
+    **Keep and submit:** Save your completed SQL worksheet and short reasoning report in Markdown or PDF, including the requested explanations and star schema. Follow your instructor's submission instructions.
+
+    **Back up:** Download your files from the Codespace Explorer or commit and push them to your own GitHub fork. Saving in the editor alone does not submit or back up your work. Back up any database changes you need before a reset or rebuild. See [troubleshooting](../troubleshooting.md).
+
 ## 1. Get ready
 
 From the repository root in Codespaces:

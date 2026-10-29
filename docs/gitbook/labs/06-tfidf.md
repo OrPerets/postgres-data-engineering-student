@@ -4,6 +4,25 @@
 
 **You will practice:** Field extraction, tokenization, term frequency, document frequency, TF-IDF and performance analysis.
 
+!!! info "Your work"
+
+    **Edit in Codespaces:** In Explorer, open `labs → 06-tfidf → student_tasks.py` and implement the Python exercises. Save your SQL answer for question 9 in a file or report of your own. Save changes with **Ctrl+S** (Windows/Linux) or **⌘S** (Mac).
+
+    **Run and check:** From the repository root, run `make lab-tfidf` for the Python demo. The full assignment also requires PostgreSQL for questions 8–9: run `make lab-tfidf-sql` from the repository root, then enter the lab folder to run the reference query and Python tests:
+
+    ```bash
+    cd labs/06-tfidf
+    docker compose exec -T postgres psql -v ON_ERROR_STOP=1 -U student -d tfidf_lab < sql/02_reference_query.sql
+    python -m unittest tests.test_demo -v
+    python -m unittest discover -s tests -v
+    ```
+
+    Student tests intentionally fail until you implement the functions. Passing them helps check the code but does not grade your SQL answer or report; compare SQL and Python using the same corpus and formula. Python-only exploration does not complete the SQL questions.
+
+    **Keep for submission:** Your completed `student_tasks.py`, SQL answer for question 9, test output and a concise report, as specified in the [assignment](https://github.com/OrPerets/postgres-data-engineering-student/blob/main/labs/06-tfidf/STUDENT_ASSIGNMENT.md). Follow your instructor's submission instructions.
+
+    **Back up:** Download your files from the Codespace Explorer or commit and push them to your own GitHub fork. Saving in the editor alone does not submit your work or keep a copy outside the Codespace.
+
 ## 1. Get ready
 
 From the repository root:

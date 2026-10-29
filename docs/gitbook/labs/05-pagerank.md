@@ -4,6 +4,24 @@
 
 **You will practice:** Rank propagation, normalization, damping, dangling nodes, convergence and MapReduce-style computation.
 
+!!! info "Your work"
+
+    **Edit in Codespaces:** In Explorer, open `labs → 05-pagerank → student_tasks.py` and implement the assigned functions. Save your changes with **Ctrl+S** (Windows/Linux) or **⌘S** (Mac).
+
+    **Run and check:** From the repository root, start with `make lab-pagerank`. Then enter the lab folder and run the tests:
+
+    ```bash
+    cd labs/05-pagerank
+    python -m unittest tests.test_demo -v
+    python -m unittest discover -s tests -v
+    ```
+
+    The demo test checks the reference example; student tests intentionally fail until you implement the functions. Passing tests helps check the code but does not assess your report or all assignment requirements.
+
+    **Keep for submission:** Your completed `student_tasks.py` and a short report with hand calculations, screenshots or test output, convergence observations and discussion. Follow the [assignment](https://github.com/OrPerets/postgres-data-engineering-student/blob/main/labs/05-pagerank/STUDENT_ASSIGNMENT.md) and your instructor's submission instructions.
+
+    **Back up:** Download your files from the Codespace Explorer or commit and push them to your own GitHub fork. Saving in the editor alone does not submit your work or keep a copy outside the Codespace.
+
 ## 1. Get ready
 
 From the repository root:

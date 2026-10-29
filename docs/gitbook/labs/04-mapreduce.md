@@ -4,6 +4,25 @@
 
 **You will practice:** Key-value mapping, grouping, reducer partitioning, combiners, mean/variance aggregation and skew.
 
+!!! info "Your work"
+
+    **Edit:** In your Codespace Explorer, open `labs → 04-mapreduce → student_tasks.py` and implement the functions while preserving their signatures. The GitHub link below shows the starter; edit your own Codespace copy.
+
+    **Run and check:** From the repository root, enter the lab folder and run the demo and tests:
+
+    ```bash
+    cd labs/04-mapreduce
+    python mapreduce_demo.py
+    python -m unittest tests.test_demo -v
+    python -m unittest discover -s tests -v
+    ```
+
+    The demo tests check the reference implementation. The full suite also checks student functions and initially fails until you implement them; passing tests are helpful checks, not a complete grade of your report or reasoning.
+
+    **Keep and submit:** Save `student_tasks.py`, a short report with the requested trace and explanations, passing test output, and a 200–300 word discussion. Follow the [full assignment](https://github.com/OrPerets/postgres-data-engineering-student/blob/main/labs/04-mapreduce/STUDENT_ASSIGNMENT.md) and your instructor's submission instructions.
+
+    **Back up:** Download copies from Explorer or commit and push your work to your own GitHub fork. Saving in the editor alone does not submit or back up your work. See [environment setup](../getting-started.md) and [troubleshooting](../troubleshooting.md).
+
 ## 1. Get ready
 
 From the repository root:
