@@ -13,3 +13,7 @@ python3 -m venv .venv
 .venv/bin/python -m pip install -r requirements-docs.txt
 .venv/bin/mkdocs serve
 ```
+
+## Managing workshop visibility
+
+Edit [`lab-visibility.yml`](lab-visibility.yml) to choose which workshop pages appear on the course website. See [course administration](COURSE_ADMIN.md) for the steps and the limitations of a public repository.

@@ -1,0 +1,11 @@
+# Edit true/false to choose which workshops appear on the course website.
+# Changes are published by GitHub Actions after committing to main.
+# This controls website visibility only; the public GitHub repository and its
+# history remain accessible to everyone. Do not use it to protect secrets.
+labs:
+  '01': true
+  '02': false
+  '03': false
+  '04': false
+  '05': false
+  '06': false
