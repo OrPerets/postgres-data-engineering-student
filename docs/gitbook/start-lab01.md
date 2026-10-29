@@ -15,7 +15,8 @@ flowchart LR
 1. Open the [student course repository](https://github.com/OrPerets/postgres-data-engineering-student).
 2. Select the green **Code** button, then **Codespaces**.
 3. Select **Create codespace on main**. If you already have a Codespace for this repository, you can reopen it or use the **+** button to create another one.
-4. Wait for the editor and its terminal to finish starting. The first setup can take several minutes. If it stays on the setup screen, check the Codespace creation log and see [Troubleshooting](troubleshooting.md).
+4. Wait for the editor and its terminal to finish starting. The first setup can take several minutes. If it stays on the setup screen, see [Troubleshooting](troubleshooting.md#the-codespace-is-taking-a-long-time-or-cannot-connect).
+5. If the editor asks whether you trust the workspace, review the course repository and choose **Trust** when you are comfortable enabling its features.
 
 ![GitHub Code menu with the Codespaces tab selected](images/setup/01-github-codespaces.png)
 

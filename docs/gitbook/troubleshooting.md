@@ -1,7 +1,15 @@
 # Troubleshooting
 
+## The Codespace is taking a long time or cannot connect
+
+The first startup can take several minutes. If the editor remains stuck, go to [Your Codespaces](https://github.com/codespaces) and select the existing course Codespace to reopen it. If needed, use its **… → Stop codespace** menu and then select its name to start it again. Stopping pauses compute usage; storage can still count toward your allowance.
+
+If it still cannot connect, try another browser and check [GitHub's connection troubleshooting](https://docs.github.com/en/codespaces/troubleshooting/troubleshooting-your-connection-to-github-codespaces). Once connected, you can open the Command Palette (**Ctrl+Shift+P** on Windows/Linux or **⌘⇧P** on Mac) and select **Codespaces: View Creation Log** to inspect setup errors. See [GitHub's log guide](https://docs.github.com/en/codespaces/troubleshooting/github-codespaces-logs) for other logs.
+
+Do not delete the Codespace or rebuild its container until you have backed up any work you need. If the editor asks whether you trust the workspace, review the repository and choose **Trust** when you are comfortable enabling its features.
+
 ## `docker: command not found`
-You may be in a Codespaces recovery container, or Docker tooling is unavailable. Check Codespaces creation logs and the repository's `.devcontainer/devcontainer.json`. Rebuild or recreate the Codespace using the current configuration; don't install Docker on your laptop just to fix the cloud container.
+You may be in a Codespaces recovery container, or Docker tooling is unavailable. Check Codespaces creation logs and the repository's `.devcontainer/devcontainer.json`. Back up your work before rebuilding or recreating the Codespace using the current configuration; don't install Docker on your laptop just to fix the cloud container.
 
 ## `service "postgres" is not running`
 Run the initializer **from the repository root**:
