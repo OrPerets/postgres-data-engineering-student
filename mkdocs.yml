@@ -16,8 +16,11 @@ theme:
     - search.suggest
     - content.code.copy
   palette:
-    primary: indigo
-    accent: teal
+    primary: custom
+    accent: custom
+
+extra_css:
+  - stylesheets/extra.css
 
 plugins:
   - search
@@ -26,6 +29,7 @@ markdown_extensions:
   - admonition
   - tables
   - attr_list
+  - md_in_html
   - pymdownx.highlight
   - pymdownx.superfences:
       custom_fences:

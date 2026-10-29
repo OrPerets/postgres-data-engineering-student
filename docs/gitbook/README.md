@@ -1,52 +1,61 @@
-# Data Engineering
+<div class="course-hero" markdown="1">
 
-**HANDS-ON LABORATORY COURSE**
+<p class="course-kicker">DATA ENGINEERING &nbsp; / &nbsp; HANDS-ON LABORATORY</p>
 
-*From relational databases to distributed data processing.*
+# Data engineering, in practice.
 
-Explore data engineering through hands-on experiments with PostgreSQL, SQL, Python, Docker and GitHub Codespaces. Build ETL pipelines and investigate MapReduce, PageRank and TF-IDF while learning to predict, implement and validate your results.
+From relational databases to distributed data processing. Learn by building, testing, and explaining each step.
+{: .course-hero__lead }
 
-[**Start Learning**](getting-started.md) · [**Course Map**](course-map.md) · [**Explore Labs**](#explore-the-course) · [**Open GitHub Repository**](https://github.com/OrPerets/postgres-data-engineering-student) · [**Troubleshooting**](troubleshooting.md)
+<div class="course-actions" markdown="1">
 
----
+[Start learning](getting-started.md){: .course-action-primary } [Explore the course](#explore-the-course){: .course-action-secondary }
+
+</div>
+</div>
 
 ## Explore the course
 
-**Part I — Relational Data Engineering**
+Six workshops follow a path from SQL fundamentals to distributed algorithms. Choose a lab or use the [course map](course-map.md) to see how they connect to the lectures.
 
-1. [**Relational SQL & Query Optimization**](labs/01-relational-sql.md) — Write reliable SQL and interpret execution plans.
-2. [**Partitioning & Replication**](labs/02-partitions-replicas.md) — Scale storage and separate analytical reads.
-3. [**Data Warehouse & ETL**](labs/03-dwh-etl.md) — Transform raw data into trusted analytical facts.
+<div class="course-sections" markdown="1">
+<div class="course-section" markdown="1">
 
-**Part II — Distributed Data Processing**
+### 01 / Relational data engineering
 
-4. [**MapReduce**](labs/04-mapreduce.md) — Break computations into Map, Shuffle and Reduce.
-5. [**PageRank**](labs/05-pagerank.md) — Understand rank propagation across graph edges.
-6. [**Regex & TF-IDF**](labs/06-tfidf.md) — Turn messy text into structured numerical features.
+- [Lab 01 — Relational SQL & Query Optimization](labs/01-relational-sql.md) — Write reliable SQL and interpret query plans.
+- [Lab 02 — Partitioning & Replication](labs/02-partitions-replicas.md) — Explore partition pruning and read replicas.
+- [Lab 03 — Data Warehouse & ETL](labs/03-dwh-etl.md) — Turn raw sources into analytical facts.
+
+</div>
+<div class="course-section" markdown="1">
+
+### 02 / Distributed data processing
+
+- [Lab 04 — MapReduce](labs/04-mapreduce.md) — Trace map, shuffle and reduce.
+- [Lab 05 — PageRank](labs/05-pagerank.md) — Follow rank through a directed graph.
+- [Lab 06 — Regex & TF-IDF](labs/06-tfidf.md) — Transform text into numerical features.
+
+</div>
+</div>
 
 ## One workflow, six labs
 
-**UNDERSTAND → PREDICT → IMPLEMENT → VALIDATE → EXPLAIN**
+Understand → Predict → Implement → Validate → Explain
+{: .course-flow }
 
-Each lab opens with a concrete question, continues with a small worked example and ends with a coding exercise and validation.
-Review the [course map](course-map.md) for lecture connections, SQL and Python prerequisites, and estimated workshop times.
+Start with a concrete question, try the example, and use the checks to explain what happened. Each lab includes a student assignment and its own instructions.
 
-### Launch your first lab
+### Ready to begin?
 
-Open the GitHub course repository in Codespaces and, from its root, run:
+Open the [student repository](https://github.com/OrPerets/postgres-data-engineering-student) in Codespaces, then run this from the repository root:
 
 ```bash
 make lab-sql
 ```
 
-The starter brings up PostgreSQL and initializes the sample dataset if it has not already been prepared.
-
-[Open the course repository](https://github.com/OrPerets/postgres-data-engineering-student)
+For help, see [Environment Setup](getting-started.md), [Troubleshooting](troubleshooting.md), or the [Glossary](glossary.md).
 
 ---
 
-## Need help?
-
-Use [Troubleshooting](troubleshooting.md) for Docker, Codespaces and SQL issues, or review the [Glossary](glossary.md) for terminology.
-
-**Course documentation** — Shenkar-inspired academic styling. The site is a teaching resource; institutional logo usage and formal publication status should be approved separately.
+Course documentation · Shenkar-inspired styling · Data Engineering

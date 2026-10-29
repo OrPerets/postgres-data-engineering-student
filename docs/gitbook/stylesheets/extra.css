@@ -1,0 +1,167 @@
+/* Course-specific styling inspired by Shenkar's red and editorial composition.
+   The site deliberately uses no institutional logo or official insignia. */
+[data-md-color-scheme="default"] {
+  --md-primary-fg-color: #8b2029;
+  --md-primary-fg-color--light: #ac3a3d;
+  --md-primary-fg-color--dark: #6c1720;
+  --md-primary-bg-color: #ffffff;
+  --md-accent-fg-color: #8b2029;
+  --md-accent-fg-color--transparent: #8b20291a;
+  --md-typeset-a-color: #8b2029;
+  --md-default-bg-color: #fffefa;
+}
+
+body {
+  font-family: "Helvetica Neue", Arial, sans-serif;
+  letter-spacing: -0.005em;
+}
+
+.md-header {
+  background-color: #8b2029;
+  box-shadow: none;
+}
+
+.md-header__title { font-weight: 700; }
+.md-search__form { background-color: rgba(0, 0, 0, .16); }
+.md-main__inner { margin-top: 1.25rem; }
+.md-nav__title, .md-nav__link { letter-spacing: 0; }
+.md-nav__link--active { font-weight: 700; }
+.md-typeset { line-height: 1.7; }
+.md-typeset h1, .md-typeset h2, .md-typeset h3 {
+  color: #202020;
+  font-weight: 700;
+  letter-spacing: -0.025em;
+}
+.md-typeset h1 { font-size: 2.15em; }
+.md-typeset h2 { margin-top: 2.25em; }
+.md-typeset a { text-decoration-thickness: .08em; text-underline-offset: .16em; }
+.md-typeset a:hover { text-decoration: underline; }
+.md-typeset :focus-visible, .md-header :focus-visible, .md-nav :focus-visible {
+  outline: 3px solid #bf6855;
+  outline-offset: 3px;
+}
+.md-footer { background-color: #252020; }
+
+/* The homepage classes are kept independent of the lab page structure. */
+.md-typeset .course-hero {
+  position: relative;
+  overflow: hidden;
+  margin: 0 0 2.75rem;
+  padding: clamp(2rem, 5vw, 3.75rem);
+  color: #fff;
+  background: linear-gradient(135deg, #751d27 0%, #a92d32 100%);
+}
+.md-typeset .course-hero::after {
+  position: absolute;
+  right: -2rem;
+  bottom: -2rem;
+  width: min(30%, 10rem);
+  height: .3rem;
+  background: rgba(255,255,255,.45);
+  content: "";
+  transform: rotate(-45deg);
+  transform-origin: center;
+  pointer-events: none;
+}
+.md-typeset .course-hero :is(h1, h2, p, strong) { color: #fff; }
+.md-typeset .course-kicker {
+  margin: 0 0 1rem;
+  font-size: .66rem;
+  font-weight: 700;
+  letter-spacing: .13em;
+  text-transform: uppercase;
+}
+.md-typeset .course-hero h1,
+.md-typeset .course-hero__title {
+  max-width: 14ch;
+  margin: 0 0 1rem;
+  font-size: clamp(2.5rem, 6vw, 4.1rem);
+  font-weight: 800;
+  line-height: 1.04;
+  letter-spacing: -.045em;
+}
+.md-typeset .course-hero__lead {
+  max-width: 38rem;
+  margin: 0;
+  font-size: clamp(.9rem, 1.7vw, 1.05rem);
+  line-height: 1.6;
+}
+.md-typeset .course-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .75rem;
+  align-items: center;
+  margin-top: 1.75rem;
+}
+.md-typeset .course-actions p { display: contents; }
+.md-typeset .course-actions a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 2.5rem;
+  padding: .6rem 1rem;
+  border: 1px solid #fff;
+  color: #8b2029;
+  background: #fff;
+  font-size: .72rem;
+  font-weight: 700;
+  text-decoration: none;
+  transition: color .18s ease, background-color .18s ease;
+}
+.md-typeset .course-actions a + a {
+  color: #fff;
+  background: transparent;
+}
+.md-typeset .course-actions a:hover {
+  color: #fff;
+  background: #67151d;
+  text-decoration: none;
+}
+.md-typeset .course-actions a:focus-visible { outline-color: #fff; }
+
+.md-typeset .course-sections {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: clamp(1.5rem, 4vw, 3rem);
+  margin: 1.25rem 0 2.5rem;
+}
+.md-typeset .course-section { border-top: 3px solid #8b2029; }
+.md-typeset .course-section h2,
+.md-typeset .course-section h3 {
+  margin: .75rem 0 1.2rem;
+  font-size: 1.1rem;
+  line-height: 1.25;
+}
+.md-typeset .course-section ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.md-typeset .course-section li {
+  margin: 0;
+  padding: .65rem 0;
+  border-bottom: 1px solid #e2ddda;
+}
+.md-typeset .course-section li::marker { color: #8b2029; font-weight: 700; }
+.md-typeset .course-section li a { font-weight: 700; }
+.md-typeset .course-flow {
+  margin: 2rem 0;
+  padding: 1.5rem 1.75rem;
+  border-left: 4px solid #8b2029;
+  background-color: #f4f0ec;
+}
+.md-typeset .course-flow h2,
+.md-typeset .course-flow h3 { margin-top: 0; }
+
+@media screen and (max-width: 600px) {
+  .md-main__inner { margin-top: .7rem; }
+  .md-typeset .course-hero { padding: 2rem 1.4rem; }
+  .md-typeset .course-hero h1,
+  .md-typeset .course-hero__title { font-size: 2.5rem; }
+  .md-typeset .course-sections { grid-template-columns: 1fr; gap: 1.5rem; }
+  .md-typeset .course-actions { align-items: stretch; }
+  .md-typeset .course-actions a { justify-content: center; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .md-typeset .course-actions a { transition: none; }
+}
