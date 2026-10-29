@@ -6,3 +6,6 @@ __pycache__/
 
 # Generated documentation site
 /site/
+
+# Local drafts for the guided SQL workspace
+/labs/01-relational-sql/.workspace-data/

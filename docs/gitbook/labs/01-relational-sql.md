@@ -8,9 +8,11 @@
 
 !!! info "Your work"
 
-    **Edit:** In your Codespace Explorer, open `labs → 01-relational-sql → sql → student_answers.sql` and write your answers below the 15 questions. The GitHub link below is a reference; edit your own Codespace copy.
+    **Work in the guided workspace:** After running `make lab-sql` from the repository root, run `make lab-sql-workspace`. Keep the terminal running, then open port **8765** from the Codespace **Ports** tab in your browser. Keep the port private. Work through one question at a time and run read-only SQL against your Codespace database. [Opening and saving your work](../start-lab01.md#4-write-and-save-your-answers).
 
-    **Run and check:** After starting the lab, run your saved SQL from the lab folder:
+    **Save and back up:** Use **Save answers** to keep drafts in the Codespace, and **Download SQL** to keep a separate copy outside it. Edits are not saved automatically. The workspace does not grade your answers or submit them for you.
+
+    **Prefer the SQL file?** In Explorer, edit `labs → 01-relational-sql → sql → student_answers.sql` instead. The worksheet and guided drafts are separate and do not overwrite each other. Run the saved worksheet from the lab folder:
 
     ```bash
     cd labs/01-relational-sql
@@ -31,7 +33,7 @@ Open the [course repository](https://github.com/OrPerets/postgres-data-engineeri
 make lab-sql
 ```
 
-When the initializer finishes, open your student answer file in the Codespace Explorer as shown above. You can also [view the starter file on GitHub](https://github.com/OrPerets/postgres-data-engineering-student/blob/main/labs/01-relational-sql/sql/student_answers.sql); it contains all 15 questions with empty answer sections.
+When the initializer finishes, open the guided workspace or your student answer file as shown above. You can also [view the starter file on GitHub](https://github.com/OrPerets/postgres-data-engineering-student/blob/main/labs/01-relational-sql/sql/student_answers.sql); it contains all 15 questions with empty answer sections.
 
 ### Checkpoint — Can you access the data?
 
@@ -96,7 +98,7 @@ Write your prediction, then test it with SQL.
 
 ## 3. Complete the 15 SQL questions
 
-Open `labs/01-relational-sql/sql/student_answers.sql`. Write SQL beneath each numbered question.
+Use the guided workspace or open `labs/01-relational-sql/sql/student_answers.sql` and write SQL beneath each numbered question.
 
 Work in this sequence:
 
@@ -214,7 +216,7 @@ Try answering aloud before expanding each suggested answer. Use examples from th
 
 <details><summary>8. How can you filter to the three highest-ranked orders per customer?</summary><p>Compute <code>ROW_NUMBER()</code> in a subquery or CTE, partitioned by customer and ordered by the intended measure and a stable tie-breaker. Filter the resulting number in the outer query. Window results are computed after the same query level's <code>WHERE</code>, so they cannot be filtered there directly.</p></details>
 
-**Deliverable:** Your completed `student_answers.sql`, together with any explanation or benchmark evidence requested by your instructor.
+**Deliverable:** Your completed SQL answers, together with any explanation or benchmark evidence requested by your instructor.
 
 **Next:** [Lab 02 — Partitions & Replication](02-partitions-replicas.md).
 

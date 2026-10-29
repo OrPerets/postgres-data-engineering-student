@@ -57,6 +57,20 @@ You are now back at the shell prompt. To return to the repository root, run `cd 
 
 ## 4. Write and save your answers
 
+### Option A: Guided SQL workspace
+
+The guided workspace presents one question at a time and runs your SQL against this Codespace's PostgreSQL database. After `make lab-sql` has finished, run this command **from the repository root**:
+
+```bash
+make lab-sql-workspace
+```
+
+Keep the terminal running. Open the **Ports** tab in the Codespace, find port **8765**, and use **Open in Browser**. Keep the forwarded port private. Enter your SQL, choose **Run query** to see results or an error, and use **Save answers** to save your drafts in the Codespace. Edits are not saved automatically. The pilot runs read-only SQL; it does not grade the answers.
+
+Use **Download SQL** to download your answers as a `.sql` file and keep that copy outside the Codespace. Saved workspace drafts and the original SQL worksheet are separate; the workspace does not overwrite the worksheet. Follow your instructor's submission instructions and include any required explanations and query-plan evidence.
+
+### Option B: SQL worksheet
+
 1. In the editor's **Explorer**, open `labs → 01-relational-sql → sql → student_answers.sql`.
 2. Write your SQL under each question and save the file (**Ctrl+S** on Windows/Linux or **⌘S** on Mac).
 3. Keep a copy outside the Codespace. You can download the file from the editor's Explorer, or commit and push your work to your own GitHub fork. If you are working from a repository where you have read-only access, GitHub may prompt to create or link a fork when you commit.
