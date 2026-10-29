@@ -6,7 +6,13 @@
 
 !!! info "Your work"
 
-    **Edit in Codespaces:** In Explorer, open `labs → 02-partitioning-replication → sql → student_exercises.sql` and write your labeled SQL answers there. Save with **Ctrl+S** (Windows/Linux) or **⌘S** (Mac).
+    **Work in the guided workspace:** After `make lab-partitions` finishes, run `make lab-partitions-workspace` from the repository root. Keep the terminal running, then open port **8766** from the Codespace **Ports** tab in your browser. Keep the port private. Select **Primary** or **Replica** for each statement and check which server is shown with its result.
+
+    **Run carefully:** Primary read mode rolls back; the explicit apply action commits a successful statement to Primary, including DDL and inserts. The Replica handles writes as a real standby and rejects them. Each run is one statement in its own transaction; use the terminal for an interactive multi-statement transaction. Replication is asynchronous, so a new Primary row may take time to appear on Replica.
+
+    **Save and back up:** Use **Save answers** in the workspace and download the SQL file as a separate copy. Edits are not autosaved. Workspace drafts and the original `sql/student_exercises.sql` worksheet are separate. Label your statements for Primary or Replica in your SQL comments. The workspace does not grade or submit your work.
+
+    **Prefer the worksheet?** In Explorer, edit `labs → 02-partitioning-replication → sql → student_exercises.sql` instead. Save with **Ctrl+S** (Windows/Linux) or **⌘S** (Mac).
 
     **Check your environment:** After starting the lab, run `make test LAB=02-partitioning-replication` from the repository root. It checks that the sales tables contain data and that Primary and Replica report the expected roles; it **does not grade your answers**.
 

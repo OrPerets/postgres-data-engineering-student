@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light">
+  <title>Partitioning &amp; replication workspace · Data Engineering</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="app.js" defer></script>
+</head>
+<body>
+  <a class="skip-link" href="#workspace">Skip to question</a>
+  <header class="site-header">
+    <div class="brand"><span class="brand-mark" aria-hidden="true"></span><span>DATA ENGINEERING <span class="brand-divider">/</span> <span class="brand-subtitle">LAB 02</span></span></div>
+    <div class="header-actions">
+      <span id="save-status" class="save-status" role="status" aria-live="polite">Loading workspace…</span>
+      <button id="save-button" class="button button-light" type="button" disabled>Save answers</button>
+      <button id="export-button" class="button button-outline-light" type="button" disabled>Download SQL</button>
+    </div>
+  </header>
+
+  <main id="workspace" class="workspace" tabindex="-1">
+    <div class="page-intro">
+      <div><p class="eyebrow">PRACTICE SPACE <span aria-hidden="true">/</span> PARTITIONING &amp; REPLICATION</p><h1>Your SQL workspace<span class="heading-dot">.</span></h1><p class="intro-copy">Choose a server, run SQL, and observe how changes reach the replica.</p></div>
+      <span class="intro-badge">02 <span aria-hidden="true">/</span> SQL LAB</span>
+    </div>
+    <div id="load-error" class="alert alert-error" role="alert" hidden></div>
+    <div id="save-error" class="alert alert-error" role="alert" hidden></div>
+    <div class="layout">
+      <aside class="question-list-panel" aria-labelledby="question-list-title">
+        <div class="panel-heading"><div><p class="eyebrow">YOUR WORK</p><h2 id="question-list-title">Questions</h2></div><span id="question-total" class="count-pill">—</span></div>
+        <p class="sidebar-note">Choose a question to begin. A dot means you have written something.</p>
+        <nav aria-label="Lab questions"><ol id="question-list" class="question-list"></ol></nav>
+        <div class="sidebar-note sidebar-bottom"><strong>Your work stays yours.</strong><br>Save regularly and download a copy outside the Codespace.</div>
+      </aside>
+
+      <aside class="schema-panel" aria-label="Database schema reference">
+        <details id="schema-disclosure" class="schema-disclosure">
+          <summary class="schema-summary"><span><span class="eyebrow schema-eyebrow">REFERENCE</span><span class="schema-title">Table structure</span></span><span class="schema-chevron" aria-hidden="true">⌄</span></summary>
+          <div class="schema-body">
+            <p class="schema-intro" id="schema-server">Columns and keys on Primary.</p>
+            <div class="schema-toolbar"><span class="schema-legend"><abbr title="Primary key">PK</abbr> Primary key · <abbr title="Foreign key">FK</abbr> Foreign key<br>Multiple PK columns form one key. Nullable columns allow NULL.</span><button id="schema-refresh" class="schema-refresh" type="button">Refresh</button></div>
+            <div id="schema-content" class="schema-content" aria-live="polite"><p class="schema-message">Loading table structure…</p></div>
+          </div>
+        </details>
+      </aside>
+
+      <div class="content-column">
+        <section class="question-card" aria-labelledby="question-title">
+          <div class="question-meta"><p class="eyebrow">THE QUESTION</p><span id="question-counter" class="question-counter">—</span></div>
+          <h2 id="question-title">Getting your questions ready</h2>
+          <div id="question-text" class="question-text">Connecting to the lab workspace…</div>
+          <div id="hint-container" class="hint-container" hidden>
+            <button id="hint-toggle" class="hint-toggle" type="button" aria-expanded="false" aria-controls="hint-text">Show hint <span aria-hidden="true">＋</span></button>
+            <p id="hint-text" class="hint-text" hidden></p>
+          </div>
+          <div class="question-nav"><button id="previous-button" class="text-button" type="button" disabled>← Previous</button><button id="next-button" class="text-button" type="button" disabled>Next →</button></div>
+        </section>
+
+        <section class="editor-card" aria-labelledby="editor-title">
+          <div class="section-heading"><div><p class="eyebrow">YOUR ANSWER</p><h2 id="editor-title">Write your SQL</h2><p class="helper">Run one statement at a time. Select part of your answer to run only that statement. Save answers explicitly; edits are not saved automatically.</p></div><span class="sql-chip">SQL</span></div>
+          <fieldset class="server-picker">
+            <legend>Database server</legend>
+            <label><input type="radio" name="database-target" value="primary" checked> Primary</label>
+            <label><input type="radio" name="database-target" value="replica"> Replica</label>
+          </fieldset>
+          <p id="target-help" class="target-help">Primary: Run query is read-only. Apply on Primary commits the selected statement, including writes or DDL.</p>
+          <label class="sr-only" for="sql-input">SQL answer for the selected question</label>
+          <textarea id="sql-input" spellcheck="false" autocomplete="off" autocapitalize="off" placeholder="Write your SQL query here…" disabled></textarea>
+          <p class="transaction-note">Each click runs one statement in its own transaction. Use the terminal for multi-statement transactions. Label Primary and Replica statements in your answer with SQL comments.</p>
+          <div class="editor-footer"><span class="editor-tip" id="selected-target">Selected: Primary</span><div class="run-actions"><button id="run-button" class="button button-primary" type="button" disabled>Run query</button><button id="apply-button" class="button button-apply" type="button" disabled>Apply on Primary</button></div></div>
+          <p class="transaction-note">The Apply action commits changes to the Primary database. Changes may appear on the Replica after a delay. A write attempted on the Replica should return PostgreSQL's standby error.</p>
+          <p class="transaction-note">For C7 and D2, include your explanations in your report. SQL comments can also be saved in your answer.</p>
+        </section>
+
+        <section class="results-card" aria-labelledby="results-title">
+          <div class="results-heading"><div><p class="eyebrow">QUERY OUTPUT</p><h2 id="results-title">Results</h2><span class="result-note">Not graded · Downloads include displayed rows only</span></div><button id="download-results" class="schema-refresh" type="button" disabled>Download results CSV</button></div>
+          <div id="results" class="results" role="region" aria-live="polite" aria-label="Query results"><p class="empty-state">Your results will appear here after you run a query.</p></div>
+        </section>
+        <p class="backup-note"><strong>Before you finish:</strong> save your answers and download a copy for submission. Saving here does not submit your work.</p>
+      </div>
+    </div>
+  </main>
+</body>
+</html>

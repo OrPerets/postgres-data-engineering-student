@@ -26,6 +26,7 @@ jobs:
       - run: python -m pip install -r requirements-docs.txt
       - run: python -m unittest discover -s tests -q
       - run: python -m unittest discover -s labs/01-relational-sql/workspace/tests -q
+      - run: python -m unittest discover -s labs/02-partitioning-replication/workspace/tests -q
       - run: node --test tests/test_lab01_join.cjs tests/test_lab02_partitions.cjs tests/test_learning_packs.cjs
       - run: python scripts/build_site.py --site-dir site
       - uses: actions/upload-pages-artifact@v3

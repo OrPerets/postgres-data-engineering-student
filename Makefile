@@ -1,5 +1,5 @@
 SHELL := /bin/bash
-.PHONY: help setup demo test benchmark health reset lab-sql lab-sql-workspace lab-partitions lab-dwh lab-mapreduce lab-pagerank lab-tfidf lab-tfidf-sql
+.PHONY: help setup demo test benchmark health reset lab-sql lab-sql-workspace lab-partitions lab-partitions-workspace lab-dwh lab-mapreduce lab-pagerank lab-tfidf lab-tfidf-sql
 LABS := 01-relational-sql 02-partitioning-replication 03-dwh-etl 04-mapreduce 05-pagerank 06-tfidf
 LAB ?= 01-relational-sql
 
@@ -8,6 +8,7 @@ help:
 	@echo "  make lab-sql        SQL queries / window functions"
 	@echo "  make lab-sql-workspace  Open the guided Lab 01 SQL workspace"
 	@echo "  make lab-partitions Primary / Replica + sales data"
+	@echo "  make lab-partitions-workspace  Open the guided Lab 02 SQL workspace"
 	@echo "  make lab-dwh        Staging and dimensional warehouse"
 	@echo "  make lab-mapreduce  Python MapReduce"
 	@echo "  make lab-pagerank   Python PageRank"
@@ -21,6 +22,8 @@ lab-sql-workspace:
 	@python labs/01-relational-sql/workspace/server.py
 lab-partitions:
 	@bash scripts/student-init.sh 02-partitioning-replication
+lab-partitions-workspace:
+	@python labs/02-partitioning-replication/workspace/server.py
 lab-dwh:
 	@bash scripts/student-init.sh 03-dwh-etl
 lab-mapreduce:
