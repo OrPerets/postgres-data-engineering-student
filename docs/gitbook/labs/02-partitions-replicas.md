@@ -4,6 +4,25 @@
 
 **You will practice:** RANGE partitions, partition pruning, physical PostgreSQL replication, replication lag, and analytical Window Functions.
 
+!!! info "Your work"
+
+    **Edit in Codespaces:** In Explorer, open `labs → 02-partitioning-replication → sql → student_exercises.sql` and write your labeled SQL answers there. Save with **Ctrl+S** (Windows/Linux) or **⌘S** (Mac).
+
+    **Check your environment:** After starting the lab, run `make test LAB=02-partitioning-replication` from the repository root. It checks that the sales tables contain data and that Primary and Replica report the expected roles; it **does not grade your answers**.
+
+    **Run your SQL:** From the repository root, first run `cd labs/02-partitioning-replication`. Then use either command to open a SQL prompt on the appropriate server:
+
+    ```bash
+    docker compose exec primary psql -U lab -d engineering
+    docker compose exec replica psql -U lab -d engineering
+    ```
+
+    Run selected statements on the correct server, not the entire mixed worksheet. Use Primary for writes. Run the exercise that attempts a write on the read-only Replica separately; it should produce an error. Exit each `psql` prompt with `\q` before opening another.
+
+    **Keep for submission:** Your completed SQL file and a brief `report.md` or PDF with timings, execution plans, screenshots and the D2 explanation, as described in the [assignment](https://github.com/OrPerets/postgres-data-engineering-student/blob/main/labs/02-partitioning-replication/assignments/STUDENT_ASSIGNMENT.md). Submit using your instructor's instructions.
+
+    **Back up:** Keep copies outside the Codespace: download your files from Explorer or commit and push them to your own GitHub fork. Saving in the editor alone does not submit or back up your work. See [environment setup](../getting-started.md) and [troubleshooting](../troubleshooting.md).
+
 ## 1. Get ready
 
 In GitHub Codespaces, **from the repository root**:

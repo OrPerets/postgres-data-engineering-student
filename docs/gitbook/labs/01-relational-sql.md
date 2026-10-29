@@ -6,6 +6,21 @@
 
 **Environment:** PostgreSQL in GitHub Codespaces. No local Docker installation is required.
 
+!!! info "Your work"
+
+    **Edit:** In your Codespace Explorer, open `labs → 01-relational-sql → sql → student_answers.sql` and write your answers below the 15 questions. The GitHub link below is a reference; edit your own Codespace copy.
+
+    **Run and check:** After starting the lab, run your saved SQL from the lab folder:
+
+    ```bash
+    cd labs/01-relational-sql
+    docker compose exec -T postgres psql -v ON_ERROR_STOP=1 -U student -d query_lab < sql/student_answers.sql
+    ```
+
+    Read the output and compare it with each question's requirements. From the repository root, `make test LAB=01-relational-sql` checks sample data and services; it **does not grade your answers**.
+
+    **Keep and submit:** Save your completed SQL, short explanations for questions 6, 7 and 15, and query plans for selected queries. Follow your instructor's submission instructions. [How to save a copy outside the Codespace](../start-lab01.md#4-write-and-save-your-answers).
+
 ## 1. Get ready
 
 New to Codespaces? Follow the illustrated [first SQL lab walkthrough](../start-lab01.md).
@@ -16,7 +31,7 @@ Open the [course repository](https://github.com/OrPerets/postgres-data-engineeri
 make lab-sql
 ```
 
-When the initializer finishes, open the [student answer file](https://github.com/OrPerets/postgres-data-engineering-student/blob/main/labs/01-relational-sql/sql/student_answers.sql). It contains all 15 questions with empty answer sections.
+When the initializer finishes, open your student answer file in the Codespace Explorer as shown above. You can also [view the starter file on GitHub](https://github.com/OrPerets/postgres-data-engineering-student/blob/main/labs/01-relational-sql/sql/student_answers.sql); it contains all 15 questions with empty answer sections.
 
 ### Checkpoint — Can you access the data?
 
