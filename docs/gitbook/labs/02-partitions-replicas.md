@@ -169,6 +169,14 @@ Try answering aloud before expanding each suggested answer. Connect your answer 
 
 <details><summary>4. Why is a replica not a substitute for a backup?</summary><p>Replication copies changes, including accidental deletes or corrupt data, to the standby; shared failures can also affect both servers. A recoverable backup and tested restore process protect against different failure scenarios. A standby alone also does not provide automatic failover.</p></details>
 
+<details><summary>5. How can a window function calculate a running sales total per customer?</summary><p>Use <code>SUM(amount) OVER (PARTITION BY customer_id ORDER BY sale_date, sale_id ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW)</code>. It keeps one result per sale while accumulating that customer's sales in a stable order.</p></details>
+
+<details><summary>6. When would you use LAG, and what should you consider when comparing months?</summary><p><code>LAG</code> reads a value from a previous row in the ordered partition, for example to compare monthly revenue with the previous month. It returns the previous available row, not necessarily the previous calendar month: build a complete month series first if missing months must be included.</p></details>
+
+<details><summary>7. How would you compute a three-month moving average?</summary><p>First aggregate sales to one row per month and fill missing months if they count in the calculation. Then apply <code>AVG</code> with an ordered <code>ROWS BETWEEN 2 PRECEDING AND CURRENT ROW</code> frame. The first two rows have fewer than three months in their frames unless you provide earlier history.</p></details>
+
+<details><summary>8. Does filtering dates before a window calculation change the answer?</summary><p>It can: a window sees the rows that remain after the query level's <code>WHERE</code>. Filtering to one month before calculating a running total starts the total within that month. To calculate over a longer history but display only one month, compute the window in a subquery or CTE and apply the display filter outside it.</p></details>
+
 **Submit:** Your SQL, execution-plan evidence, and the explanations required by the assignment.
 
 **Next:** [Lab 03 — DWH & ETL](03-dwh-etl.md).

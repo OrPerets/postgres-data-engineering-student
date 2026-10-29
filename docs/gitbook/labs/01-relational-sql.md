@@ -206,6 +206,14 @@ Try answering aloud before expanding each suggested answer. Use examples from th
 
 <details><summary>4. How would you investigate a slow SQL query?</summary><p>First check that it returns the intended results, then examine <code>EXPLAIN (ANALYZE, BUFFERS)</code> for actual row counts, repeated work, scans, sorts and buffer activity. Compare alternatives under representative data and conditions; indexes and plans depend on the workload. ANALYZE executes the query, so take care with statements that modify data.</p></details>
 
+<details><summary>5. What are the advantages of window functions, and when would you use them?</summary><p>They let you add group-level or ordered calculations to individual rows without collapsing them. Common uses include running totals, ranking customers and comparing each order with the previous one. They can make a query clearer than a self-join or correlated subquery, but speed depends on the plan and data; measure it.</p></details>
+
+<details><summary>6. What do PARTITION BY, ORDER BY and a window frame control?</summary><p><code>PARTITION BY</code> defines groups, <code>ORDER BY</code> orders rows within each group, and the frame selects the rows used by frame-sensitive calculations such as a running sum. In PostgreSQL, an ordered window's default frame includes peers with equal ordering values; specify a frame and tie-breaker when you need a particular row-by-row result.</p></details>
+
+<details><summary>7. How do ROW_NUMBER and RANK handle ties?</summary><p><code>ROW_NUMBER()</code> assigns a different number to every row; add a stable tie-breaker for reproducible selection. <code>RANK()</code> gives equal ranks to peers and leaves gaps after ties. If ties must share a rank, do not add a unique identifier to that ranking window's ordering.</p></details>
+
+<details><summary>8. How can you filter to the three highest-ranked orders per customer?</summary><p>Compute <code>ROW_NUMBER()</code> in a subquery or CTE, partitioned by customer and ordered by the intended measure and a stable tie-breaker. Filter the resulting number in the outer query. Window results are computed after the same query level's <code>WHERE</code>, so they cannot be filtered there directly.</p></details>
+
 **Deliverable:** Your completed `student_answers.sql`, together with any explanation or benchmark evidence requested by your instructor.
 
 **Next:** [Lab 02 — Partitions & Replication](02-partitions-replicas.md).
