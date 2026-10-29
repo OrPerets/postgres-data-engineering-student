@@ -194,6 +194,18 @@ Before leaving the lab, be ready to explain:
 2. Why `ROWS` and `RANGE` may produce different cumulative results when dates tie.
 3. Why your two running-total queries produce identical outputs but different execution plans.
 
+## Job interview questions
+
+Try answering aloud before expanding each suggested answer. Use examples from this lab to support your explanation.
+
+<details><summary>1. How can a WHERE condition change the result of a LEFT JOIN?</summary><p>A LEFT JOIN keeps unmatched rows from the left table, with NULLs for the right side. A WHERE condition such as <code>o.status = 'completed'</code> removes those unmatched rows. Put a right-side filter in the JOIN condition when unmatched left rows must remain, and check the intended semantics.</p></details>
+
+<details><summary>2. Why can NOT IN return no rows when the subquery contains NULL?</summary><p>Comparisons involving NULL can be unknown. If no equal value is found but the list contains NULL, <code>NOT IN</code> can evaluate to unknown and the WHERE clause excludes that row. Consider <code>NOT EXISTS</code>, while explicitly deciding how NULL values in the outer column should be handled.</p></details>
+
+<details><summary>3. How does a window function differ from GROUP BY?</summary><p>GROUP BY produces one row per group; a window function calculates across related rows while retaining the individual input rows. For a customer running total, partition by customer and order by date plus a stable tie-breaker; choose the frame deliberately.</p></details>
+
+<details><summary>4. How would you investigate a slow SQL query?</summary><p>First check that it returns the intended results, then examine <code>EXPLAIN (ANALYZE, BUFFERS)</code> for actual row counts, repeated work, scans, sorts and buffer activity. Compare alternatives under representative data and conditions; indexes and plans depend on the workload. ANALYZE executes the query, so take care with statements that modify data.</p></details>
+
 **Deliverable:** Your completed `student_answers.sql`, together with any explanation or benchmark evidence requested by your instructor.
 
 **Next:** [Lab 02 — Partitions & Replication](02-partitions-replicas.md).

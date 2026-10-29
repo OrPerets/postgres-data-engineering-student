@@ -104,6 +104,18 @@ Record measured times, speedup and efficiency. [Read the performance assignment]
 
 **Explain:** Why can two or four worker processes be *slower* on small graphs? How is a single Codespace different from a multi-node distributed cluster?
 
+## Job interview questions
+
+Try answering aloud before revealing each suggested answer. Use an example from the lab to support your explanation.
+
+<details><summary>1. How does PageRank differ from simply counting incoming links?</summary><p>PageRank weights a link by the rank of its source and divides that source's contribution among its outgoing links. Two pages with the same number of incoming links can therefore have different ranks.</p></details>
+
+<details><summary>2. What is a dangling node, and how does this lab handle it?</summary><p>A dangling node has no outgoing links. The lab sums the rank of all such nodes and redistributes that mass uniformly across every page, so it is not lost from the calculation.</p></details>
+
+<details><summary>3. Why does PageRank use a damping factor?</summary><p>Damping combines following links with a chance of teleporting to another page. It limits the influence of link structure alone and helps the iteration converge; the precise result depends on the chosen factor and teleportation distribution.</p></details>
+
+<details><summary>4. How would you tell when an iterative PageRank calculation can stop?</summary><p>Compare successive rank vectors with a stated distance, such as the sum of absolute differences, and stop when it falls below a tolerance or a maximum iteration count is reached. Also check that ranks remain nonnegative and sum approximately to one.</p></details>
+
 **Next:** [Lab 06 — TF-IDF](06-tfidf.md).
 
 

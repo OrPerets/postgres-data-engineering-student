@@ -157,6 +157,18 @@ Try each task yourself first. Expand a hint if you need a direction; the hints d
 - Can you explain why filtering by a partition key changes the plan?
 - Can you route ETL writes to Primary and BI reads to Replica?
 
+## Job interview questions
+
+Try answering aloud before expanding each suggested answer. Connect your answer to what you observed in the lab.
+
+<details><summary>1. What is partition pruning, and when can it help?</summary><p>PostgreSQL can skip table partitions that cannot contain rows matching a query's conditions. A suitable filter on the partition key, such as a date range on a table partitioned by sale date, can reduce work. Check the plan: performance still depends on data size, selectivity and other costs.</p></details>
+
+<details><summary>2. Is a table partition the same as PARTITION BY in a window function?</summary><p>No. Table partitioning organizes a logical table into physical child partitions and can enable pruning. Window <code>PARTITION BY</code> groups rows for a calculation such as a running total; it does not create or change physical table partitions.</p></details>
+
+<details><summary>3. What can a client observe when reading from an asynchronous replica?</summary><p>The replica may not yet have replayed a recently committed write, so a read can return older data. Route writes to the primary and choose a consistency strategy appropriate to the application, such as reading from the primary when immediate read-after-write consistency is required.</p></details>
+
+<details><summary>4. Why is a replica not a substitute for a backup?</summary><p>Replication copies changes, including accidental deletes or corrupt data, to the standby; shared failures can also affect both servers. A recoverable backup and tested restore process protect against different failure scenarios. A standby alone also does not provide automatic failover.</p></details>
+
 **Submit:** Your SQL, execution-plan evidence, and the explanations required by the assignment.
 
 **Next:** [Lab 03 — DWH & ETL](03-dwh-etl.md).

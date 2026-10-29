@@ -96,6 +96,18 @@ Why do hot keys create skew? What communication does Shuffle represent? Which co
 
 This exercise is a **single-process logical simulator**, not a real multi-machine Hadoop deployment.
 
+## Job interview questions
+
+Try answering aloud before opening the suggested answers. Use examples from this lab to support your explanation.
+
+<details><summary>1. What happens in the Map, Shuffle and Reduce stages?</summary><p>Map turns input records into intermediate key-value pairs. Shuffle routes and groups values by key. Reduce processes each key's group to produce a result, such as a count.</p></details>
+
+<details><summary>2. When is a combiner safe, and why can averaging worker averages be wrong?</summary><p>A combiner is safe when its partial state can be merged repeatedly without changing the intended result. An unweighted average of worker means can be wrong when workers have different counts; merge <code>(sum, count)</code> instead and divide once at the end.</p></details>
+
+<details><summary>3. What is a hot key, and how can you reduce its impact?</summary><p>A hot key receives a disproportionate share of records, so its assigned reducer can become a bottleneck. Local aggregation can reduce intermediate data when valid; another approach is to split the hot key across buckets and perform a second aggregation, at the cost of an extra step.</p></details>
+
+<details><summary>4. Why must partitioning route identical keys consistently?</summary><p>All values for a key must reach the same reducer for a single-stage per-key result. A stable partition function makes this routing reproducible across workers and runs; changing the number of reducers may change assignments, but not correct final counts.</p></details>
+
 **Next:** [Lab 05 — PageRank](05-pagerank.md).
 
 
