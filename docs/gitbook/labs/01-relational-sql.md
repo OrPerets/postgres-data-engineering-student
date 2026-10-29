@@ -46,6 +46,20 @@ You are analyzing three related tables:
 
 The lab uses **synthetic data** designed to expose common SQL mistakes.
 
+### How the tables connect
+
+```mermaid
+flowchart LR
+  C["customers<br/>one row per customer"] -->|"one customer → zero or more orders"| O["orders<br/>one row per order"]
+  O -->|"one order → zero or more item lines"| I["order_items<br/>one row per order line"]
+```
+
+Read the arrows from left to right: an order belongs to one customer, and each item line belongs to one order. A customer can have no orders, and the schema does not require an order to have an item line.
+
+**Example:** If one customer has one order containing two item lines, joining that order to its item lines produces **two rows** for the order. The order count is still one. This is why the row's **grain**—what one row represents—matters before you count or average.
+
+[Try the interactive JOIN explorer and practice quiz](../activities/lab01-learning-pack.md). Both use separate small teaching examples and run in your browser.
+
 ### Business rules
 
 - Count only `completed` orders in revenue unless the question says otherwise.
@@ -84,6 +98,40 @@ Before moving on, ask:
 - Is my `ORDER BY` deterministic when dates or amounts tie?
 
 **Hint:** When an order has several items, calculate *per-order* metrics at the order grain before joining them to per-customer summaries.
+
+### Optional hints for questions 1–15
+
+Try each question on your own first. Open a hint when you need a direction; these hints do not contain the assignment answers.
+
+<details><summary>Question 1 — Dates and conditions</summary><p>Which conditions must the January date restriction apply to? Check how parentheses affect the order of AND and OR.</p></details>
+
+<details><summary>Question 2 — Customer metrics</summary><p>Consider calculating revenue per order before summarizing per customer. How will you keep a customer with no completed orders, and distinguish zero revenue from an unknown average?</p></details>
+
+<details><summary>Question 3 — Both categories, no returns</summary><p>Think about the customer's purchases across all completed orders, then separately test whether any returned order exists. The required categories need not appear in the same order.</p></details>
+
+<details><summary>Question 4 — Compare with other orders</summary><p>First work at the order grain. When forming the comparison average, exclude the current order and consider what happens when there are no other completed orders.</p></details>
+
+<details><summary>Question 5 — City summaries</summary><p>Build counts at the appropriate customer and order grains before combining them by city. Keep customers with no orders and consider a city with a zero-order denominator.</p></details>
+
+<details><summary>Question 6 — Debug an aggregate</summary><p>Trace what the WHERE filter does to unmatched customers, what each joined row represents, and whether the average is over order lines or orders. Check the requested output and final thresholds separately.</p></details>
+
+<details><summary>Question 7 — Missing cities and NOT IN</summary><p>What happens if the subquery produces a NULL city? Consider a way to test for the absence of a matching returned-order city while separately requiring the outer city to be known.</p></details>
+
+<details><summary>Question 8 — Revenue ranks</summary><p>Compute each customer's revenue first. Compare what ROW_NUMBER, RANK and DENSE_RANK do with equal revenue; a tie-breaker used for row numbering should not break revenue ties in the other rankings.</p></details>
+
+<details><summary>Question 9 — Order history</summary><p>Compute one revenue value per completed order, then consider windows partitioned by customer and ordered by date and order ID. Define the moving frame and protect percentage calculations when the previous value is absent or zero.</p></details>
+
+<details><summary>Question 10 — Top category</summary><p>Summarize revenue at customer-and-category grain, then choose one category per customer with a deterministic tie-break. Compare that amount with the customer's total, including the zero-total case.</p></details>
+
+<details><summary>Question 11 — Complete months</summary><p>Make sure each customer has a row for each of the three months before comparing adjacent months. Distinguish the first month from a previous month with zero revenue.</p></details>
+
+<details><summary>Question 12 — Every sold category</summary><p>Derive the required category set from completed orders, and compare each customer's coverage with that set. A free purchase still counts; handle an empty required set explicitly.</p></details>
+
+<details><summary>Question 13 — Product pairs</summary><p>Start with unique products per completed order, then form pairs in a consistent alphabetical order. What must you count so repeated lines in one order cannot inflate the result?</p></details>
+
+<details><summary>Question 14 — First threshold crossing</summary><p>Build cumulative revenue in the specified order first. Only then determine which qualifying order is earliest for each customer.</p></details>
+
+<details><summary>Question 15 — ROWS and RANGE</summary><p>Identify the ordering columns and frame for each cumulative calculation. Under a date-only ordering, consider whether same-day orders are peers and how that affects each result.</p></details>
 
 ## 4. Experiment — Why can a Window Function be faster?
 

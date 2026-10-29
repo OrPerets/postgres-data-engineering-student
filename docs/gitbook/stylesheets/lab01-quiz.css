@@ -1,0 +1,73 @@
+/* Scoped to the optional Lab 01 formative quiz. */
+.md-typeset .lab01-quiz {
+  padding: clamp(1rem, 3vw, 1.6rem);
+  border: 1px solid #dfd1ca;
+  border-top: 4px solid #8b2029;
+  background: #fffefa;
+}
+.md-typeset .lab01-quiz__progress {
+  margin: 0 0 .8rem;
+  color: #70202a;
+  font-size: .75rem;
+  font-weight: 700;
+  letter-spacing: .035em;
+}
+.md-typeset .lab01-quiz__fieldset {
+  min-width: 0;
+  padding: 0;
+  margin: 0;
+  border: 0;
+}
+.md-typeset .lab01-quiz__legend,
+.md-typeset .lab01-quiz__title {
+  padding: 0;
+  margin: 0 0 1rem;
+  color: #26211f;
+  font-size: 1rem;
+  font-weight: 700;
+  line-height: 1.5;
+}
+.md-typeset .lab01-quiz__option {
+  display: flex;
+  align-items: flex-start;
+  gap: .65rem;
+  margin: .5rem 0;
+  padding: .65rem .75rem;
+  border: 1px solid #ddd5d1;
+  cursor: pointer;
+  line-height: 1.5;
+}
+.md-typeset .lab01-quiz__option:hover { border-color: #8b2029; background: #faf3f1; }
+.md-typeset .lab01-quiz__option:focus-within { outline: 3px solid #bf6855; outline-offset: 2px; }
+.md-typeset .lab01-quiz__option input { flex: none; margin: .3em 0 0; accent-color: #8b2029; }
+.md-typeset .lab01-quiz__feedback:not(:empty) {
+  margin-top: 1rem;
+  padding: .8rem 1rem;
+  border-left: 4px solid #806000;
+  background: #fff7dd;
+  color: #29231a;
+}
+.md-typeset .lab01-quiz__feedback--correct:not(:empty) { border-color: #28674a; background: #edf7f0; }
+.md-typeset .lab01-quiz__feedback--review:not(:empty) { border-color: #8b2029; background: #f9ece9; }
+.md-typeset .lab01-quiz__actions { display: flex; flex-wrap: wrap; gap: .65rem; margin-top: 1rem; }
+.md-typeset .lab01-quiz__button {
+  min-height: 2.5rem;
+  padding: .55rem 1rem;
+  border: 1px solid #8b2029;
+  border-radius: 0;
+  background: #8b2029;
+  color: #fff;
+  font: inherit;
+  font-size: .75rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+.md-typeset .lab01-quiz__button:hover:not(:disabled) { background: #641720; }
+.md-typeset .lab01-quiz__button--secondary, .md-typeset .lab01-quiz__button--text { background: transparent; color: #741c25; }
+.md-typeset .lab01-quiz__button--secondary:hover:not(:disabled), .md-typeset .lab01-quiz__button--text:hover:not(:disabled) { color: #fff; }
+.md-typeset .lab01-quiz__button:disabled { opacity: .55; cursor: not-allowed; }
+.md-typeset .lab01-quiz__button:focus-visible { outline: 3px solid #bf6855; outline-offset: 3px; }
+@media (max-width: 32rem) {
+  .md-typeset .lab01-quiz__actions { align-items: stretch; }
+  .md-typeset .lab01-quiz__button { flex: 1 1 auto; }
+}

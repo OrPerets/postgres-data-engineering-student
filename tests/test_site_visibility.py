@@ -36,6 +36,11 @@ class SiteVisibilityTests(unittest.TestCase):
             search = (out / "search/search_index.json").read_text()
             getting = (out / "getting-started/index.html").read_text()
             all_pages = "\n".join(p.read_text() for p in out.rglob("*.html")) + search
+            practice_page = out / "activities" / "lab01-learning-pack" / "index.html"
+            self.assertEqual(practice_page.exists(), "01" in active)
+            if "01" not in active:
+                self.assertNotIn("activities/lab01-learning-pack/", all_pages)
+                self.assertFalse((out / "javascripts" / "lab01-quiz.js").exists())
             for number, slug in PAGES.items():
                 with self.subTest(number=number, active=active):
                     self.assertEqual((out / "labs" / slug / "index.html").exists(), number in active)

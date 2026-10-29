@@ -1,0 +1,61 @@
+/* Scoped to the Lab 01 learning tool. */
+.md-typeset .join-explorer {
+  border: 1px solid #d7cecb;
+  background: #fff;
+  margin: 1.5rem 0 2.5rem;
+  padding: clamp(1rem, 3vw, 1.8rem);
+}
+.md-typeset .join-explorer__eyebrow {
+  color: #8b2029;
+  font-size: .65rem;
+  font-weight: 800;
+  letter-spacing: .11em;
+  margin: 0 0 .45rem;
+}
+.md-typeset .join-explorer__intro > p:last-child { margin: 0 0 1.2rem; }
+.md-typeset .join-explorer__source {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: .7rem;
+  padding: 1rem;
+  background: #f5f1ef;
+  border-left: 3px solid #8b2029;
+}
+.md-typeset .join-explorer__source strong,
+.md-typeset .join-explorer__source span { display: block; }
+.md-typeset .join-explorer__source strong { margin-bottom: .25rem; color: #67151d; }
+.md-typeset .join-explorer__source span { font-size: .68rem; line-height: 1.65; }
+.md-typeset .join-explorer__controls {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: .8rem;
+  margin-top: 1.35rem;
+}
+.md-typeset .join-explorer__controls label { display: block; font-weight: 700; margin-bottom: .35rem; }
+.md-typeset .join-explorer__controls select {
+  display: block;
+  width: 100%;
+  min-height: 2.5rem;
+  padding: .45rem .7rem;
+  border: 1px solid #766966;
+  border-radius: 0;
+  background-color: #fff;
+  color: #1f1b1a;
+  font: inherit;
+}
+.md-typeset .join-explorer select:focus-visible,
+.md-typeset .join-explorer__table-wrap:focus-visible { outline: 3px solid #bf6855; outline-offset: 3px; }
+.md-typeset .join-explorer__sql { margin-top: 1.2rem; }
+.md-typeset .join-explorer__sql pre { margin: .45rem 0 1rem; overflow-x: auto; }
+.md-typeset .join-explorer__result-label { font-weight: 800; color: #67151d; margin: 1.3rem 0 .5rem; }
+.md-typeset .join-explorer__table-wrap { overflow-x: auto; }
+.md-typeset .join-explorer table { width: 100%; margin: .2rem 0; font-size: .7rem; }
+.md-typeset .join-explorer table caption { text-align: left; padding-bottom: .4rem; font-weight: 700; }
+.md-typeset .join-explorer table th { background: #f5f1ef; }
+.md-typeset .join-explorer__null { font-family: monospace; font-weight: 700; color: #684e49; }
+.md-typeset .join-explorer__explanation { margin: 1rem 0 .5rem; }
+.md-typeset .join-explorer__note { color: #58504e; font-size: .7rem; margin-bottom: 0; }
+@media (max-width: 640px) {
+  .md-typeset .join-explorer__source, .md-typeset .join-explorer__controls { grid-template-columns: 1fr; }
+  .md-typeset .join-explorer__source { gap: .65rem; }
+}
