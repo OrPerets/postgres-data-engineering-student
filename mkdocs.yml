@@ -25,12 +25,20 @@ extra_css:
   - stylesheets/lab01-quiz.css
   - stylesheets/lab02-explorer.css
   - stylesheets/lab02-quiz.css
+  - stylesheets/lab06-pack.css
+  - stylesheets/lab05-pack.css
+  - stylesheets/lab04-pack.css
+  - stylesheets/lab03-pack.css
 
 extra_javascript:
   - javascripts/lab01-join.js
   - javascripts/lab01-quiz.js
   - javascripts/lab02-explorer.js
   - javascripts/lab02-quiz.js
+  - javascripts/lab06-pack.js
+  - javascripts/lab05-pack.js
+  - javascripts/lab04-pack.js
+  - javascripts/lab03-pack.js
 
 plugins:
   - search
@@ -59,10 +67,14 @@ nav:
       - Lab 02 — Partitioning & Replication: labs/02-partitions-replicas.md
       - Partitioning practice & quiz: activities/lab02-learning-pack.md
       - Lab 03 — Data Warehouse & ETL: labs/03-dwh-etl.md
+      - Warehouse practice & quiz: activities/lab03-learning-pack.md
   - Distributed Data Processing:
       - Lab 04 — MapReduce: labs/04-mapreduce.md
+      - MapReduce practice & quiz: activities/lab04-learning-pack.md
       - Lab 05 — PageRank: labs/05-pagerank.md
+      - PageRank practice & quiz: activities/lab05-learning-pack.md
       - Lab 06 — Regex & TF-IDF: labs/06-tfidf.md
+      - TF-IDF practice & quiz: activities/lab06-learning-pack.md
   - Resources:
       - Troubleshooting: troubleshooting.md
       - Glossary: glossary.md

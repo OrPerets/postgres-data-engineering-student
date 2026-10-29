@@ -1,0 +1,10 @@
+#lab06-practice .lab06-panel, #lab06-practice .lab06-question { border-top: 3px solid #8b2029; background: #f7f3f0; padding: 1.2rem; margin: 1rem 0; }
+#lab06-practice label { display: block; font-weight: 600; margin: .6rem 0; }
+#lab06-practice select { display: block; min-height: 2.5rem; width: 100%; max-width: 24rem; background: white; border: 1px solid #aaa; padding: .45rem; }
+#lab06-practice .lab06-result { padding: .75rem; border-left: 3px solid #8b2029; background: white; overflow-wrap: anywhere; }
+#lab06-practice fieldset { border: 0; padding: 0; margin: 0; }
+#lab06-practice legend { font-weight: 700; }
+#lab06-practice fieldset label { font-weight: 400; padding: .5rem; background: white; }
+#lab06-practice button { background: #8b2029; color: white; border: 1px solid #8b2029; padding: .6rem .9rem; margin: .35rem .5rem .35rem 0; cursor: pointer; }
+#lab06-practice button:disabled { opacity: .55; cursor: not-allowed; }
+#lab06-practice :focus-visible { outline: 3px solid #bf6855; outline-offset: 3px; }

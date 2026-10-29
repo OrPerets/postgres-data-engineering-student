@@ -1,0 +1,24 @@
+/* Scoped styles for the Lab 03 observation explorer and formative quiz. */
+.md-typeset .lab03-trace, .md-typeset .lab03-quiz { margin: 1.2rem 0; padding: 1.4rem; background: #fffefa; border: 1px solid #e1d9d4; border-top: 4px solid #8b2029; }
+.md-typeset .lab03-trace label { display: block; font-weight: 700; margin-bottom: .4rem; }
+.md-typeset .lab03-trace select { display: block; width: 100%; max-width: 32rem; padding: .6rem; border: 1px solid #777; color: #222; background: white; font: inherit; }
+.md-typeset .lab03-trace__stages { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 1rem; margin-top: 1.3rem; }
+.md-typeset .lab03-trace__stages section { padding: .8rem; border-top: 2px solid #8b2029; background: #f6f1ef; overflow-wrap: anywhere; }
+.md-typeset .lab03-trace__stages h3 { margin: 0 0 .6rem; font-size: .88rem; }
+.md-typeset .lab03-trace__stages p { margin: 0; }
+.md-typeset .lab03-trace__summary { margin: 1rem 0; font-weight: 700; }
+.md-typeset .lab03-trace__note { margin-bottom: 0; border-left: 3px solid #8b2029; padding-left: .8rem; }
+.md-typeset .lab03-quiz__progress { margin: 0 0 1rem; color: #74232a; font-weight: 700; }
+.md-typeset .lab03-quiz__fieldset { margin: 0; padding: 0; border: 0; }
+.md-typeset .lab03-quiz__legend { margin-bottom: .8rem; font-size: 1rem; font-weight: 700; }
+.md-typeset .lab03-quiz__option { display: flex; gap: .65rem; align-items: baseline; padding: .75rem; margin: .4rem 0; border: 1px solid #e1d9d4; cursor: pointer; }
+.md-typeset .lab03-quiz__option:focus-within { outline: 3px solid #bd7864; outline-offset: 2px; }
+.md-typeset .lab03-quiz input { accent-color: #8b2029; }
+.md-typeset .lab03-quiz__feedback:not(:empty) { margin: 1rem 0; padding: .8rem; border-left: 3px solid #8b2029; background: #f5eeec; }
+.md-typeset .lab03-quiz__feedback.is-correct { border-color: #426c55; background: #eef5ee; }
+.md-typeset .lab03-quiz__actions { display: flex; flex-wrap: wrap; gap: .5rem; margin-top: .8rem; }
+.md-typeset .lab03-quiz__button { min-height: 2.6rem; padding: .6rem .8rem; border: 1px solid #8b2029; color: #fff; background: #8b2029; font: inherit; font-weight: 700; cursor: pointer; }
+.md-typeset .lab03-quiz__button--secondary { color: #8b2029; background: #fffefa; }
+.md-typeset .lab03-quiz__button:disabled { opacity: .5; cursor: not-allowed; }
+.md-typeset .lab03-trace :focus-visible, .md-typeset .lab03-quiz :focus-visible { outline: 3px solid #bd7864; outline-offset: 3px; }
+@media (max-width: 700px) { .md-typeset .lab03-trace__stages { grid-template-columns: 1fr; } .md-typeset .lab03-trace, .md-typeset .lab03-quiz { padding: 1rem; } }

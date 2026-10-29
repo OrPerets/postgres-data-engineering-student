@@ -23,6 +23,8 @@ refund USD 120.50 requested
 
 **Predict:** Which ticket IDs are valid if the pattern requires 4–6 digits? Should `TKT-12` match?
 
+[Try the interactive TF-IDF explorer and practice quiz](../activities/lab06-learning-pack.md).
+
 ## 3. Explore the transformation pipeline
 
 ```text
@@ -66,6 +68,18 @@ python -m unittest discover -s tests -v
 For the PostgreSQL comparison required by the full 100-point assignment, run `make lab-tfidf-sql` from the repository root, then follow the SQL commands in the Lab 06 README to run `sql/02_reference_query.sql`. The Python-only path is also available for exploration.
 
 **Checkpoint:** For `data` in document D1, TF=2/4, DF=3, N=4. Under the lab's natural-log convention, TF-IDF is approximately 0.1116.
+
+### Optional assignment hints
+
+Try the tasks first; these hints give directions without providing the assignment solutions.
+
+<details><summary>1–3: Extract and normalize</summary><p>Test valid and invalid boundaries, capture the currency and numeric amount separately, and decide how case and punctuation affect tokens.</p></details>
+
+<details><summary>4–7: Four MapReduce stages</summary><p>Track the keys at each stage. TF uses the document length, while DF counts distinct documents. Keep the logarithm convention consistent.</p></details>
+
+<details><summary>8–10: Compare SQL and draw the pipeline</summary><p>Compare the same corpus and formula in both implementations. Choose a deterministic tie-break for the top term and identify which key each shuffle groups.</p></details>
+
+<details><summary>11–13: Operational reasoning</summary><p>Consider how new documents change N and DF, how empty or repeated IDs affect the input contract, and which costs a single-host simulation cannot measure.</p></details>
 
 ## 6. Optional performance challenge
 

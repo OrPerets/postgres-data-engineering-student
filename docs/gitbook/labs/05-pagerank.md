@@ -49,6 +49,8 @@ new_rank(p) = (1-d)/N + d*(incoming_contributions + dangling_mass/N)
 
 **Checkpoint:** The four-page first iteration should approximately be A=.303125, B=.196875, C=.409375, D=.090625. The ranks must sum to 1.
 
+[Try the interactive PageRank explorer and practice quiz](../activities/lab05-learning-pack.md). The examples run in your browser and do not execute a multi-machine cluster.
+
 ## 5. Implement and validate
 
 Complete contribution mapping, shuffle grouping, dangling mass, one damped update and convergence in `student_tasks.py`.
@@ -59,6 +61,38 @@ python -m unittest discover -s tests -v
 ```
 
 Student tests intentionally fail until completed.
+
+### Optional hints for the assignment
+
+Try each task first; expand a hint when you need a direction.
+
+<details><summary>1 — Inlinks and outlinks</summary><p>For each node, list incoming and outgoing edges separately. Count the links in each list.</p></details>
+
+<details><summary>2 — Two manual iterations</summary><p>Keep a separate rank vector for each iteration. Split each current rank over its outlinks before adding contributions to destinations.</p></details>
+
+<details><summary>3 — In-degree and PageRank</summary><p>Compare equal in-degree pages whose incoming pages have different ranks or different numbers of outlinks.</p></details>
+
+<details><summary>4 — Out-degree and contributions</summary><p>Count outgoing neighbors before emitting one destination contribution per edge. Handle a page without outlinks separately.</p></details>
+
+<details><summary>5 — Shuffle grouping</summary><p>Use destination page as the key, gathering all contributions for that destination.</p></details>
+
+<details><summary>6 — Dangling mass</summary><p>Sum the current ranks of all pages whose outgoing-neighbor lists are empty.</p></details>
+
+<details><summary>7 — One damped update</summary><p>For each page, combine teleportation with damped incoming contributions and damped dangling redistribution. Include pages with no incoming contributions.</p></details>
+
+<details><summary>8 — Convergence</summary><p>After each update, compare the old and new vectors using the sum of absolute differences. Add a maximum iteration limit.</p></details>
+
+<details><summary>9 — Iterations and total rank</summary><p>Record the rank vector after each update and sum all page ranks before rounding for display.</p></details>
+
+<details><summary>10 — Compare damping factors</summary><p>Hold the graph and stopping tolerance fixed. Compare both the resulting order and iteration counts, rather than assuming either must always change.</p></details>
+
+<details><summary>11 — Preserve graph structure</summary><p>Ask what the next iteration needs to know about each page in addition to its new rank.</p></details>
+
+<details><summary>12 — Safe combiner and dangling mass</summary><p>Consider which numeric values can be summed locally and how adjacency records pass through. How does the driver obtain a complete global dangling total before it is used?</p></details>
+
+<details><summary>13 — Popular destination and skew</summary><p>Think about one destination receiving many contributions, then split that work into partial sums before combining them.</p></details>
+
+<details><summary>14 — Simulation versus cluster</summary><p>Identify at least two missing distributed costs or behaviors such as network shuffle, fault recovery, or distributed storage.</p></details>
 
 ## 6. Performance experiment
 

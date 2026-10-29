@@ -51,6 +51,36 @@ Suppose one worker observes `[1]` and another observes `[3,5,7]`. Compare the na
 
 **Hint:** A safe mean combiner merges `(sum, count)`, not just the average.
 
+### Practice with an interactive trace
+
+[Open the MapReduce trace and practice quiz](../activities/lab04-learning-pack.md) to step through a small character-count example in your browser. This is a logical simulation, not a networked cluster.
+
+### Optional assignment hints
+
+Try the assignment yourself first; expand a hint when you need direction. These do not provide the assignment solutions.
+
+<details><summary>1 — Trace the pipeline</summary><p>Track every character occurrence through map, group all values for the same key, then sum each group.</p></details>
+
+<details><summary>2 — Compare reducer counts</summary><p>Predict what changes about the grouping workload and what must stay unchanged in the final count if every key is routed consistently.</p></details>
+
+<details><summary>3 — Compare combiner on and off</summary><p>Count mapped pairs and pairs passed into shuffle separately. A local aggregate may reduce pairs but must preserve the final count.</p></details>
+
+<details><summary>4 — Word mapping</summary><p>Split the line by whitespace and normalize case. Does every occurrence contribute a separate pair, even when a word repeats?</p></details>
+
+<details><summary>5 — Filter mapper</summary><p>Check both status and the amount threshold against each record before emitting. Consider records that satisfy only one condition.</p></details>
+
+<details><summary>6 — Mergeable mean</summary><p>Keep a partial sum and the number of observations together. Think about unequal split sizes and an empty input before computing the final mean.</p></details>
+
+<details><summary>7 — Population variance</summary><p>Preserve the requested partial count, sum and sum of squares across splits. Consider the empty case and discuss cancellation when values are close together.</p></details>
+
+<details><summary>8 — Reproducible partitioning</summary><p>Compare Python's process-dependent hash behavior with a deterministic byte-based hash. What should happen to the same key across runs?</p></details>
+
+<details><summary>9 — Skewed key</summary><p>Imagine most input pairs have the same key. Which reducer gets that key, and what extra work might a mitigation introduce?</p></details>
+
+<details><summary>10 — Unsafe combiners</summary><p>Ask whether a partial result can be merged repeatedly without losing information. Consider unequal group sizes and operations whose order matters.</p></details>
+
+<details><summary>11 — Shuffle and mapper cost</summary><p>Distinguish local computation from intermediate-data movement, then compare a one-process simulation with a real networked cluster.</p></details>
+
 ## 5. Validate your work
 
 ```bash

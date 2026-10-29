@@ -58,6 +58,12 @@ def filter_docs(directory: Path, enabled: dict[str, bool]) -> None:
                       "stylesheets/lab02-explorer.css", "stylesheets/lab02-quiz.css"):
             (directory / asset).unlink()
 
+    for number in ("03", "04", "05", "06"):
+        if number in hidden:
+            (directory / "activities" / f"lab{number}-learning-pack.md").unlink()
+            for asset in (f"javascripts/lab{number}-pack.js", f"stylesheets/lab{number}-pack.css"):
+                (directory / asset).unlink()
+
     # Filter any Markdown line containing a direct link to a hidden lab page.
     # The remaining references to the public source repository are deliberate:
     # this feature controls the website, not access to repository contents.
@@ -148,7 +154,13 @@ def filtered_config(text: str, enabled: dict[str, bool]) -> str:
         for asset in ("stylesheets/lab02-explorer.css", "stylesheets/lab02-quiz.css",
                       "javascripts/lab02-explorer.js", "javascripts/lab02-quiz.js"):
             text = require_replace(text, f"  - {asset}\n", "", f"Lab 02 asset {asset}")
-    if not enabled["01"] and not enabled["02"]:
+    for number, label in (("03", "Warehouse"), ("04", "MapReduce"),
+                          ("05", "PageRank"), ("06", "TF-IDF")):
+        if not enabled[number]:
+            text = require_replace(text, f"      - {label} practice & quiz: activities/lab{number}-learning-pack.md\n", "", f"Lab {number} practice nav")
+            for asset in (f"stylesheets/lab{number}-pack.css", f"javascripts/lab{number}-pack.js"):
+                text = require_replace(text, f"  - {asset}\n", "", f"Lab {number} asset {asset}")
+    if not any(enabled.values()):
         text = require_replace(text, "extra_javascript:\n\n", "extra_javascript: []\n\n", "empty JavaScript list")
     for label, nums in (("Relational Data Engineering", ("01", "02", "03")),
                         ("Distributed Data Processing", ("04", "05", "06"))):

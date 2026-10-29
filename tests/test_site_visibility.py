@@ -46,6 +46,12 @@ class SiteVisibilityTests(unittest.TestCase):
             if "02" not in active:
                 self.assertNotIn("activities/lab02-learning-pack/", all_pages)
                 self.assertFalse((out / "javascripts" / "lab02-quiz.js").exists())
+            for number in ("03", "04", "05", "06"):
+                practice = out / "activities" / f"lab{number}-learning-pack" / "index.html"
+                self.assertEqual(practice.exists(), number in active)
+                if number not in active:
+                    self.assertNotIn(f"activities/lab{number}-learning-pack/", all_pages)
+                    self.assertFalse((out / "javascripts" / f"lab{number}-pack.js").exists())
             for number, slug in PAGES.items():
                 with self.subTest(number=number, active=active):
                     self.assertEqual((out / "labs" / slug / "index.html").exists(), number in active)
@@ -66,6 +72,14 @@ class SiteVisibilityTests(unittest.TestCase):
 
     def test_only_second_workshop(self):
         self.build({"02"})
+
+    def test_only_sixth_workshop(self):
+        self.build({"06"})
+
+    def test_each_middle_workshop_by_itself(self):
+        for number in ("03", "04", "05"):
+            with self.subTest(number=number):
+                self.build({number})
 
     def test_all_workshops(self):
         self.build(set(PAGES))
