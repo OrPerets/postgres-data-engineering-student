@@ -48,6 +48,17 @@ def task_list():
     expected = 14 if NUMBER == '05' else 13
     if [t['id'] for t in tasks] != list(range(1, expected + 1)):
         raise ValueError('Could not load the complete assignment.')
+    if NUMBER == '05':
+        # Later questions refer to examples given in earlier assignment text.
+        # Use that source directly so the context stays aligned with the task.
+        if context is None:
+            raise ValueError('Could not load the PageRank graph context from the assignment.')
+        task1 = tasks[0]['question']
+        task7 = tasks[6]['question']
+        task9 = tasks[8]['question']
+        tasks[1]['question'] += '\n\nContext from Task 1: ' + task1
+        tasks[8]['question'] += '\n\nContext from Task 7: ' + task7
+        tasks[9]['question'] += '\n\nContext from Task 7: ' + task7 + '\n\nRepeat Task 9: ' + task9
     return tasks
 
 
