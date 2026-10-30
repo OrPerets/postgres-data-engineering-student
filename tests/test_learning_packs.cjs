@@ -1,8 +1,24 @@
 const { test } = require('node:test');
 const assert = require('node:assert/strict');
+const { newLoadState, loadSelectedRow, correctSelectedSource } = require('../docs/gitbook/javascripts/lab03-pack.js');
 const { traceRecords } = require('../docs/gitbook/javascripts/lab04-pack.js');
 const { step } = require('../docs/gitbook/javascripts/lab05-pack.js');
 const { score, compareAddedDocument } = require('../docs/gitbook/javascripts/lab06-pack.js');
+
+test('fixed fact key skips reruns and does not propagate source corrections', () => {
+  const initial = newLoadState();
+  assert.equal(initial.fact, null);
+  const first = loadSelectedRow(initial);
+  assert.deepEqual([first.fact.batch, first.fact.row, first.fact.cost, first.inserted, first.skipped], ['dk-sample-v1', 1, '0.008205', 1, 0]);
+  const repeat = loadSelectedRow(first);
+  assert.deepEqual([repeat.fact.cost, repeat.inserted, repeat.skipped], ['0.008205', 0, 1]);
+  const corrected = correctSelectedSource(repeat);
+  assert.equal(corrected.source.cost, '0.010000');
+  const correctionRerun = loadSelectedRow(corrected);
+  assert.deepEqual([correctionRerun.source.cost, correctionRerun.fact.cost, correctionRerun.inserted, correctionRerun.skipped], ['0.010000', '0.008205', 0, 1]);
+  assert.equal(first.source.cost, '0.008205');
+  assert.deepEqual(newLoadState(), initial);
+});
 
 test('MapReduce trace preserves counts with and without a combiner', () => {
   const normal = traceRecords(['ABR', 'CCR', 'ACB'], false);

@@ -84,6 +84,8 @@ Rerun `sql/02_dwh.sql` **only after preserving any assignment changes**. Compare
 
 **Predict:** Does `ON CONFLICT DO NOTHING` prevent duplicate fixed-batch inserts? Will it propagate a correction made to a previously loaded source row?
 
+Try the [repeated fact load explorer](../activities/lab03-learning-pack.md#explore-repeated-fact-loads) to compare the source and fact after a hypothetical correction. It is a browser simulation and does not modify the database.
+
 ### Optional hints for the assignment
 
 Try each question first. Expand a hint for guidance without revealing a full solution.

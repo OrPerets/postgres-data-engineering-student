@@ -10,6 +10,14 @@ Choose a sample record to follow its source, staging and warehouse representatio
 
 <noscript>The observation explorer needs JavaScript. You can still follow the [Lab 03 guide](../labs/03-dwh-etl.md) and use PostgreSQL in Codespaces.</noscript>
 
+## Explore repeated fact loads
+
+Predict how the existing fact responds when its source cost changes, then step through a fixed-batch load and a rerun. This is a browser simulation of one selected row; it does not modify your database.
+
+<div id="lab03-load-explorer"></div>
+
+<noscript>Paper exercise: load the selected key (dk-sample-v1, 1) with cost 0.008205, rerun, then hypothetically change the source cost to 0.010000 and rerun. What happens to the existing fact under ON CONFLICT DO NOTHING? A fixed fact count alone does not show whether its value matches the source.</noscript>
+
 ## Check your understanding
 
 Answer five practice questions on staging, missing values, source meaning and warehouse loading. Each answer has an explanation. Results are not recorded or submitted.

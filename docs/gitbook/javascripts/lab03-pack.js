@@ -57,6 +57,63 @@
     const n = document.createElement(tag); if (cls) n.className = cls;
     if (text !== undefined) n.textContent = text; return n;
   }
+  // One selected source row, assuming dimension joins succeed. Costs are
+  // strings so this fixed example never introduces floating-point rounding.
+  function newLoadState() {
+    return { source: { batch: 'dk-sample-v1', row: 1, cost: '0.008205' }, fact: null, runs: 0, inserted: 0, skipped: 0 };
+  }
+  function loadSelectedRow(state) {
+    const match = state.fact && state.fact.batch === state.source.batch && state.fact.row === state.source.row;
+    return { ...state, fact: match ? { ...state.fact } : { ...state.source }, runs: state.runs + 1,
+      inserted: match ? 0 : 1, skipped: match ? 1 : 0 };
+  }
+  function correctSelectedSource(state) {
+    return { ...state, source: { ...state.source, cost: '0.010000' } };
+  }
+  if (typeof module !== 'undefined' && module.exports) module.exports = { newLoadState, loadSelectedRow, correctSelectedSource };
+  if (typeof document === 'undefined') return;
+
+  function setupLoadExplorer() {
+    const root = document.getElementById('lab03-load-explorer');
+    if (!root || root.dataset.ready === 'true') return;
+    root.dataset.ready = 'true'; root.classList.add('lab03-load');
+    root.innerHTML = `<p class="lab03-load__eyebrow">INTERACTIVE · FACT LOAD</p>
+      <h3>Will a repeated load update a correction?</h3>
+      <p>Predict first: when a source cost changes, will rerunning <code>ON CONFLICT (batch_id, row_no) DO NOTHING</code> update the matching fact?</p>
+      <p>Follow one sample row; assume its dimension joins succeed. The initial cost is from the supplied synthetic data; the corrected value is hypothetical.</p>
+      <div class="lab03-load__tables">
+        <section><h4>Source / staging view</h4><table><caption>Selected source observation</caption><tbody class="lab03-load__source"></tbody></table></section>
+        <section><h4>Warehouse fact</h4><table><caption>Selected fact observation</caption><tbody class="lab03-load__fact"></tbody></table></section>
+      </div>
+      <p class="lab03-load__count"></p>
+      <div class="lab03-load__actions"><button type="button" data-action="load">Run load</button><button type="button" data-action="correct">Apply hypothetical correction</button><button type="button" data-action="reset">Reset</button></div>
+      <p class="lab03-load__status" role="status" aria-live="polite" aria-atomic="true"></p>
+      <p class="lab03-load__note">This is a one-row browser simulation: it does not connect to PostgreSQL, run a distributed job, or implement change data capture or deletion. An unchanged fact count does not prove that source and fact values match.</p>`;
+    let state = newLoadState();
+    const source = root.querySelector('.lab03-load__source'), fact = root.querySelector('.lab03-load__fact');
+    const count = root.querySelector('.lab03-load__count'), status = root.querySelector('.lab03-load__status');
+    const correct = root.querySelector('[data-action="correct"]');
+    function fill(body, row) {
+      body.replaceChildren();
+      if (!row) { const tr = el('tr'); const td = el('td', '', 'No fact loaded'); td.colSpan = 2; tr.append(td); body.append(tr); return; }
+      for (const [name, value] of [['batch_id', row.batch], ['row_no', row.row], ['cost_usd', row.cost]]) {
+        const tr = el('tr'), th = el('th', '', name), td = el('td', '', String(value)); th.scope = 'row'; tr.append(th, td); body.append(tr);
+      }
+    }
+    function render(message) {
+      fill(source, state.source); fill(fact, state.fact);
+      count.textContent = `Selected fact rows: ${state.fact ? 1 : 0}. Load runs: ${state.runs}.`;
+      correct.disabled = !state.fact || state.source.cost === '0.010000';
+      status.textContent = message;
+    }
+    root.querySelector('[data-action="load"]').addEventListener('click', () => {
+      state = loadSelectedRow(state);
+      render(state.inserted ? 'Inserted 1 selected fact; skipped 0.' : `Inserted 0; skipped 1 existing composite key. ${state.source.cost !== state.fact.cost ? 'The fact still has the earlier cost, so source and fact differ.' : 'Source and fact costs match in this example.'}`);
+    });
+    correct.addEventListener('click', () => { state = correctSelectedSource(state); render('Hypothetical source correction applied. Predict the next load result before running it.'); });
+    root.querySelector('[data-action="reset"]').addEventListener('click', () => { state = newLoadState(); render('Reset to the original source value and no selected fact.'); });
+    render('No selected fact has been loaded. Run the first load, then rerun it.');
+  }
   function setupExplorer() {
     const root = document.getElementById('lab03-observation-explorer');
     if (!root || root.dataset.ready === 'true') return;
@@ -122,6 +179,6 @@
     }
     render(false);
   }
-  function init() { setupExplorer(); setupQuiz(); }
+  function init() { setupExplorer(); setupLoadExplorer(); setupQuiz(); }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init, { once: true }); else init();
 }());
