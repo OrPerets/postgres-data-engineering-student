@@ -151,8 +151,8 @@ These tasks address issues observed in the course review. Effort estimates are a
 
 ### 8. Preserve NULL distinctions in exported SQL results
 
-- [ ] Define and document an export representation that distinguishes SQL NULL, literal `NULL`, empty strings and any escape marker.
-- [ ] Update the Lab 02, 03 and 06 workspace CSV exports and add checks for NULL, literal text, empty values, commas, quotes and newlines.
+- [x] Define and document an export representation that distinguishes SQL NULL, literal `NULL`, empty strings and any escape marker.
+- [x] Update the Lab 02, 03 and 06 workspace CSV exports and add checks for NULL, literal text, empty values, commas, quotes and newlines.
 
 **Why:** The current CSV encoders convert both SQL NULL and the literal string `NULL` to the same quoted text. This can make exported evidence ambiguous, especially in Lab 03's missing-value exercises. This finding is based on source inspection and encoder reproduction, not a live database test.
 
@@ -161,6 +161,8 @@ These tasks address issues observed in the course review. Effort estimates are a
 **Acceptance:** Exported values remain distinguishable under the documented interpretation, existing result metadata and truncation warnings are preserved, and regression checks pass for the affected workspaces. Verify a real database example when available.
 
 **Effort:** Medium, approximately 0.5–1 day.
+
+**Status, 2026-10-30:** CSV data cells now represent SQL NULL as `\N` and double backslashes in non-null values; UI guidance and CSV metadata document the decoding. Headers and existing metadata are preserved. Three actual download-handler tests passed across Labs 02, 03 and 06, including NULL, literal text, escapes, empty strings, commas, quotes and newlines. The 7 Lab 02, 6 Lab 03 and 10 Lab 06 workspace tests also passed. These are local tests; real-browser and live SQL verification remain pending. Cell shortening is tracked separately in task 11.
 
 ### 10. Make the Lab 02 replica demonstration repeatable
 

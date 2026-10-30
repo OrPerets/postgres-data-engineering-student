@@ -1,5 +1,5 @@
 """Workspaces preserve student files and run real course checks on a temporary copy."""
-import importlib.util, json, tempfile, threading, types, unittest
+import importlib.util, json, shutil, subprocess, tempfile, threading, types, unittest
 from http.client import HTTPConnection
 from http.server import ThreadingHTTPServer
 from pathlib import Path
@@ -10,6 +10,11 @@ spec = importlib.util.spec_from_file_location('python_workspace', FILE)
 server = importlib.util.module_from_spec(spec); spec.loader.exec_module(server)
 
 class WorkspaceTests(unittest.TestCase):
+    @unittest.skipUnless(shutil.which('node'), 'Node.js is required for browser CSV export checks')
+    def test_sql_csv_download_handler(self):
+        result = subprocess.run(['node', '--test', str(Path(__file__).with_name('test_csv_export.cjs'))],
+                                capture_output=True, text=True)
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
     def test_assignment_and_hints(self):
         tasks = server.task_list()
         expected = 14 if server.NUMBER == '05' else 13
