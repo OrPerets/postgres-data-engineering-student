@@ -162,13 +162,16 @@ Try each question on your own first. Open a hint when you need a direction; thes
 
 First predict which version will be faster: a correlated subquery or `SUM(...) OVER (...)`. Both should return the same answers.
 
-Run the benchmark setup:
+**Before running setup:** The seed drops and recreates `benchmark_sales`, deleting its existing rows and indexes, including any index you added for the challenge. It does not drop the `customers`, `orders`, or `order_items` classroom tables. If you want to keep an earlier benchmark experiment, back up the table's data and schema (including index definitions) outside the Codespace before reseeding, or keep the existing table and skip the seed. Save any query plans or timing results separately.
+
+From a **shell terminal** at the repository root, enter the lab folder. If you are already in `labs/01-relational-sql`, skip the `cd` command. Run setup only when you are ready to replace the benchmark table:
 
 ```bash
+cd labs/01-relational-sql
 docker compose exec -T postgres psql -U student -d query_lab < benchmarks/01_seed_running_total.sql
 ```
 
-Now run the **compact comparison**:
+From the same lab folder, run the **compact comparison**:
 
 ```bash
 docker compose exec -T postgres psql -U student -d query_lab < benchmarks/03_compact_report.sql

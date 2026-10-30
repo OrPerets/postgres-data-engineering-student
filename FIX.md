@@ -87,8 +87,8 @@ These tasks address issues observed in the course review. Effort estimates are a
 
 ### 13. Warn before recreating the Lab 01 benchmark table
 
-- [ ] Tell students the benchmark seed drops and recreates `benchmark_sales`, removing its previous rows and indexes, and to preserve work before rerunning it.
-- [ ] State the working directory for the benchmark commands and align the tutorial and benchmark instructions.
+- [x] Tell students the benchmark seed drops and recreates `benchmark_sales`, removing its previous rows and indexes, and to preserve work before rerunning it.
+- [x] State the working directory for the benchmark commands and align the tutorial and benchmark instructions.
 
 **Why:** The tutorial presents the benchmark seed without warning, while the seed drops `benchmark_sales` and the benchmark challenge invites students to create an index. Rerunning setup therefore removes that experiment. This follows from the SQL source; no live database run was performed.
 
@@ -97,6 +97,8 @@ These tasks address issues observed in the course review. Effort estimates are a
 **Acceptance:** Students can identify the table affected, preserve a prior experiment, and run commands from the correct directory without implying the original classroom tables are dropped. Verify with a fresh database when available.
 
 **Effort:** Small, a few hours.
+
+**Status, 2026-10-30:** Added warnings and working-directory guidance to the Lab 01 tutorial and benchmark README. Both explain preserving the benchmark data, schema, indexes and evidence before reseeding. All eight site visibility tests and `git diff --check` passed; a live database/Codespaces check remains pending.
 
 ## P1 — Repair the learning sequence
 
@@ -197,6 +199,19 @@ These tasks address issues observed in the course review. Effort estimates are a
 **Starting points:** `labs/06-tfidf/tfidf_demo.py`, `labs/06-tfidf/tests/test_demo.py`, `labs/06-tfidf/STUDENT_ASSIGNMENT.md`.
 
 **Acceptance:** Supported cases are documented and tested, unsupported or malformed continuations cannot silently produce misleading partial amounts, and the intended student exercises remain unchanged.
+
+**Effort:** Small–medium, approximately 0.5–1 day.
+
+### 14. Make the Lab 04 reducer-count experiment reproducible
+
+- [ ] Give students an accurate way to run the character-count example with one, two and three reducers, and correct the README's description of the default script.
+- [ ] Preserve the reference counts and explain which metrics change while the final result stays the same.
+
+**Why:** The assignment asks for runs with 1, 2 and 3 reducers, and the README says the script shows varying reducer counts. The script's entry point hard-codes three reducers and ignores command-line arguments: locally, `python3 mapreduce_demo.py 1` still reports three. This was reproduced locally, not in Codespaces.
+
+**Starting points:** `labs/04-mapreduce/STUDENT_ASSIGNMENT.md`, `labs/04-mapreduce/README.md`, `labs/04-mapreduce/mapreduce_demo.py`.
+
+**Acceptance:** A student can follow the documented steps to run each requested reducer count and see the actual configured count and matching final results; tests verify all three cases. Browser/Codespaces verification is recorded separately.
 
 **Effort:** Small–medium, approximately 0.5–1 day.
 

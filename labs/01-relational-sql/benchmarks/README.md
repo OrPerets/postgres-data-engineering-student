@@ -9,7 +9,10 @@ Compute **customer running revenue** per transaction on 12,000 synthetic rows. C
 This is a teaching demonstration of a particularly inefficient correlated formulation **on an unindexed table**, not a claim that every window function is faster than every alternative.
 
 ## Run (Codespaces, after Lab 01 setup)
-From the repository root:
+
+**Before running the seed:** It drops and recreates `benchmark_sales`, deleting any existing rows and indexes, including an index created for the challenge. It does not drop the `customers`, `orders`, or `order_items` classroom tables. To preserve an earlier experiment, back up the benchmark table's schema and data (including index definitions) outside the Codespace before reseeding, or keep the existing table and skip the seed. Save query plans and timing results separately.
+
+From a shell terminal at the repository root, enter the lab folder. If you are already in `labs/01-relational-sql`, skip the `cd` command. Run the seed only when you are ready to replace the benchmark table:
 
 ```bash
 cd labs/01-relational-sql
