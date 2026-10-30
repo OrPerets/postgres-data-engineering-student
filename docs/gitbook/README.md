@@ -48,7 +48,9 @@ Start with a concrete question, try the example, and use the checks to explain w
 
 ### Ready to begin?
 
-Open the [student repository](https://github.com/OrPerets/postgres-data-engineering-student) in Codespaces, then run this from the repository root:
+Follow the [first SQL lab walkthrough](start-lab01.md) to open a Codespace, run your first query, and choose how to work: in the guided workspace or in a SQL file in the editor.
+
+Alternatively, open the [student repository](https://github.com/OrPerets/postgres-data-engineering-student) in Codespaces, then run this from the repository root:
 
 ```bash
 make lab-sql
