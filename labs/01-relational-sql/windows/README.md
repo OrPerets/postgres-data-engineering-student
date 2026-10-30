@@ -2,6 +2,20 @@
 
 **Core: 60–90 minutes.** Complete this guided lesson before tackling the window questions in Lab 1. You will use the same `customers`, `orders`, and `order_items` tables and the [lab's business rules](../STUDENT_BRIEF.md). Work in this order: **understand → predict → implement → validate → explain**. Write down a prediction before running each query; an incorrect prediction is useful evidence for discussion.
 
+For another visual walkthrough, see the [course-book lesson](../../../docs/gitbook/labs/01-window-functions.md).
+
+### The path through the lesson
+
+```mermaid
+flowchart LR
+    A["One row per order<br/>choose the grain"] --> B["Group or window?<br/>compare the output rows"]
+    B --> C["Partition and order<br/>organize related rows"]
+    C --> D["Frame and LAG<br/>inspect related rows"]
+    D --> E["CTE<br/>filter calculated results"]
+```
+
+The same path in words: choose the row grain, compare grouping with window calculations, define partitions and ordering, examine the rows used by each calculation, and filter results in a later query level.
+
 ## What you will learn
 
 By the end, you should be able to:
@@ -39,6 +53,17 @@ Predict before running the first worksheet queries:
 
 Compare the provided `GROUP BY` and `SUM(...) OVER (...)` queries. Both calculate customer revenue, but they have different output grains: `GROUP BY` collapses rows into customer groups; a window calculation adds a value to each row of its input.
 
+The following picture uses three orders as a simplified illustration. Both approaches calculate a customer total; only the window keeps each order visible:
+
+```mermaid
+flowchart LR
+    I["Order rows<br/>101: customer 1<br/>102: customer 1<br/>106: customer 2"]
+    I --> G["GROUP BY customer<br/>one row for customer 1<br/>one row for customer 2"]
+    I --> W["Window by customer<br/>101 + customer 1 total<br/>102 + customer 1 total<br/>106 + customer 2 total"]
+```
+
+In this illustration the group query returns two rows and the window query returns three. The window attaches a result to each input row; it does not remove an order.
+
 In `SUM(revenue) OVER (PARTITION BY customer_id)`, the partition is the set of the current customer's input rows. It is a logical group for the calculation, not a physical database partition. With no `PARTITION BY`, all input rows belong to one partition. A window's input is the rows remaining after `FROM`, `WHERE`, `GROUP BY`, and `HAVING` at that query level; an outer filter can act on the results afterward.
 
 **Your turn:** add a completed-order count and each order's share of its customer's revenue to every order. Use `NULLIF` for a zero customer total. Predict how many output rows you will have, then verify that the window did not collapse them. Explain why the order for customer 12 is an important edge case.
@@ -46,6 +71,8 @@ In `SUM(revenue) OVER (PARTITION BY customer_id)`, the partition is the set of t
 ## 3. Order, peers, and ranking (10–15 minutes)
 
 The `ORDER BY` **inside** `OVER` defines the order or peer groups for the window; the outer `ORDER BY` controls how results are displayed. One does not replace the other. Rows tied on all window ordering expressions are *peers*.
+
+Think of an analytical ordering as a line of rows inside each partition. A tie in the window's ordering makes a peer group; adding a unique ID breaks that peer group. An outer display order can make results easier to read, but it cannot change how a window defined its peers.
 
 Given customer revenues `600, 600, 300` within a city, predict each ranking before running the ranking activity:
 
@@ -63,11 +90,33 @@ Write three rankings per city using customer totals. Make `ROW_NUMBER` determini
 
 For each customer's completed orders, write `LAG(revenue)` over the order sequence `order_date, order_id`. Predict the previous revenue for customer 1 before running it. The first order has no preceding row, so its result is `NULL`. The ID makes same-date ordering deterministic. Add revenue change and percentage change, using `NULLIF(previous_revenue, 0)` to avoid division by zero. A `NULL` percentage does not mean zero change.
 
+```text
+Customer 1, ordered by date and ID:
+  [101]  →  [102]  →  [103]  →  [104]  →  [134]
+              ↑
+      LAG for this order looks one position to the left.
+```
+
+The arrow shows the sequence of existing orders. It does not add rows for days or months with no orders.
+
 **Check:** Does filtering to customer 1 *inside* the same query affect customer 1's partition? What would happen if you filtered to only March orders before calculating `LAG`? Try filtering to March **after** calculating the window in a CTE and compare. Explain the difference.
 
 ## 5. Frames: running totals and moving averages (15–20 minutes)
 
 A **frame** is the set of rows used by frame-sensitive calculations for the current row. A partition can contain many rows while the frame changes at each row. For customer 1, the order-level input is:
+
+Imagine the current row is order 104. In `ROWS BETWEEN 2 PRECEDING AND CURRENT ROW`, the frame contains the current order and up to two earlier orders, while the full partition still contains all five orders:
+
+```text
+Customer 1 partition (ordered by date and ID)
+┌────────────────────────────────────────────────────────┐
+│  [101]   [102]   [103]   [104]   [134]                 │
+│          └───────── frame ─────────┘                    │
+│                           current row                  │
+└────────────────────────────────────────────────────────┘
+```
+
+In words: the frame for order 104 includes orders 102, 103, and 104. Order 101 is earlier than the frame; order 134 is later than the current row. When the current row changes, the frame can move too.
 
 | Order | Date | Revenue |
 |---:|---|---:|
@@ -96,6 +145,15 @@ Notice that the two running totals deliberately differ in **both** their orderin
 ## 6. Filter after calculating a window (10 minutes)
 
 Using a CTE, calculate revenue for customers with at least one completed order and a `DENSE_RANK` per city. In an outer query, keep the two highest **distinct revenue levels**, including ties. State the output grain and explain why the ranking belongs in the inner query and its filter in the outer query. Validate that no qualifying tied customer disappears.
+
+```mermaid
+flowchart LR
+    A["Completed orders"] --> B["Aggregate revenue<br/>per customer"]
+    B --> C["Calculate DENSE_RANK<br/>within each city"]
+    C --> D["Outer query:<br/>keep ranks 1 and 2"]
+```
+
+The ranking sees the customer totals before the outer query filters them. A `WHERE` at the ranking query's own level filters its input instead of filtering the calculated rank.
 
 Return to Lab 1 questions 8, 9, 14, and 15, and use this sequence to reason about their requirements. Question 11 adds missing months; `LAG` alone does not generate absent rows.
 

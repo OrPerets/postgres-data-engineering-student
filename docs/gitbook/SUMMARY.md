@@ -10,6 +10,7 @@
 ## Part I — Relational Data Engineering
 
 * [Lab 01 — Relational SQL & Query Optimization](labs/01-relational-sql.md)
+* [Window functions](labs/01-window-functions.md)
 * [Lab 02 — Partitioning & Replication](labs/02-partitions-replicas.md)
 * [Lab 03 — Data Warehouse & ETL](labs/03-dwh-etl.md)
 

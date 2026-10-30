@@ -108,7 +108,7 @@ Work in this sequence:
 
 1. **Queries 1–5:** Filters, JOINs, grouping and business metrics.
 2. **Queries 6–7:** Debugging aggregation and `NOT IN` / `NULL` behavior.
-3. **Before queries 8–11:** Open `labs/01-relational-sql/windows/README.md` in your course repository and complete the guided window-functions lesson and SQL worksheet. Allow 60–90 minutes for the core; advanced challenges are optional. This worksheet is separate from the guided workspace and its saved draft.
+3. **Before queries 8–11:** Work through the [visual window-functions lesson](01-window-functions.md) and its SQL worksheet. Allow 60–90 minutes for the core; advanced challenges are optional. This worksheet is separate from the guided workspace and its saved draft.
 4. **Queries 8–11:** Ranking, previous values, running totals and monthly comparisons.
 5. **Queries 12–15:** More advanced relational logic, product pairs and window-frame semantics.
 
