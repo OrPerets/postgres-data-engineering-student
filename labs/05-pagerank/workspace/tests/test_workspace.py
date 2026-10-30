@@ -1,5 +1,5 @@
 """Workspaces preserve student files and run real course checks on a temporary copy."""
-import importlib.util, json, tempfile, threading, types, unittest
+import importlib.util, json, re, tempfile, threading, types, unittest
 from http.client import HTTPConnection
 from http.server import ThreadingHTTPServer
 from pathlib import Path
@@ -22,6 +22,41 @@ class WorkspaceTests(unittest.TestCase):
         else:
             self.assertIn('G={A:[B,C],B:[C],C:[A],D:[]}', tasks[6]['question'])
             self.assertIn('Predict results', tasks[6]['question'])
+    def test_pagerank_dependent_tasks_include_assignment_context(self):
+        source = server.ASSIGNMENT.read_text(encoding='utf-8')
+        numbered = dict((int(n), re.sub(r'\*\*|`', '', text).strip())
+                        for n, text in re.findall(r'^(\d+)\.\s+(.+)$', source, re.M))
+        graph = re.sub(r'\*\*|`', '', re.search(r'^Use G=.+$', source, re.M).group(0)).strip()
+        tasks = {task['id']: task['question'] for task in server.task_list()}
+        for number in (2, 9, 10):
+            self.assertTrue(tasks[number].startswith(numbered[number]))
+        self.assertIn('Context from Task 1: ' + numbered[1], tasks[2])
+        for number in (9, 10):
+            self.assertIn('Context from Task 7: ' + numbered[7], tasks[number])
+            self.assertIn(graph, tasks[number])
+        self.assertIn('Repeat Task 9: ' + numbered[9], tasks[10])
+
+    def test_pagerank_context_is_loaded_from_current_assignment(self):
+        source = server.ASSIGNMENT.read_text(encoding='utf-8')
+        changed = source.replace('V={A,B,C}', 'V={A,B,C,Z}').replace('D:[]}', 'D:[],Z:[]}')
+        with tempfile.TemporaryDirectory() as tmp:
+            assignment = Path(tmp) / 'assignment.md'
+            assignment.write_text(changed, encoding='utf-8')
+            with patch.object(server, 'ASSIGNMENT', assignment):
+                tasks = {task['id']: task['question'] for task in server.task_list()}
+        self.assertIn('V={A,B,C,Z}', tasks[2])
+        self.assertIn('D:[],Z:[]}', tasks[9])
+        self.assertIn('D:[],Z:[]}', tasks[10])
+
+    def test_pagerank_missing_graph_context_is_reported(self):
+        source = server.ASSIGNMENT.read_text(encoding='utf-8')
+        changed = re.sub(r'^Use G=.+$', '', source, flags=re.M)
+        with tempfile.TemporaryDirectory() as tmp:
+            assignment = Path(tmp) / 'assignment.md'
+            assignment.write_text(changed, encoding='utf-8')
+            with patch.object(server, 'ASSIGNMENT', assignment):
+                with self.assertRaisesRegex(ValueError, 'graph context'):
+                    server.task_list()
     def test_initial_file_and_separate_atomic_draft(self):
         with tempfile.TemporaryDirectory() as tmp:
             source=Path(tmp)/'student_tasks.py'; source.write_text('my existing work', encoding='utf-8')
