@@ -207,15 +207,18 @@
     const {data, executedTarget, mode, questionId} = lastResult;
     const csvCell = value => '"' + String(value === null ? 'NULL' : value).replace(/"/g, '""') + '"';
     const row = values => values.map(csvCell).join(',');
+    // Data cells use a reversible escape convention; metadata and headers do not.
+    const dataCell = value => value === null ? '\\N' : String(value).replace(/\\/g, '\\\\');
     const lines = [
       row(['Server', targetName(executedTarget)]),
       row(['Mode', mode === 'commit' ? 'Applied and committed' : 'Query']),
       row(['Question', questionId]),
       row(['Displayed rows', data.rows.length]),
       row(['Truncated', data.truncated ? 'Yes' : 'No']),
+      row(['Data encoding', 'SQL NULL = \\N; backslashes in non-null values are doubled']),
       '',
       row(data.columns),
-      ...data.rows.map(values => row(values))
+      ...data.rows.map(values => row(values.map(dataCell)))
     ];
     const blob = new Blob([lines.join('\r\n') + '\r\n'], {type:'text/csv;charset=utf-8'});
     const url = URL.createObjectURL(blob);

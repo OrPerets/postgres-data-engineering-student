@@ -71,6 +71,7 @@
 
         <section class="results-card" aria-labelledby="results-title">
           <div class="results-heading"><div><p class="eyebrow">QUERY OUTPUT</p><h2 id="results-title">Results</h2><span class="result-note">Not graded · Downloads include displayed rows only</span></div><button id="download-results" class="schema-refresh" type="button" disabled>Download results CSV</button></div>
+          <p class="result-note">In downloaded CSV data cells, <code>\N</code> means SQL NULL. Non-null values escape each backslash as <code>\\</code>; after parsing CSV, replace each pair with one backslash. Headers and metadata are not escaped this way.</p>
           <div id="results" class="results" role="region" aria-live="polite" aria-label="Query results"><p class="empty-state">Your results will appear here after you run a query.</p></div>
         </section>
         <p class="backup-note"><strong>Before you finish:</strong> save your answers and download a copy for submission. Saving here does not submit your work.</p>
