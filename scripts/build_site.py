@@ -70,7 +70,8 @@ def filter_docs(directory: Path, enabled: dict[str, bool]) -> None:
                 (directory / asset).unlink()
 
     if "04" in hidden:
-        for asset in ("javascripts/lab04-mean.js", "stylesheets/lab04-mean.css"):
+        for asset in ("javascripts/lab04-mean.js", "stylesheets/lab04-mean.css",
+                      "javascripts/lab04-variance.js", "stylesheets/lab04-variance.css"):
             (directory / asset).unlink()
 
     # Filter any Markdown line containing a direct link to a hidden lab page.
@@ -178,7 +179,8 @@ def filtered_config(text: str, enabled: dict[str, bool]) -> str:
             for asset in (f"stylesheets/lab{number}-pack.css", f"javascripts/lab{number}-pack.js"):
                 text = require_replace(text, f"  - {asset}\n", "", f"Lab {number} asset {asset}")
     if not enabled["04"]:
-        for asset in ("javascripts/lab04-mean.js", "stylesheets/lab04-mean.css"):
+        for asset in ("javascripts/lab04-mean.js", "stylesheets/lab04-mean.css",
+                      "javascripts/lab04-variance.js", "stylesheets/lab04-variance.css"):
             text = require_replace(text, f"  - {asset}\n", "", f"Lab 04 asset {asset}")
     if not any(enabled.values()):
         text = require_replace(text, "extra_javascript:\n\n", "extra_javascript: []\n\n", "empty JavaScript list")

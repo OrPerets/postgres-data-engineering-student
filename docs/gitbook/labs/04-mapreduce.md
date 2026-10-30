@@ -86,6 +86,14 @@ Try the examples below: predict first, then reveal how each worker's count chang
 
 An empty worker contributes the partial state `(0, 0)` when states are merged. If the combined count is zero, the mean is undefined: the lab's reducer returns `None` instead of dividing by zero.
 
+### Explore mergeable population variance
+
+For question 7, compare local population variances with the result after merging `(count, sum, sum of squares)` states. Predict before revealing each result.
+
+<div id="lab04-variance-explorer"></div>
+
+<noscript>Paper exercise: workers A=[1, 2] and B=[3, 4] each have population variance 0.25. Merge their count, sum, and sum of squares. Is the variance of all four observations also 0.25? Consider empty input and floating-point cancellation too.</noscript>
+
 ### Practice with an interactive trace
 
 [Open the MapReduce trace and practice quiz](../activities/lab04-learning-pack.md) to step through a small character-count example in your browser. This is a logical simulation, not a networked cluster.

@@ -79,10 +79,13 @@ class SiteVisibilityTests(unittest.TestCase):
                 if number not in active:
                     self.assertNotIn(f"activities/lab{number}-learning-pack/", all_pages)
                     self.assertFalse((out / "javascripts" / f"lab{number}-pack.js").exists())
-            for asset in ("javascripts/lab04-mean.js", "stylesheets/lab04-mean.css"):
+            for asset in ("javascripts/lab04-mean.js", "stylesheets/lab04-mean.css",
+                          "javascripts/lab04-variance.js", "stylesheets/lab04-variance.css"):
                 self.assertEqual((out / asset).exists(), "04" in active, asset)
                 if "04" not in active:
                     self.assertNotIn(asset, all_pages)
+            if "04" in active:
+                self.assertIn('id="lab04-variance-explorer"', (out / "labs" / "04-mapreduce" / "index.html").read_text())
             for number, slug in PAGES.items():
                 with self.subTest(number=number, active=active):
                     self.assertEqual((out / "labs" / slug / "index.html").exists(), number in active)

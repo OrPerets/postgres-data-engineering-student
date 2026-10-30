@@ -1,0 +1,16 @@
+/* Compact variance activity, scoped to the course book. */
+.md-typeset .lab04-variance { margin: 1rem 0; padding: clamp(1rem, 3vw, 1.6rem); border: 1px solid #dfd1ca; border-top: 4px solid #8b2029; background: #fffefa; color: #26211f; }
+.md-typeset .lab04-variance__eyebrow { margin: 0; color: #70202a; font-size: .7rem; font-weight: 700; letter-spacing: .06em; }
+.md-typeset .lab04-variance h4 { margin: .35rem 0; }
+.md-typeset .lab04-variance label { display: block; font-weight: 700; }
+.md-typeset .lab04-variance select { display: block; box-sizing: border-box; width: 100%; max-width: 36rem; min-height: 2.5rem; margin-top: .35rem; padding: .5rem; color: #26211f; background: white; border: 1px solid #887671; font: inherit; }
+.md-typeset .lab04-variance button { min-height: 2.5rem; padding: .55rem 1rem; border: 1px solid #8b2029; color: white; background: #8b2029; font: inherit; font-weight: 700; cursor: pointer; }
+.md-typeset .lab04-variance button:hover { background: #641720; }
+.md-typeset .lab04-variance :focus-visible { outline: 3px solid #bf6855; outline-offset: 3px; }
+.md-typeset .lab04-variance__dots p { margin: .5rem 0; }
+.md-typeset .lab04-variance__dot { display: inline-flex; justify-content: center; align-items: center; min-width: 2rem; min-height: 2rem; margin: .15rem .25rem; border: 1px solid #81242d; border-radius: 50%; color: #5f1c22; background: #f9edeb; font-weight: 700; }
+.md-typeset .lab04-variance__table { overflow-x: auto; }
+.md-typeset .lab04-variance table { min-width: 30rem; width: 100%; }
+.md-typeset .lab04-variance caption { text-align: left; font-weight: 700; }
+.md-typeset .lab04-variance__result { margin-top: 1rem; padding: .75rem 1rem; border-left: 4px solid #8b2029; background: #f8f1ed; }
+.md-typeset .lab04-variance__note { font-size: .75rem; }
