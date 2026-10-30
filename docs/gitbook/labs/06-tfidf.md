@@ -99,6 +99,8 @@ For the PostgreSQL comparison required by the full 100-point assignment, run `ma
 
 **Checkpoint:** For `data` in document D1, TF=2/4, DF=3, N=4. Under the lab's natural-log convention, TF-IDF is approximately 0.1116.
 
+**Explore:** In the [TF-IDF practice](../activities/lab06-learning-pack.md), add an illustrative document with or without `data` and predict how the existing D1 score changes. The activity runs in your browser and does not modify your corpus.
+
 ### Optional assignment hints
 
 Try the tasks first; these hints give directions without providing the assignment solutions.

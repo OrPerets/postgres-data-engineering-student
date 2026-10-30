@@ -2,7 +2,7 @@ const { test } = require('node:test');
 const assert = require('node:assert/strict');
 const { traceRecords } = require('../docs/gitbook/javascripts/lab04-pack.js');
 const { step } = require('../docs/gitbook/javascripts/lab05-pack.js');
-const { score } = require('../docs/gitbook/javascripts/lab06-pack.js');
+const { score, compareAddedDocument } = require('../docs/gitbook/javascripts/lab06-pack.js');
 
 test('MapReduce trace preserves counts with and without a combiner', () => {
   const normal = traceRecords(['ABR', 'CCR', 'ACB'], false);
@@ -55,4 +55,19 @@ test('TF-IDF uses document frequency and natural log consistently', () => {
   assert.ok(Math.abs(data.value - 0.5 * Math.log(5/4)) < 1e-12);
   assert.equal(score('D1', 'pipelines').value, 0);
   assert.throws(() => score('missing', 'data'));
+});
+
+test('a new document changes corpus statistics but not D1 term frequency', () => {
+  const withData = compareAddedDocument('contains');
+  const withoutData = compareAddedDocument('absent');
+  assert.deepEqual([withData.before.n, withData.before.df, withData.before.tf], [4, 3, .5]);
+  assert.deepEqual([withData.after.n, withData.after.df, withData.after.tf], [5, 4, .5]);
+  assert.deepEqual([withoutData.after.n, withoutData.after.df, withoutData.after.tf], [5, 3, .5]);
+  assert.ok(Math.abs(withData.before.value - .5 * Math.log(5 / 4)) < 1e-12);
+  assert.ok(Math.abs(withData.after.value - .5 * Math.log(6 / 5)) < 1e-12);
+  assert.ok(Math.abs(withoutData.after.value - .5 * Math.log(6 / 4)) < 1e-12);
+  assert.ok(withData.after.value < withData.before.value);
+  assert.ok(withoutData.after.value > withoutData.before.value);
+  assert.equal(score('D1', 'data').n, 4); // The original corpus is not mutated.
+  assert.throws(() => compareAddedDocument('unexpected'));
 });

@@ -8,3 +8,12 @@
 #lab06-practice button { background: #8b2029; color: white; border: 1px solid #8b2029; padding: .6rem .9rem; margin: .35rem .5rem .35rem 0; cursor: pointer; }
 #lab06-practice button:disabled { opacity: .55; cursor: not-allowed; }
 #lab06-practice :focus-visible { outline: 3px solid #bf6855; outline-offset: 3px; }
+#lab06-practice .lab06-corpus__table-wrap { overflow-x: auto; }
+#lab06-practice .lab06-corpus__scroll-hint { font-size: .7rem; margin: .5rem 0 .2rem; }
+#lab06-practice .lab06-corpus table { min-width: 38rem; width: 100%; }
+#lab06-practice .lab06-corpus caption { text-align: left; font-weight: 600; }
+#lab06-practice .lab06-corpus__bars { padding: .8rem; background: white; }
+#lab06-practice .lab06-corpus__bars div { display: grid; grid-template-columns: 4.5rem minmax(4rem, 1fr) 5rem; gap: .5rem; align-items: center; margin: .4rem 0; }
+#lab06-practice .lab06-corpus__track { display: block; height: .8rem; background: #e5ddd9; }
+#lab06-practice .lab06-corpus__bar { display: block; height: 100%; background: #8b2029; }
+#lab06-practice .lab06-corpus__explanation { padding: .75rem; border-left: 3px solid #8b2029; background: white; }
