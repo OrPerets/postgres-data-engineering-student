@@ -1,6 +1,10 @@
 -- STUDENT WORKSPACE: fill in your own SQL answers.
--- WARNING: use Primary for DDL/INSERT; use Replica only for SELECT and attempted write demonstration.
--- Do not run the entire file until you have written valid statements.
+-- Run selected statements on the intended server; do not run this mixed file
+-- in full against either server, even after you have written valid statements.
+-- Use Primary for DDL and writes; use Replica for the requested reads/checks.
+-- B5 is a separate intentional write attempt on Replica: first confirm
+-- pg_is_in_recovery() is true, run it in a transaction, capture the expected
+-- standby error, then ROLLBACK. Do not retry that write on Primary.
 -- A1: list partition names and bounds
 
 -- A2: yearly count and revenue

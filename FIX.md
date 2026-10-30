@@ -71,9 +71,9 @@ These tasks address issues observed in the course review. Effort estimates are a
 
 ### 9. Correct the Lab 02 worksheet execution instructions
 
-- [ ] Replace the assignment's whole-file Primary command with instructions to execute selected statements on their intended server, consistent with the tutorial.
-- [ ] Clarify that B5 is a separate, intentional write attempt on the read-only Replica and preserve the distinction between Primary and Replica queries.
-- [ ] Update the worksheet warning so valid syntax does not imply that running the entire mixed-server file on Primary is safe.
+- [x] Replace the assignment's whole-file Primary command with instructions to execute selected statements on their intended server, consistent with the tutorial.
+- [x] Clarify that B5 is a separate, intentional write attempt on the read-only Replica and preserve the distinction between Primary and Replica queries.
+- [x] Update the worksheet warning so valid syntax does not imply that running the entire mixed-server file on Primary is safe.
 
 **Why:** The Lab 02 assignment currently suggests sending the whole completed worksheet to Primary and says not to run writes on Replica, while B5 explicitly asks students to try a write on the read-only Replica. Running that demonstration on Primary could change data rather than show the intended standby error. This is verified from source, not by a live PostgreSQL run.
 
@@ -82,6 +82,8 @@ These tasks address issues observed in the course review. Effort estimates are a
 **Acceptance:** The assignment and worksheet direct students to run each statement on the correct server, explain the B5 exception and do not recommend sending the mixed file to Primary. Validate instructions against the tutorial and, when available, a fresh lab environment.
 
 **Effort:** Small, a few hours.
+
+**Status, 2026-10-30:** Updated the assignment and starter worksheet locally to run selected statements on the correct server. B5 now explicitly checks the Replica role, runs separately in a transaction and rolls back after the expected standby error. All seven Lab 02 workspace tests and `git diff --check` passed; a live PostgreSQL/Codespaces run remains pending.
 
 ## P1 — Repair the learning sequence
 

@@ -17,9 +17,12 @@ The initializer preserves existing tables. If it reports incomplete setup, save 
 docker compose exec -T primary psql -v ON_ERROR_STOP=1 -U lab -d engineering < sql/04_lab_extensions.sql
 ```
 
-Connect to Primary: `docker compose exec primary psql -U lab -d engineering`
+Connect to Primary: `docker compose exec primary psql -U lab -d engineering`.
 Connect to Replica: `docker compose exec replica psql -U lab -d engineering`.
-For a SQL file run against Primary: `docker compose exec -T primary psql -U lab -d engineering < sql/student_exercises.sql` **only after writing valid SQL**. Do not run writes on Replica.
+
+The worksheet contains statements for **both** servers. Do not run the whole file against either server, even after all statements are valid. Copy and run each selected statement in the appropriate `psql` prompt; label it Primary or Replica in your answer. Use Primary for DDL and writes, and Replica for the reads and checks requested there. Exit a prompt with `\q` before connecting to the other server.
+
+For B5 only, first confirm the connection is the Replica with `SELECT pg_is_in_recovery();` (it should return `true`). In that Replica prompt, start a transaction, run your attempted modification separately and capture the expected read-only standby error, then issue `ROLLBACK;` to clear the failed transaction. Do not retry that write on Primary. If the role check is not `true`, stop and reconnect to the Replica before attempting the write.
 
 ## Part A: Write partitioning SQL (30 points)
 
