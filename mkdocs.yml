@@ -27,6 +27,7 @@ extra_css:
   - stylesheets/lab01-window-rank-lag.css
   - stylesheets/lab02-explorer.css
   - stylesheets/lab02-quiz.css
+  - stylesheets/lab02-months.css
   - stylesheets/lab06-pack.css
   - stylesheets/lab05-pack.css
   - stylesheets/lab04-pack.css
@@ -40,6 +41,7 @@ extra_javascript:
   - javascripts/lab01-window-rank-lag.js
   - javascripts/lab02-explorer.js
   - javascripts/lab02-quiz.js
+  - javascripts/lab02-months.js
   - javascripts/lab06-pack.js
   - javascripts/lab05-pack.js
   - javascripts/lab04-pack.js

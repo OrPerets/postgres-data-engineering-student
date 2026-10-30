@@ -1,0 +1,17 @@
+/* Scoped to the browser-only monthly-calendar explorer. */
+.md-typeset .lab02-months { margin: 1.5rem 0 2rem; padding: clamp(1rem, 3vw, 1.7rem); border: 1px solid #d8c9c4; border-top: 4px solid #81242d; color: #252020; background: #fff; }
+.md-typeset .lab02-months h3 { margin: .4rem 0; }
+.md-typeset .lab02-months__eyebrow { color: #81242d; font-weight: 800; font-size: .62rem; letter-spacing: .1em; }
+.md-typeset .lab02-months__controls { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: .8rem; }
+.md-typeset .lab02-months__controls label { font-weight: 700; font-size: .72rem; }
+.md-typeset .lab02-months select { display: block; width: 100%; min-height: 2.4rem; margin-top: .3rem; padding: .35rem; border: 1px solid #857471; background: #fff; color: #211b1b; font: inherit; }
+.md-typeset .lab02-months button { margin: 1rem 0; padding: .55rem .8rem; border: 1px solid #81242d; background: #81242d; color: #fff; font: inherit; font-weight: 700; cursor: pointer; }
+.md-typeset .lab02-months select:focus-visible, .md-typeset .lab02-months button:focus-visible, .md-typeset .lab02-months__table:focus-visible { outline: 3px solid #bf6855; outline-offset: 3px; }
+.md-typeset .lab02-months__table { overflow-x: auto; }
+.md-typeset .lab02-months table { width: 100%; min-width: 25rem; }
+.md-typeset .lab02-months caption { text-align: left; font-weight: 700; }
+.md-typeset .lab02-months__in-frame td, .md-typeset .lab02-months__in-frame th { background: #f9edeb; }
+.md-typeset .lab02-months__current th { border-left: 4px solid #81242d; }
+.md-typeset .lab02-months__result { margin-top: 1rem; padding: .85rem; border-left: 3px solid #81242d; background: #f9f6f2; }
+.md-typeset .lab02-months__note { font-size: .7rem; }
+@media (max-width: 640px) { .md-typeset .lab02-months__controls { grid-template-columns: 1fr; } }

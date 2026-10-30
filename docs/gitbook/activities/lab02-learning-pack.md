@@ -10,6 +10,14 @@ Choose a date range to see which yearly partitions could be scanned, then explor
 
 <noscript>The explorer needs JavaScript enabled. You can still read the [Lab 02 guide](../labs/02-partitions-replicas.md) and complete the workshop in Codespaces.</noscript>
 
+## Explore missing months and windows
+
+Predict how a missing February changes the previous row and a three-row average. Compare the sparse rows with a complete monthly calendar. These examples are browser-only simulations.
+
+<div id="lab02-months-explorer"></div>
+
+<noscript>Paper exercise: use January = 100, March = 300, April = 200. Compare March's previous row and three-row average before and after adding a February row with revenue 0. Zero is appropriate here only because the example assumes complete data and no February sales; missing or unknown data is not automatically zero.</noscript>
+
 ## Check your understanding
 
 Try five short questions about partitioning, replication and window functions. Each answer includes an explanation. This self-check is for practice; no results are recorded or submitted.

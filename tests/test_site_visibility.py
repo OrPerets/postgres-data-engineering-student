@@ -58,6 +58,12 @@ class SiteVisibilityTests(unittest.TestCase):
                 self.assertFalse((out / "javascripts" / "lab01-quiz.js").exists())
             second_pack = out / "activities" / "lab02-learning-pack" / "index.html"
             self.assertEqual(second_pack.exists(), "02" in active)
+            for asset in ("javascripts/lab02-months.js", "stylesheets/lab02-months.css"):
+                self.assertEqual((out / asset).exists(), "02" in active, asset)
+                if "02" not in active:
+                    self.assertNotIn(asset, all_pages)
+            if "02" in active:
+                self.assertIn('id="lab02-months-explorer"', second_pack.read_text())
             if "02" not in active:
                 self.assertNotIn("activities/lab02-learning-pack/", all_pages)
                 self.assertFalse((out / "javascripts" / "lab02-quiz.js").exists())

@@ -59,8 +59,8 @@ def filter_docs(directory: Path, enabled: dict[str, bool]) -> None:
             (directory / asset).unlink()
     if "02" in hidden:
         (directory / "activities" / "lab02-learning-pack.md").unlink()
-        for asset in ("javascripts/lab02-explorer.js", "javascripts/lab02-quiz.js",
-                      "stylesheets/lab02-explorer.css", "stylesheets/lab02-quiz.css"):
+        for asset in ("javascripts/lab02-explorer.js", "javascripts/lab02-quiz.js", "javascripts/lab02-months.js",
+                      "stylesheets/lab02-explorer.css", "stylesheets/lab02-quiz.css", "stylesheets/lab02-months.css"):
             (directory / asset).unlink()
 
     for number in ("03", "04", "05", "06"):
@@ -168,8 +168,8 @@ def filtered_config(text: str, enabled: dict[str, bool]) -> str:
             text = require_replace(text, f"  - {asset}\n", "", f"Lab 01 asset {asset}")
     if not enabled["02"]:
         text = require_replace(text, "      - Partitioning practice & quiz: activities/lab02-learning-pack.md\n", "", "Lab 02 practice nav")
-        for asset in ("stylesheets/lab02-explorer.css", "stylesheets/lab02-quiz.css",
-                      "javascripts/lab02-explorer.js", "javascripts/lab02-quiz.js"):
+        for asset in ("stylesheets/lab02-explorer.css", "stylesheets/lab02-quiz.css", "stylesheets/lab02-months.css",
+                      "javascripts/lab02-explorer.js", "javascripts/lab02-quiz.js", "javascripts/lab02-months.js"):
             text = require_replace(text, f"  - {asset}\n", "", f"Lab 02 asset {asset}")
     for number, label in (("03", "Warehouse"), ("04", "MapReduce"),
                           ("05", "PageRank"), ("06", "TF-IDF")):
