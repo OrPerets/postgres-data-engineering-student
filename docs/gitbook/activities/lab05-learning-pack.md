@@ -4,7 +4,7 @@ Use these optional activities before or during [Lab 05](../labs/05-pagerank.md).
 
 ## Explore rank over iterations
 
-Start with the four-page graph and predict how rank flows. Step through the updates and observe the total rank and the change between iterations. The explorer runs locally in your browser; it is a logical simulation, not a distributed cluster.
+Start with the four-page graph and predict how rank flows. Choose a damping factor, step through the updates and observe the total rank, shared contributions and change between iterations. Changing the factor restarts from the same uniform ranks. The explorer runs locally in your browser; it is a logical simulation, not a distributed cluster.
 
 <div id="lab05-pagerank-explorer"></div>
 

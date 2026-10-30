@@ -4,10 +4,10 @@
 
   const nodes = ['A', 'B', 'C', 'D'];
   const graph = { A: ['B', 'C'], B: ['C'], C: ['A'], D: [] };
-  const damping = 0.85;
 
   // The distributed mass from a dangling node is inside the damping factor.
-  function step(ranks) {
+  function step(ranks, damping = 0.85) {
+    if (!Number.isFinite(damping) || damping < 0 || damping > 1) throw new Error('Damping must be between 0 and 1');
     const incoming = { A: 0, B: 0, C: 0, D: 0 };
     let dangling = 0;
     for (const node of nodes) {
@@ -16,7 +16,7 @@
     }
     const next = {};
     for (const node of nodes) next[node] = (1 - damping) / nodes.length + damping * (incoming[node] + dangling / nodes.length);
-    return { incoming, dangling, next };
+    return { incoming, dangling, next, teleport: (1 - damping) / nodes.length, danglingContribution: damping * dangling / nodes.length };
   }
   if (typeof module !== 'undefined' && module.exports) module.exports = { step };
   if (typeof document === 'undefined') return;
@@ -29,12 +29,15 @@
     root.innerHTML = `
       <h3>Follow one rank update</h3>
       <p class="lab05-explorer__graph"><strong>Graph:</strong> A → B, C &nbsp; · &nbsp; B → C &nbsp; · &nbsp; C → A &nbsp; · &nbsp; D → none</p>
-      <p>Every page starts at 0.25; damping <strong>d = 0.85</strong>. Predict the next ranks before you step.</p>
+      <p>Every page starts at 0.25. Choose a damping factor and predict the next ranks before you step. Changing the factor restarts the simulation from uniform ranks.</p>
+      <label class="lab05-explorer__label" for="lab05-damping">Damping factor d</label>
+      <select id="lab05-damping"><option value="0.50">0.50</option><option value="0.85" selected>0.85</option><option value="0.95">0.95</option></select>
       <p class="lab05-explorer__iteration"></p>
       <div class="lab05-explorer__table-wrap" role="region" aria-label="PageRank table" tabindex="0">
         <table><caption>Rank per page at the current iteration</caption><thead><tr><th scope="col">Page</th><th scope="col">Rank</th><th scope="col">Outlinks</th></tr></thead><tbody></tbody></table>
       </div>
       <p class="lab05-explorer__status" role="status" aria-live="polite" aria-atomic="true"></p>
+      <p class="lab05-explorer__contributions"></p>
       <div class="lab05-explorer__actions"><button type="button" data-action="next">Next iteration</button><button type="button" data-action="reset">Reset</button></div>
       <p class="lab05-explorer__formula"><code>new rank = (1-d)/4 + d × (incoming + dangling mass/4)</code></p>
       <p>Redistributed dangling mass is multiplied by <strong>d</strong>, as are the incoming link contributions. Values are rounded only for display; calculations use full precision.</p>
@@ -42,38 +45,49 @@
     let ranks = Object.fromEntries(nodes.map(node => [node, 0.25]));
     let iteration = 0;
     let previousChange = null;
+    let lastUpdate = null;
+    const dampingSelect = root.querySelector('#lab05-damping');
     const tbody = root.querySelector('tbody');
     const iterationLabel = root.querySelector('.lab05-explorer__iteration');
     const status = root.querySelector('.lab05-explorer__status');
+    const contributions = root.querySelector('.lab05-explorer__contributions');
     function render() {
       tbody.replaceChildren();
       for (const node of nodes) {
         const row = document.createElement('tr');
-        for (const text of [node, ranks[node].toFixed(6), graph[node].length ? graph[node].join(', ') : 'none (dangling)']) {
-          const cell = document.createElement('td');
-          cell.textContent = text;
-          row.append(cell);
-        }
+        const name = document.createElement('th'); name.scope = 'row'; name.textContent = node;
+        const rank = document.createElement('td');
+        const value = document.createElement('span'); value.textContent = ranks[node].toFixed(6);
+        const track = document.createElement('span'); track.className = 'lab05-explorer__bar-track'; track.setAttribute('aria-hidden', 'true');
+        const fill = document.createElement('span'); fill.className = 'lab05-explorer__bar-fill'; fill.style.width = `${Math.max(0, Math.min(100, ranks[node] * 100))}%`; track.append(fill); rank.append(value, track);
+        const links = document.createElement('td'); links.textContent = graph[node].length ? graph[node].join(', ') : 'none (dangling)';
+        row.append(name, rank, links);
         tbody.append(row);
       }
-      iterationLabel.textContent = `Iteration ${iteration}`;
+      iterationLabel.textContent = `Iteration ${iteration} · damping d = ${Number(dampingSelect.value).toFixed(2)}`;
       const total = nodes.reduce((sum, node) => sum + ranks[node], 0);
-      status.textContent = `Total rank: ${total.toFixed(6)}. Dangling mass: ${ranks.D.toFixed(6)}.` +
+      status.textContent = `Total rank: ${total.toFixed(6)}. Current dangling mass: ${ranks.D.toFixed(6)}.` +
         (previousChange === null ? ' Starting ranks are uniform.' : ` L1 change from previous iteration: ${previousChange.toFixed(6)}.`);
+      const update = lastUpdate || step(ranks, Number(dampingSelect.value));
+      contributions.textContent = `${lastUpdate ? 'Last update' : 'Next update'}: teleportation adds ${update.teleport.toFixed(6)} to each page; dangling rank ${update.dangling.toFixed(6)} contributes ${update.danglingContribution.toFixed(6)} to each page after damping.`;
     }
     root.querySelector('[data-action="next"]').addEventListener('click', function () {
-      const result = step(ranks);
+      const result = step(ranks, Number(dampingSelect.value));
       previousChange = nodes.reduce((sum, node) => sum + Math.abs(result.next[node] - ranks[node]), 0);
       ranks = result.next;
+      lastUpdate = result;
       iteration += 1;
       render();
     });
-    root.querySelector('[data-action="reset"]').addEventListener('click', function () {
+    function reset() {
       ranks = Object.fromEntries(nodes.map(node => [node, 0.25]));
       iteration = 0;
       previousChange = null;
+      lastUpdate = null;
       render();
-    });
+    }
+    root.querySelector('[data-action="reset"]').addEventListener('click', reset);
+    dampingSelect.addEventListener('change', reset);
     render();
   }
 

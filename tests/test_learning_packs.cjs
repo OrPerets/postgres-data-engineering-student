@@ -26,6 +26,29 @@ test('PageRank conserves mass and damps dangling mass', () => {
   }
 });
 
+test('PageRank damping changes a first step while preserving mass', () => {
+  const uniform = { A:.25, B:.25, C:.25, D:.25 };
+  // Each pre-damping input is link contribution + .25/4 from dangling D.
+  const expected = {
+    0.50: { A:.28125, B:.21875, C:.34375, D:.15625 },
+    0.85: { A:.303125, B:.196875, C:.409375, D:.090625 },
+    0.95: { A:.309375, B:.190625, C:.428125, D:.071875 }
+  };
+  for (const d of [.5, .85, .95]) {
+    const result = step(uniform, d);
+    for (const [node, value] of Object.entries(expected[d])) assert.ok(Math.abs(result.next[node] - value) < 1e-12);
+    assert.ok(Math.abs(result.teleport - (1-d)/4) < 1e-12);
+    assert.ok(Math.abs(result.danglingContribution - d*.25/4) < 1e-12);
+    let ranks = uniform;
+    for (let i = 0; i < 50; i++) {
+      ranks = step(ranks, d).next;
+      assert.ok(Math.abs(Object.values(ranks).reduce((sum, v) => sum + v, 0) - 1) < 1e-12);
+    }
+  }
+  assert.throws(() => step(uniform, -0.1));
+  assert.throws(() => step(uniform, 1.1));
+});
+
 test('TF-IDF uses document frequency and natural log consistently', () => {
   const data = score('D1', 'data');
   assert.equal(data.count, 2); assert.equal(data.length, 4); assert.equal(data.df, 3);

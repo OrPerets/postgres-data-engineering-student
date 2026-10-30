@@ -308,6 +308,8 @@ flowchart LR
 
 Run the model using `d=0.50`, `0.85`, then `0.95`. Record final rank order, number of iterations and whether the total rank remains 1.
 
+You can first explore these factors with the [browser PageRank explorer](../activities/lab05-learning-pack.md). Changing the factor resets its ranks to the same starting state. For iteration counts, choose the same L1 stopping tolerance for every run; the explorer reports the change but does not stop automatically.
+
 Try the [performance benchmark](https://github.com/OrPerets/postgres-data-engineering-student/blob/main/labs/05-pagerank/PERFORMANCE_ASSIGNMENT.md) and explain why more local worker processes can sometimes make performance worse.
 
 **This benchmark uses one host, not a multi-machine Hadoop cluster.**

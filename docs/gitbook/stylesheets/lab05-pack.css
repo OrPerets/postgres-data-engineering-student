@@ -80,8 +80,12 @@
 }
 .md-typeset .lab05-explorer h3 { margin-top: 0; }
 .md-typeset .lab05-explorer__graph { font-weight: 500; }
+.md-typeset .lab05-explorer__label { display: block; font-weight: 700; }
+.md-typeset .lab05-explorer select { display: block; width: min(100%, 12rem); min-height: 2.5rem; margin-top: .35rem; padding: .4rem .6rem; border: 1px solid #8b7771; background: white; color: #26211f; font: inherit; }
 .md-typeset .lab05-explorer__table-wrap { overflow-x: auto; }
 .md-typeset .lab05-explorer table { width: 100%; background: #fffefa; }
+.md-typeset .lab05-explorer__bar-track { display: block; width: 100%; min-width: 5rem; height: .55rem; margin-top: .3rem; background: #e5dad6; }
+.md-typeset .lab05-explorer__bar-fill { display: block; height: 100%; background: #81242b; }
 .md-typeset .lab05-explorer__status { font-weight: 700; }
 .md-typeset .lab05-explorer__formula { overflow-x: auto; }
 .md-typeset .lab05-explorer__actions { display: flex; flex-wrap: wrap; gap: .6rem; }
