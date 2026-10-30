@@ -1,6 +1,14 @@
-# Lab 06 — TF-IDF practice
+# Lab 06 — Regex and TF-IDF practice
 
-Explore the small lecture corpus and try five questions before returning to [Lab 06](../labs/06-tfidf.md). These activities are optional practice and do not grade or submit your assignment.
+Explore ticket-ID boundaries and the small lecture corpus, then try five questions before returning to [Lab 06](../labs/06-tfidf.md). These activities are optional practice and do not grade or submit your assignment.
+
+## Explore ticket-ID boundaries
+
+Compare an unbounded pattern with a pattern using word boundaries. Predict what each matches before revealing the substrings and offsets. These fixed ASCII examples run in your browser; they do not execute Python.
+
+<div id="lab06-regex"></div>
+
+<noscript>Paper exercise: compare TKT-[0-9]{4,6} with the same pattern surrounded by word boundaries. Predict the match for TKT-1042, TKT-12, TKT-1042A, TKT-1234_, TKT-1234567 and xTKT-1042. Consider the characters immediately outside each candidate; underscore is a word character. The examples use ASCII and uppercase IDs.</noscript>
 
 ## Explore term weights
 

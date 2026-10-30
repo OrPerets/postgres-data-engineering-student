@@ -17,3 +17,15 @@
 #lab06-practice .lab06-corpus__track { display: block; height: .8rem; background: #e5ddd9; }
 #lab06-practice .lab06-corpus__bar { display: block; height: 100%; background: #8b2029; }
 #lab06-practice .lab06-corpus__explanation { padding: .75rem; border-left: 3px solid #8b2029; background: white; }
+#lab06-regex .lab06-regex { border-top: 3px solid #8b2029; background: #f7f3f0; padding: 1.2rem; margin: 1rem 0; }
+#lab06-regex .lab06-regex__eyebrow { font-size: .65rem; font-weight: 800; letter-spacing: .08em; color: #792129; }
+#lab06-regex label { display: block; font-weight: 600; margin: .6rem 0; }
+#lab06-regex select { display: block; min-height: 2.5rem; width: 100%; max-width: 24rem; background: white; border: 1px solid #777; padding: .45rem; }
+#lab06-regex button { background: #8b2029; color: white; border: 1px solid #8b2029; padding: .6rem .9rem; margin: .5rem 0; cursor: pointer; }
+#lab06-regex :focus-visible { outline: 3px solid #bf6855; outline-offset: 3px; }
+#lab06-regex .lab06-regex__table-wrap { overflow-x: auto; }
+#lab06-regex table { width: 100%; min-width: 28rem; }
+#lab06-regex caption { text-align: left; font-weight: 600; }
+#lab06-regex .lab06-regex__matches, #lab06-regex .lab06-regex__explain { padding: .75rem; background: white; overflow-wrap: anywhere; }
+#lab06-regex mark { background: #f8dca0; color: #211a10; text-decoration: underline; }
+#lab06-regex .lab06-regex__note { font-size: .72rem; }

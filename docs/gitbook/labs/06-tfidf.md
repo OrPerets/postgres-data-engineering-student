@@ -53,7 +53,7 @@ refund USD 120.50 requested
 
 **Predict:** Which ticket IDs are valid if the pattern requires 4–6 digits? Should `TKT-12` match?
 
-[Try the interactive TF-IDF explorer and practice quiz](../activities/lab06-learning-pack.md).
+[Explore ticket-ID boundaries, TF-IDF and the practice quiz](../activities/lab06-learning-pack.md).
 
 ## 3. Explore the transformation pipeline
 

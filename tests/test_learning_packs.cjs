@@ -3,7 +3,7 @@ const assert = require('node:assert/strict');
 const { newLoadState, loadSelectedRow, correctSelectedSource } = require('../docs/gitbook/javascripts/lab03-pack.js');
 const { traceRecords } = require('../docs/gitbook/javascripts/lab04-pack.js');
 const { step } = require('../docs/gitbook/javascripts/lab05-pack.js');
-const { score, compareAddedDocument } = require('../docs/gitbook/javascripts/lab06-pack.js');
+const { score, compareAddedDocument, compareTicketPatterns } = require('../docs/gitbook/javascripts/lab06-pack.js');
 
 test('fixed fact key skips reruns and does not propagate source corrections', () => {
   const initial = newLoadState();
@@ -86,4 +86,21 @@ test('a new document changes corpus statistics but not D1 term frequency', () =>
   assert.ok(withoutData.after.value > withoutData.before.value);
   assert.equal(score('D1', 'data').n, 4); // The original corpus is not mutated.
   assert.throws(() => compareAddedDocument('unexpected'));
+});
+
+test('ticket boundary examples distinguish complete IDs from partial matches', () => {
+  const samples = [
+    ['TKT-1042', { text:'TKT-1042', start:0, end:8 }, { text:'TKT-1042', start:0, end:8 }],
+    ['TKT-12', null, null],
+    ['TKT-1042A', { text:'TKT-1042', start:0, end:8 }, null],
+    ['TKT-1234_', { text:'TKT-1234', start:0, end:8 }, null],
+    ['TKT-1234567', { text:'TKT-123456', start:0, end:10 }, null],
+    ['xTKT-1042', { text:'TKT-1042', start:1, end:9 }, null],
+    ['TKT-998877', { text:'TKT-998877', start:0, end:10 }, { text:'TKT-998877', start:0, end:10 }],
+    ['TKT-12345', { text:'TKT-12345', start:0, end:9 }, { text:'TKT-12345', start:0, end:9 }],
+    ['Ticket=TKT-1042.', { text:'TKT-1042', start:7, end:15 }, { text:'TKT-1042', start:7, end:15 }],
+    ['tkt-1042', null, null]
+  ];
+  for (const [text, loose, bounded] of samples) assert.deepEqual(compareTicketPatterns(text), { loose, bounded });
+  assert.throws(() => compareTicketPatterns('éTKT-1042'));
 });

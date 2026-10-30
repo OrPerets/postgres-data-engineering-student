@@ -24,7 +24,17 @@
     if (!Object.hasOwn(examples, scenario)) throw new Error('Unknown example');
     return { text: examples[scenario], before: score('D1', 'data'), after: scoreInCorpus({ ...corpus, D5: examples[scenario] }, 'D1', 'data') };
   }
-  if (typeof module !== 'undefined' && module.exports) module.exports = { score, compareAddedDocument };
+  // Fixed ASCII examples only: JavaScript and Python word boundaries can differ
+  // for non-ASCII text. End offsets are exclusive.
+  function compareTicketPatterns(text) {
+    if (typeof text !== 'string' || !/^[\x00-\x7f]*$/.test(text)) throw new Error('This illustration accepts ASCII text only');
+    function match(pattern) {
+      const found = pattern.exec(text);
+      return found ? { text: found[0], start: found.index, end: found.index + found[0].length } : null;
+    }
+    return { loose: match(/TKT-[0-9]{4,6}/), bounded: match(/\bTKT-[0-9]{4,6}\b/) };
+  }
+  if (typeof module !== 'undefined' && module.exports) module.exports = { score, compareAddedDocument, compareTicketPatterns };
   if (typeof document === 'undefined') return;
   const questions = [
     { q:'A term appears three times in a document of six tokens. What is its normalized TF?', options:['3','0.5','6'], answer:1, why:'TF is the term count divided by document length: 3 / 6 = 0.5.' },
@@ -33,7 +43,57 @@
     { q:'Why can adding a new document affect existing TF-IDF scores?', options:['It cannot affect existing scores','N and document frequencies may change','Only punctuation changes'], answer:1, why:'IDF uses corpus-wide N and DF, so existing document scores may require recalculation.' },
     { q:'What does the logical MapReduce demonstration establish?', options:['A multi-machine speedup','How records and grouping stages relate','The measured network shuffle cost'], answer:1, why:'The demonstration simulates logical grouping locally; it does not measure a multi-machine cluster or network shuffle.' }
   ];
+  function initRegex() {
+    const root = document.getElementById('lab06-regex');
+    if (!root || root.dataset.ready) return;
+    root.dataset.ready = 'true';
+    root.innerHTML = `<section class="lab06-regex" aria-labelledby="lab06-regex-title">
+      <p class="lab06-regex__eyebrow">INTERACTIVE · REGEX BOUNDARIES</p>
+      <h3 id="lab06-regex-title">Can a regex match only part of an ID?</h3>
+      <p>Choose an ASCII example. Predict whether each case-sensitive pattern finds a match before revealing the result.</p>
+      <label for="lab06-regex-example">Example text</label>
+      <select id="lab06-regex-example"><option>TKT-1042</option><option>TKT-12</option><option>TKT-1042A</option><option>TKT-1234_</option><option>TKT-1234567</option><option>xTKT-1042</option><option>TKT-998877</option></select>
+      <button type="button" id="lab06-regex-reveal" aria-expanded="false" aria-controls="lab06-regex-result">Reveal matches</button>
+      <div id="lab06-regex-result" hidden>
+        <p>Offsets start at zero; the end offset is exclusive. Scroll horizontally if needed.</p>
+        <div class="lab06-regex__table-wrap" role="region" aria-label="Pattern match comparison" tabindex="0"><table><caption>First match in the selected text</caption><thead><tr><th scope="col">Pattern</th><th scope="col">Matched substring</th><th scope="col">Offsets [start, end)</th></tr></thead><tbody></tbody></table></div>
+        <div class="lab06-regex__matches" role="status" aria-live="polite" aria-atomic="true"></div>
+        <p class="lab06-regex__explain"></p>
+      </div>
+      <p class="lab06-regex__note">Browser simulation with fixed ASCII examples, not Python execution. The assignment requests uppercase IDs; its Python demo uses case-insensitive matching. JavaScript and Python word-boundary behavior can differ for non-ASCII text.</p>
+    </section>`;
+    const example = root.querySelector('#lab06-regex-example'), reveal = root.querySelector('#lab06-regex-reveal');
+    const result = root.querySelector('#lab06-regex-result'), tbody = root.querySelector('tbody');
+    const matches = root.querySelector('.lab06-regex__matches'), explain = root.querySelector('.lab06-regex__explain');
+    let shown = false;
+    function render() {
+      const input = example.value, values = compareTicketPatterns(input);
+      tbody.replaceChildren(); matches.replaceChildren();
+      for (const [name, pattern, found] of [['Unbounded', 'TKT-[0-9]{4,6}', values.loose], ['Bounded', String.raw`\bTKT-[0-9]{4,6}\b`, values.bounded]]) {
+        const row = document.createElement('tr');
+        const heading = document.createElement('th'); heading.scope = 'row'; heading.textContent = `${name}: ${pattern}`; row.append(heading);
+        for (const value of [found ? found.text : 'No match', found ? `[${found.start}, ${found.end})` : '—']) {
+          const cell = document.createElement('td'); cell.textContent = value; row.append(cell);
+        }
+        tbody.append(row);
+        const line = document.createElement('p'); const label = document.createElement('strong'); label.textContent = `${name}: `; line.append(label);
+        if (found) {
+          const code = document.createElement('code'); code.append(document.createTextNode(input.slice(0, found.start)));
+          const mark = document.createElement('mark'); mark.textContent = found.text; code.append(mark, document.createTextNode(input.slice(found.end))); line.append(code);
+        } else line.append(document.createTextNode('No match'));
+        matches.append(line);
+      }
+      explain.textContent = values.loose && !values.bounded
+        ? 'The unbounded pattern finds a substring even though the bounded pattern rejects it. Check the characters immediately before and after the candidate.'
+        : values.bounded ? 'Both patterns find this candidate. The word boundaries require a transition between word and non-word positions around the ID.'
+        : 'Neither pattern finds four consecutive digits after the uppercase TKT- prefix in this example.';
+      result.hidden = !shown; reveal.textContent = shown ? 'Hide matches' : 'Reveal matches'; reveal.setAttribute('aria-expanded', String(shown));
+    }
+    example.addEventListener('change', () => { shown = false; render(); });
+    reveal.addEventListener('click', () => { shown = !shown; render(); }); render();
+  }
   function init() {
+    initRegex();
     const root = document.getElementById('lab06-practice');
     if (!root || root.dataset.ready) return;
     root.dataset.ready = 'true';
