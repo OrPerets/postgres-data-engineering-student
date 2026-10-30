@@ -144,7 +144,6 @@ Try answering aloud before revealing each suggested answer. Use an example from 
 
 <details><summary>4. How would you tell when an iterative PageRank calculation can stop?</summary><p>Compare successive rank vectors with a stated distance, such as the sum of absolute differences, and stop when it falls below a tolerance or a maximum iteration count is reached. Also check that ranks remain nonnegative and sum approximately to one.</p></details>
 
-**Next:** [Lab 06 — TF-IDF](06-tfidf.md).
 
 
 ## Visual walkthrough — One rank update
@@ -332,3 +331,5 @@ python -m http.server 8000 --directory simulators
 ```
 
 Open forwarded port **8000** in the Codespaces Ports panel (keep visibility **Private**). Select **PageRank**, change the input or parameters, and navigate one step at a time. The app is not yet deployed as a public website.
+
+**Next:** [Lab 06 — TF-IDF](06-tfidf.md).

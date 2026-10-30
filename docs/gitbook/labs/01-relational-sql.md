@@ -192,6 +192,31 @@ The correlated subquery may repeatedly scan the table for each transaction. The 
 
 Read the [performance challenge](https://github.com/OrPerets/postgres-data-engineering-student/blob/main/labs/01-relational-sql/benchmarks/STUDENT_CHALLENGE.md). Add a composite index and compare again.
 
+## Visual checkpoint — One result, two query plans
+
+The running-total benchmark computes identical per-row results using two approaches.
+
+| Stage | Correlated subquery | Window function |
+|---|---|---|
+| Read sales | Outer scan, then repeated inner scans | One main scan |
+| Order rows | No explicit sort in original plan | Sort by customer, date, sale ID |
+| Calculate cumulative sum | Repeated aggregate per sale | One WindowAgg plan node |
+| Verify | Compare every output row | Compare every output row |
+
+### Five-row illustration (not a timing measurement)
+
+| Sale ID | Amount | Running total |
+|---|---:|---:|
+| 1 | 10 | 10 |
+| 2 | 20 | 30 |
+| 3 | 30 | 60 |
+| 4 | 40 | 100 |
+| 5 | 50 | 150 |
+
+**Predict:** How many previous values would the naive correlated approach revisit for the fifth row? How many new values does an incremental running sum need to add when moving from row four to row five?
+
+**Try it:** Run `benchmarks/03_compact_report.sql` and compare the real execution counts. The five-row table is only an illustrative example; the benchmark itself uses a larger synthetic dataset.
+
 ## 5. Reflect and finish
 
 Before leaving the lab, be ready to explain:
@@ -223,29 +248,3 @@ Try answering aloud before expanding each suggested answer. Use examples from th
 **Deliverable:** Your completed SQL answers, together with any explanation or benchmark evidence requested by your instructor.
 
 **Next:** [Lab 02 — Partitions & Replication](02-partitions-replicas.md).
-
-
-## Visual checkpoint — One result, two query plans
-
-The running-total benchmark computes identical per-row results using two approaches.
-
-| Stage | Correlated subquery | Window function |
-|---|---|---|
-| Read sales | Outer scan, then repeated inner scans | One main scan |
-| Order rows | No explicit sort in original plan | Sort by customer, date, sale ID |
-| Calculate cumulative sum | Repeated aggregate per sale | One WindowAgg plan node |
-| Verify | Compare every output row | Compare every output row |
-
-### Five-row illustration (not a timing measurement)
-
-| Sale ID | Amount | Running total |
-|---|---:|---:|
-| 1 | 10 | 10 |
-| 2 | 20 | 30 |
-| 3 | 30 | 60 |
-| 4 | 40 | 100 |
-| 5 | 50 | 150 |
-
-**Predict:** How many previous values would the naive correlated approach revisit for the fifth row? How many new values does an incremental running sum need to add when moving from row four to row five?
-
-**Try it:** Run `benchmarks/03_compact_report.sql` and compare the real execution counts. The five-row table is only an illustrative example; the benchmark itself uses a larger synthetic dataset.
