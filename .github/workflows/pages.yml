@@ -27,6 +27,11 @@ jobs:
       - run: python -m unittest discover -s tests -q
       - run: python -m unittest discover -s labs/01-relational-sql/workspace/tests -q
       - run: python -m unittest discover -s labs/02-partitioning-replication/workspace/tests -q
+      - run: python -m unittest discover -s labs/03-dwh-etl/workspace/tests -q
+      - run: python -m unittest discover -s labs/04-mapreduce/workspace/tests -q
+      - run: python -m unittest discover -s labs/05-pagerank/workspace/tests -q
+      - run: python -m unittest discover -s labs/06-tfidf/workspace/tests -q
+      - run: for lab in 03-dwh-etl 04-mapreduce 05-pagerank 06-tfidf; do node --check "labs/$lab/workspace/app.js" || exit 1; done
       - run: node --test tests/test_lab01_join.cjs tests/test_lab02_partitions.cjs tests/test_learning_packs.cjs
       - run: python scripts/build_site.py --site-dir site
       - uses: actions/upload-pages-artifact@v3

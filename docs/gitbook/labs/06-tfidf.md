@@ -6,6 +6,8 @@
 
 !!! info "Your work"
 
+    **Guided workspace:** From the repository root, run `make lab-tfidf-workspace`. Keep the terminal open and use the Codespace **Ports** tab to open private port **8770** in a browser. Work on a separate Python draft, add task notes, run examples and tests, and explicitly save and download your work. For the full assignment's PostgreSQL questions, first run `make lab-tfidf-sql` from the repository root in another terminal; the workspace can run the reference query and your SQL answer. Python-only exploration does not complete those questions.
+
     **Edit in Codespaces:** In Explorer, open `labs → 06-tfidf → student_tasks.py` and implement the Python exercises. Save your SQL answer for question 9 in a file or report of your own. Save changes with **Ctrl+S** (Windows/Linux) or **⌘S** (Mac).
 
     **Run and check:** From the repository root, run `make lab-tfidf` for the Python demo. The full assignment also requires PostgreSQL for questions 8–9: run `make lab-tfidf-sql` from the repository root, then enter the lab folder to run the reference query and Python tests:

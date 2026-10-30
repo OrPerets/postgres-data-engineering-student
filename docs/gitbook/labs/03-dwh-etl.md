@@ -6,6 +6,8 @@
 
 !!! info "Your work"
 
+    **Guided workspace:** From the repository root, run `make lab-dwh` and then `make lab-dwh-workspace`. Keep the terminal open and use the Codespace **Ports** tab to open private port **8767** in a browser. The workspace shows the questions, schema and SQL results. Save drafts explicitly and download your SQL; keep your report separately. The original worksheet remains separate.
+
     **Edit in Codespaces:** In Explorer, open `labs → 03-dwh-etl → sql → student_exercises.sql` and write your SQL answers there. Keep your explanations in a separate Markdown or PDF report. The provided `01_stage.sql` and `02_dwh.sql` are lab setup scripts; do not edit them for your answers.
 
     **Start and check:** From the repository root, run `make lab-dwh` to initialize the sample, then `make test LAB=03-dwh-etl` to inspect sample data and check that the source and fact tables are nonempty. This check **does not grade your answers**.

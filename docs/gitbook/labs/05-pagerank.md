@@ -6,6 +6,8 @@
 
 !!! info "Your work"
 
+    **Guided workspace:** From the repository root, run `make lab-pagerank-workspace`. Keep the terminal open and use the Codespace **Ports** tab to open private port **8769** in a browser. Work on a separate draft of `student_tasks.py`, add task notes, run examples and the lab tests. Explicitly save and download your code and notes. The original file remains available as an alternative.
+
     **Edit in Codespaces:** In Explorer, open `labs → 05-pagerank → student_tasks.py` and implement the assigned functions. Save your changes with **Ctrl+S** (Windows/Linux) or **⌘S** (Mac).
 
     **Run and check:** From the repository root, start with `make lab-pagerank`. Then enter the lab folder and run the tests:

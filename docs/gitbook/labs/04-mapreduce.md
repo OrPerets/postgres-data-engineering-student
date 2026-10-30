@@ -6,6 +6,8 @@
 
 !!! info "Your work"
 
+    **Guided workspace:** From the repository root, run `make lab-mapreduce-workspace`. Keep the terminal open and use the Codespace **Ports** tab to open private port **8768** in a browser. Work on a separate draft of `student_tasks.py`, add task notes, run examples and the lab tests. Explicitly save and download your code and notes. The original file remains available as an alternative.
+
     **Edit:** In your Codespace Explorer, open `labs → 04-mapreduce → student_tasks.py` and implement the functions while preserving their signatures. The GitHub link below shows the starter; edit your own Codespace copy.
 
     **Run and check:** From the repository root, enter the lab folder and run the demo and tests:

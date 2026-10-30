@@ -10,3 +10,7 @@ __pycache__/
 # Local drafts for the guided SQL workspace
 /labs/01-relational-sql/.workspace-data/
 /labs/02-partitioning-replication/.workspace-data/
+/labs/03-dwh-etl/.workspace-data/
+/labs/04-mapreduce/.workspace-data/
+/labs/05-pagerank/.workspace-data/
+/labs/06-tfidf/.workspace-data/

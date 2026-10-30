@@ -1,5 +1,5 @@
 SHELL := /bin/bash
-.PHONY: help setup demo test benchmark health reset lab-sql lab-sql-workspace lab-partitions lab-partitions-workspace lab-dwh lab-mapreduce lab-pagerank lab-tfidf lab-tfidf-sql
+.PHONY: help setup demo test benchmark health reset lab-sql lab-sql-workspace lab-partitions lab-partitions-workspace lab-dwh lab-dwh-workspace lab-mapreduce lab-mapreduce-workspace lab-pagerank lab-pagerank-workspace lab-tfidf lab-tfidf-workspace lab-tfidf-sql
 LABS := 01-relational-sql 02-partitioning-replication 03-dwh-etl 04-mapreduce 05-pagerank 06-tfidf
 LAB ?= 01-relational-sql
 
@@ -10,9 +10,13 @@ help:
 	@echo "  make lab-partitions Primary / Replica + sales data"
 	@echo "  make lab-partitions-workspace  Open the guided Lab 02 SQL workspace"
 	@echo "  make lab-dwh        Staging and dimensional warehouse"
+	@echo "  make lab-dwh-workspace  Guided Lab 03 workspace"
 	@echo "  make lab-mapreduce  Python MapReduce"
+	@echo "  make lab-mapreduce-workspace  Guided Lab 04 workspace"
 	@echo "  make lab-pagerank   Python PageRank"
+	@echo "  make lab-pagerank-workspace  Guided Lab 05 workspace"
 	@echo "  make lab-tfidf      Python TF-IDF (no Docker)"
+	@echo "  make lab-tfidf-workspace  Guided Lab 06 workspace"
 	@echo "  make lab-tfidf-sql  PostgreSQL for the full TF-IDF assignment"
 	@echo "Advanced: make setup|demo|test|benchmark|health|reset LAB=<lab-name>"
 
@@ -26,12 +30,20 @@ lab-partitions-workspace:
 	@python labs/02-partitioning-replication/workspace/server.py
 lab-dwh:
 	@bash scripts/student-init.sh 03-dwh-etl
+lab-dwh-workspace:
+	@python labs/03-dwh-etl/workspace/server.py
 lab-mapreduce:
 	@bash scripts/student-init.sh 04-mapreduce
+lab-mapreduce-workspace:
+	@python labs/04-mapreduce/workspace/server.py
 lab-pagerank:
 	@bash scripts/student-init.sh 05-pagerank
+lab-pagerank-workspace:
+	@python labs/05-pagerank/workspace/server.py
 lab-tfidf:
 	@bash scripts/student-init.sh 06-tfidf
+lab-tfidf-workspace:
+	@python labs/06-tfidf/workspace/server.py
 lab-tfidf-sql:
 	@bash scripts/student-init.sh 06-tfidf-sql
 
