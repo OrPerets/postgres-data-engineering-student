@@ -1,0 +1,21 @@
+/* A focused, browser-only mean combiner activity. */
+.md-typeset .lab04-mean { margin: 1.2rem 0; padding: clamp(1rem, 3vw, 1.6rem); border: 1px solid #dfd1ca; border-top: 4px solid #8b2029; background: #fffefa; color: #26211f; }
+.md-typeset .lab04-mean__eyebrow { margin: 0; color: #70202a; font-size: .7rem; font-weight: 700; letter-spacing: .06em; }
+.md-typeset .lab04-mean h3 { margin: .35rem 0; }
+.md-typeset .lab04-mean label { display: block; font-weight: 700; }
+.md-typeset .lab04-mean select { display: block; box-sizing: border-box; width: 100%; max-width: 36rem; min-height: 2.5rem; margin-top: .35rem; padding: .5rem; color: #26211f; background: white; border: 1px solid #887671; font: inherit; }
+.md-typeset .lab04-mean button { min-height: 2.5rem; padding: .55rem 1rem; border: 1px solid #8b2029; color: white; background: #8b2029; font: inherit; font-weight: 700; cursor: pointer; }
+.md-typeset .lab04-mean button:hover { background: #641720; }
+.md-typeset .lab04-mean :focus-visible { outline: 3px solid #bf6855; outline-offset: 3px; }
+.md-typeset .lab04-mean__weights { margin: 1rem 0; }
+.md-typeset .lab04-mean__weights p { margin: .5rem 0 .25rem; }
+.md-typeset .lab04-mean__bar { display: flex; min-height: 2.1rem; width: 100%; max-width: 38rem; }
+.md-typeset .lab04-mean__bar span { display: flex; align-items: center; justify-content: center; box-sizing: border-box; padding: .3rem; font-size: .7rem; font-weight: 700; }
+.md-typeset .lab04-mean__a { background: #81242d; color: #fff; }
+.md-typeset .lab04-mean__b { background: #ead2cb; color: #321f20; border: 1px solid #81242d; }
+.md-typeset .lab04-mean__table-wrap { overflow-x: auto; }
+.md-typeset .lab04-mean table { min-width: 38rem; width: 100%; }
+.md-typeset .lab04-mean caption { text-align: left; font-weight: 700; }
+.md-typeset .lab04-mean__result { padding: .75rem 1rem; border-left: 4px solid #8b2029; background: #f8f1ed; }
+.md-typeset .lab04-mean__result p { margin: .4rem 0; }
+.md-typeset .lab04-mean__note { font-size: .75rem; }

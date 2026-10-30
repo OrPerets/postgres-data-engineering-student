@@ -30,6 +30,7 @@ extra_css:
   - stylesheets/lab06-pack.css
   - stylesheets/lab05-pack.css
   - stylesheets/lab04-pack.css
+  - stylesheets/lab04-mean.css
   - stylesheets/lab03-pack.css
 
 extra_javascript:
@@ -42,6 +43,7 @@ extra_javascript:
   - javascripts/lab06-pack.js
   - javascripts/lab05-pack.js
   - javascripts/lab04-pack.js
+  - javascripts/lab04-mean.js
   - javascripts/lab03-pack.js
 
 plugins:

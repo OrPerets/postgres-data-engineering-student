@@ -78,6 +78,14 @@ Suppose one worker observes `[1]` and another observes `[3,5,7]`. Compare the na
 
 **Hint:** A safe mean combiner merges `(sum, count)`, not just the average.
 
+Try the examples below: predict first, then reveal how each worker's count changes its weight. Changing the input hides the result so you can make another prediction.
+
+<div id="lab04-mean-explorer"></div>
+
+<noscript>This interactive comparison requires JavaScript. Use the two worker inputs above to calculate their means and merge their sums and counts by hand.</noscript>
+
+An empty worker contributes the partial state `(0, 0)` when states are merged. If the combined count is zero, the mean is undefined: the lab's reducer returns `None` instead of dividing by zero.
+
 ### Practice with an interactive trace
 
 [Open the MapReduce trace and practice quiz](../activities/lab04-learning-pack.md) to step through a small character-count example in your browser. This is a logical simulation, not a networked cluster.

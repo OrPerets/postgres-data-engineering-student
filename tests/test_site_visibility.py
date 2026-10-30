@@ -67,6 +67,10 @@ class SiteVisibilityTests(unittest.TestCase):
                 if number not in active:
                     self.assertNotIn(f"activities/lab{number}-learning-pack/", all_pages)
                     self.assertFalse((out / "javascripts" / f"lab{number}-pack.js").exists())
+            for asset in ("javascripts/lab04-mean.js", "stylesheets/lab04-mean.css"):
+                self.assertEqual((out / asset).exists(), "04" in active, asset)
+                if "04" not in active:
+                    self.assertNotIn(asset, all_pages)
             for number, slug in PAGES.items():
                 with self.subTest(number=number, active=active):
                     self.assertEqual((out / "labs" / slug / "index.html").exists(), number in active)
