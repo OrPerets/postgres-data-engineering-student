@@ -10,6 +10,14 @@ Change the join and filter to see how customer, order and item rows combine. The
 
 <noscript>The JOIN explorer needs JavaScript enabled. You can still read the [Lab 01 guide](../labs/01-relational-sql.md) and complete the SQL exercises in Codespaces.</noscript>
 
+## Explore NOT IN and NULL
+
+Predict how a returned city's NULL affects the filter, then compare the three-valued results. The fixed example is a browser simulation, not a live query.
+
+<div id="lab01-null-explorer"></div>
+
+<noscript>Paper exercise: compare Eilat to the returned-city set Haifa, Tel Aviv and NULL using &lt;&gt; and AND. Is the result TRUE, FALSE or UNKNOWN? Does WHERE keep it? What changes if NULL is removed?</noscript>
+
 ## Check your understanding
 
 Try five short questions on JOINs, NULLs and window functions. You will see an explanation after each answer. This self-check is for practice; no results are recorded or submitted.

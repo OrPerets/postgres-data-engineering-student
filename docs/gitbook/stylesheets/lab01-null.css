@@ -1,0 +1,15 @@
+.md-typeset .lab01-null{margin:1.5rem 0 2rem;padding:clamp(1rem,3vw,1.7rem);border:1px solid #e2d8d5;border-top:4px solid #81242d;background:#faf8f6;color:#252020}
+.md-typeset .lab01-null__eyebrow{color:#81242d;font-size:.65rem;letter-spacing:.08em;font-weight:800}
+.md-typeset .lab01-null h3{margin:.3rem 0 .6rem}
+.md-typeset .lab01-null__controls{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1rem}
+.md-typeset .lab01-null label{font-weight:700;font-size:.75rem}
+.md-typeset .lab01-null select{display:block;width:100%;min-height:2.4rem;margin-top:.3rem;padding:.4rem;color:#252020;background:white;border:1px solid #857471;font:inherit}
+.md-typeset .lab01-null button{padding:.6rem 1rem;border:1px solid #81242d;background:#81242d;color:white;font:inherit;font-weight:700;cursor:pointer}
+.md-typeset .lab01-null :is(button,select):focus-visible,.md-typeset .lab01-null__table-wrap:focus-visible{outline:3px solid #bf6855;outline-offset:3px}
+.md-typeset .lab01-null__table-wrap{overflow-x:auto}
+.md-typeset .lab01-null table{width:100%;font-size:.7rem;border-collapse:collapse}
+.md-typeset .lab01-null table caption{text-align:left;font-weight:700}
+.md-typeset .lab01-null table th,.md-typeset .lab01-null table td{padding:.5rem;border-bottom:1px solid #e1d6d2;text-align:left}
+.md-typeset .lab01-null__summary{padding:.7rem;border-left:3px solid #81242d;background:#fff}
+.md-typeset .lab01-null__note{font-size:.7rem;color:#554d4b}
+@media(max-width:640px){.md-typeset .lab01-null__controls{grid-template-columns:1fr}.md-typeset .lab01-null__alternatives{font-size:.62rem}}

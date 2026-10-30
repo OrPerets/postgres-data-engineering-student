@@ -35,6 +35,7 @@ jobs:
       - run: node --test tests/test_lab01_join.cjs tests/test_lab02_partitions.cjs tests/test_learning_packs.cjs
       - run: node --test tests/test_lab02_months.cjs
       - run: node --test tests/test_lab01_window_frame.cjs tests/test_lab01_window_rank_lag.cjs
+      - run: node --test tests/test_lab01_null.cjs
       - run: node --test tests/test_lab04_mean.cjs
       - run: node --test labs/02-partitioning-replication/workspace/tests/test_results_csv.cjs labs/06-tfidf/workspace/tests/test_csv_export.cjs
       - run: python scripts/build_site.py --site-dir site

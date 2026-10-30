@@ -52,9 +52,9 @@ def filter_docs(directory: Path, enabled: dict[str, bool]) -> None:
         (directory / "activities" / "lab01-learning-pack.md").unlink()
         (directory / "start-lab01.md").unlink()
         (directory / "images" / "setup" / "01-github-codespaces.png").unlink()
-        for asset in ("javascripts/lab01-join.js", "javascripts/lab01-quiz.js",
+        for asset in ("javascripts/lab01-join.js", "javascripts/lab01-quiz.js", "javascripts/lab01-null.js",
                       "javascripts/lab01-window-frame.js", "javascripts/lab01-window-rank-lag.js",
-                      "stylesheets/lab01-join.css", "stylesheets/lab01-quiz.css",
+                      "stylesheets/lab01-join.css", "stylesheets/lab01-quiz.css", "stylesheets/lab01-null.css",
                       "stylesheets/lab01-window-frame.css", "stylesheets/lab01-window-rank-lag.css"):
             (directory / asset).unlink()
     if "02" in hidden:
@@ -161,9 +161,9 @@ def filtered_config(text: str, enabled: dict[str, bool]) -> str:
         text = require_replace(text, "      - First SQL lab: start-lab01.md\n", "", "Lab 01 walkthrough nav")
         text = require_replace(text, "      - Window functions: labs/01-window-functions.md\n", "", "Lab 01 window lesson nav")
         text = require_replace(text, "      - SQL practice & quiz: activities/lab01-learning-pack.md\n", "", "Lab 01 practice nav")
-        for asset in ("stylesheets/lab01-join.css", "stylesheets/lab01-quiz.css",
+        for asset in ("stylesheets/lab01-join.css", "stylesheets/lab01-quiz.css", "stylesheets/lab01-null.css",
                       "stylesheets/lab01-window-frame.css", "stylesheets/lab01-window-rank-lag.css",
-                      "javascripts/lab01-join.js", "javascripts/lab01-quiz.js",
+                      "javascripts/lab01-join.js", "javascripts/lab01-quiz.js", "javascripts/lab01-null.js",
                       "javascripts/lab01-window-frame.js", "javascripts/lab01-window-rank-lag.js"):
             text = require_replace(text, f"  - {asset}\n", "", f"Lab 01 asset {asset}")
     if not enabled["02"]:
