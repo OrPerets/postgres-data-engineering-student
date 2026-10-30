@@ -85,6 +85,19 @@ These tasks address issues observed in the course review. Effort estimates are a
 
 **Status, 2026-10-30:** Updated the assignment and starter worksheet locally to run selected statements on the correct server. B5 now explicitly checks the Replica role, runs separately in a transaction and rolls back after the expected standby error. All seven Lab 02 workspace tests and `git diff --check` passed; a live PostgreSQL/Codespaces run remains pending.
 
+### 13. Warn before recreating the Lab 01 benchmark table
+
+- [ ] Tell students the benchmark seed drops and recreates `benchmark_sales`, removing its previous rows and indexes, and to preserve work before rerunning it.
+- [ ] State the working directory for the benchmark commands and align the tutorial and benchmark instructions.
+
+**Why:** The tutorial presents the benchmark seed without warning, while the seed drops `benchmark_sales` and the benchmark challenge invites students to create an index. Rerunning setup therefore removes that experiment. This follows from the SQL source; no live database run was performed.
+
+**Starting points:** `docs/gitbook/labs/01-relational-sql.md`, `labs/01-relational-sql/benchmarks/README.md`, `labs/01-relational-sql/benchmarks/01_seed_running_total.sql`.
+
+**Acceptance:** Students can identify the table affected, preserve a prior experiment, and run commands from the correct directory without implying the original classroom tables are dropped. Verify with a fresh database when available.
+
+**Effort:** Small, a few hours.
+
 ## P1 — Repair the learning sequence
 
 ### 5. Place the next-lab link after the learning material
@@ -121,8 +134,8 @@ These tasks address issues observed in the course review. Effort estimates are a
 
 ### 7. Match starter error messages to assignment tasks
 
-- [ ] Check unfinished function errors in Labs 04–06 against their assignments and replace misleading numbers with the correct task and function name where applicable.
-- [ ] Preserve intentionally unfinished student functions and the intended test behavior.
+- [x] Check unfinished function errors in Labs 04–06 against their assignments and replace misleading numbers with the correct task and function name where applicable.
+- [x] Preserve intentionally unfinished student functions and the intended test behavior.
 
 **Why:** In Lab 04, `word_mapper` belongs to assignment task 4 but its starter raises `NotImplementedError("Exercise 1")`. In Lab 05, `out_degree` belongs to task 4 but raises `NotImplementedError("Task 1")`. Untouched student tests reproduce the misleading messages; the failures themselves are expected.
 
@@ -131,6 +144,8 @@ These tasks address issues observed in the course review. Effort estimates are a
 **Acceptance:** Each relevant message identifies the correct function and assignment task; unfinished starter tests still fail as expected, and reference demo checks pass. Do not complete the student exercises.
 
 **Effort:** Small, a few hours.
+
+**Status, 2026-10-30:** Updated the messages of all 21 starter functions to name the function and its assignment task. Verified the task mappings and that every function still raises `NotImplementedError`; all eight reference demo tests passed. `git diff --check` passed. A live Codespaces run remains pending.
 
 ### 8. Preserve NULL distinctions in exported SQL results
 
