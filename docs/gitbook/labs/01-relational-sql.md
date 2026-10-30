@@ -108,8 +108,9 @@ Work in this sequence:
 
 1. **Queries 1–5:** Filters, JOINs, grouping and business metrics.
 2. **Queries 6–7:** Debugging aggregation and `NOT IN` / `NULL` behavior.
-3. **Queries 8–11:** Ranking, previous values, running totals and monthly comparisons.
-4. **Queries 12–15:** More advanced relational logic, product pairs and window-frame semantics.
+3. **Before queries 8–11:** Open `labs/01-relational-sql/windows/README.md` in your course repository and complete the guided window-functions lesson and SQL worksheet. Allow 60–90 minutes for the core; advanced challenges are optional. This worksheet is separate from the guided workspace and its saved draft.
+4. **Queries 8–11:** Ranking, previous values, running totals and monthly comparisons.
+5. **Queries 12–15:** More advanced relational logic, product pairs and window-frame semantics.
 
 ### Checkpoint — Is the output actually correct?
 
@@ -248,6 +249,6 @@ Try answering aloud before expanding each suggested answer. Use examples from th
 
 <details><summary>8. How can you filter to the three highest-ranked orders per customer?</summary><p>Compute <code>ROW_NUMBER()</code> in a subquery or CTE, partitioned by customer and ordered by the intended measure and a stable tie-breaker. Filter the resulting number in the outer query. Window results are computed after the same query level's <code>WHERE</code>, so they cannot be filtered there directly.</p></details>
 
-**Deliverable:** Your completed SQL answers, together with any explanation or benchmark evidence requested by your instructor.
+**Deliverable:** Your completed SQL answers, together with worksheet work, explanations or benchmark evidence requested by your instructor.
 
 **Next:** [Lab 02 — Partitions & Replication](02-partitions-replicas.md).

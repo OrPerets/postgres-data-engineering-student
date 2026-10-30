@@ -25,9 +25,10 @@ In the interactive `psql` prompt, try `\dt`, `SELECT * FROM customers LIMIT 5;`,
 
 1. Read the [student brief](STUDENT_BRIEF.md) and the original course PDF.
 2. Open [sql/student_answers.sql](sql/student_answers.sql) and write 15 solutions.
-3. Run chosen queries interactively: `docker compose exec postgres psql -U student -d query_lab`.
-4. For longer scripts: `docker compose exec -T postgres psql -U student -d query_lab < sql/student_answers.sql`.
-5. Submit SQL, a short explanation for Q6/Q7/Q15, and query plans for selected queries.
+3. Before questions 8–11, work through the [guided window-functions lesson](windows/README.md) and its SQL worksheet. Allow approximately 60–90 minutes for the core activities; advanced challenges are optional.
+4. Run chosen queries interactively: `docker compose exec postgres psql -U student -d query_lab`.
+5. For longer scripts: `docker compose exec -T postgres psql -U student -d query_lab < sql/student_answers.sql`.
+6. Submit SQL, a short explanation for Q6/Q7/Q15, and query plans for selected queries, as well as any worksheet work requested by your instructor.
 
 ## Query optimization exploration
 
