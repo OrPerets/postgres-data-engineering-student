@@ -89,9 +89,9 @@ These tasks address issues observed in the course review. Effort estimates are a
 
 ### 5. Place the next-lab link after the learning material
 
-- [ ] Review all six tutorials for material after deliverable or next-lab links.
-- [ ] Move or integrate worked examples and visual checkpoints into the relevant learning sequence. Mark optional extensions clearly.
-- [ ] Place the final next-lab link after the instructional content and completion guidance.
+- [x] Review all six tutorials for material after deliverable or next-lab links.
+- [x] Move or integrate worked examples and visual checkpoints into the relevant learning sequence. Mark optional extensions clearly.
+- [x] Place the final next-lab link after the instructional content and completion guidance.
 
 **Why:** Labs 01, 03, 04 and 05 place a next-lab link before additional material; Labs 04 and 05 have substantial worked support after it. The ordering is observed; whether students actually skip it has not been measured.
 
@@ -100,6 +100,8 @@ These tasks address issues observed in the course review. Effort estimates are a
 **Acceptance:** Each tutorial has a coherent concept → practice → check → keep/submit → next sequence, and all existing learning content and valid links are retained.
 
 **Effort:** Small–medium, approximately 0.5–1 day.
+
+**Status, 2026-10-30:** Moved the Lab 01 and 03 visual checkpoints before their reflection sections, and the Lab 04 and 05 next links after their simulator sections. Labs 02 and 06 already had appropriate endings. Existing content was preserved; all eight visibility tests and `git diff --check` passed. Rendered browser verification remains pending.
 
 ### 6. Keep prerequisite graph context visible in PageRank tasks
 
@@ -153,6 +155,20 @@ These tasks address issues observed in the course review. Effort estimates are a
 **Acceptance:** Consecutive demonstrations use distinct markers, query the corresponding new rows and preserve other data. Test repeat runs and replication behavior in a fresh database when available.
 
 **Effort:** Small–medium, approximately 0.5–1 day.
+
+### 11. Make shortened SQL result cells visible
+
+- [ ] Track and communicate when an individual result cell was shortened, separately from row-count truncation.
+- [ ] Show the warning in affected workspace results and their CSV exports; document that shortened values are not full evidence.
+- [ ] Test long text, text exactly at the limit, and values naturally ending in an ellipsis.
+
+**Why:** Labs 01–03 and 06 shorten long text cells at 2,000 characters, while the existing SQL result `truncated` flag reports only whether rows were omitted. The CSV downloads in Labs 02, 03 and 06 can therefore contain shortened cell values while their row-truncation metadata says `No`. This was reproduced against the cell-conversion function; a live database was not tested.
+
+**Starting points:** `labs/01-relational-sql/workspace/server.py`, `labs/02-partitioning-replication/workspace/server.py`, `labs/03-dwh-etl/workspace/server.py`, `labs/06-tfidf/workspace/server.py` and their workspace result displays and exporters.
+
+**Acceptance:** Students can distinguish cell shortening from row truncation in the UI and relevant exports, including when text naturally ends in an ellipsis. Checks cover each affected workspace; validate a live SQL result when available.
+
+**Effort:** Medium, approximately 1–2 days.
 
 ## Verification before closing the backlog
 

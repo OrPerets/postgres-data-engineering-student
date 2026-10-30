@@ -137,7 +137,6 @@ Try answering aloud before opening the suggested answers. Use examples from this
 
 <details><summary>4. Why must partitioning route identical keys consistently?</summary><p>All values for a key must reach the same reducer for a single-stage per-key result. A stable partition function makes this routing reproducible across workers and runs; changing the number of reducers may change assignments, but not correct final counts.</p></details>
 
-**Next:** [Lab 05 — PageRank](05-pagerank.md).
 
 
 ## Visual walkthrough — Follow the keys
@@ -294,3 +293,5 @@ python -m http.server 8000 --directory simulators
 ```
 
 Open forwarded port **8000** in the Codespaces Ports panel (keep visibility **Private**). Select **MapReduce**, change the input or parameters, and navigate one step at a time. The app is not yet deployed as a public website.
+
+**Next:** [Lab 05 — PageRank](05-pagerank.md).
