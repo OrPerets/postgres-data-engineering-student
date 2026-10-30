@@ -55,9 +55,9 @@ These tasks address issues observed in the course review. Effort estimates are a
 
 ### 4. Connect first-visit setup to the guided workspace
 
-- [ ] Update the homepage-to-setup path to make the first concrete next step and the choice of workspace versus editor visible.
-- [ ] Link each lab starter to its tutorial and show where to find its workspace command and port.
-- [ ] Keep the Lab 01 illustrated walkthrough easy to find and preserve account/quota and backup guidance.
+- [x] Update the homepage-to-setup path to make the first concrete next step and the choice of workspace versus editor visible.
+- [x] Link each lab starter to its tutorial and show where to find its workspace command and port.
+- [x] Keep the Lab 01 illustrated walkthrough easy to find and preserve account/quota and backup guidance.
 
 **Why:** The current setup page lists initializer commands and says to open a student file, while the detailed guided-workspace route is elsewhere.
 
@@ -66,6 +66,22 @@ These tasks address issues observed in the course review. Effort estimates are a
 **Acceptance:** Starting at the homepage, a student can find the Codespace setup, choose a working path and reach Lab 01's first exercise without guessing which command or port to use.
 
 **Effort:** Small, a few hours alongside task 1.
+
+**Status, 2026-10-30:** The homepage links the first SQL walkthrough; environment setup links each tutorial and explains the two routes, private ports, distinct drafts and backup. All eight visibility tests passed, including hidden-lab configurations. Rendered and fresh Codespaces verification remain pending.
+
+### 9. Correct the Lab 02 worksheet execution instructions
+
+- [ ] Replace the assignment's whole-file Primary command with instructions to execute selected statements on their intended server, consistent with the tutorial.
+- [ ] Clarify that B5 is a separate, intentional write attempt on the read-only Replica and preserve the distinction between Primary and Replica queries.
+- [ ] Update the worksheet warning so valid syntax does not imply that running the entire mixed-server file on Primary is safe.
+
+**Why:** The Lab 02 assignment currently suggests sending the whole completed worksheet to Primary and says not to run writes on Replica, while B5 explicitly asks students to try a write on the read-only Replica. Running that demonstration on Primary could change data rather than show the intended standby error. This is verified from source, not by a live PostgreSQL run.
+
+**Starting points:** `labs/02-partitioning-replication/assignments/STUDENT_ASSIGNMENT.md`, `labs/02-partitioning-replication/sql/student_exercises.sql`, `docs/gitbook/labs/02-partitions-replicas.md`.
+
+**Acceptance:** The assignment and worksheet direct students to run each statement on the correct server, explain the B5 exception and do not recommend sending the mixed file to Primary. Validate instructions against the tutorial and, when available, a fresh lab environment.
+
+**Effort:** Small, a few hours.
 
 ## P1 — Repair the learning sequence
 
@@ -122,6 +138,19 @@ These tasks address issues observed in the course review. Effort estimates are a
 **Acceptance:** Exported values remain distinguishable under the documented interpretation, existing result metadata and truncation warnings are preserved, and regression checks pass for the affected workspaces. Verify a real database example when available.
 
 **Effort:** Medium, approximately 0.5–1 day.
+
+### 10. Make the Lab 02 replica demonstration repeatable
+
+- [ ] Replace the fixed demonstration identifier with a fresh, traceable marker and explain how to check that specific new row on the Replica.
+- [ ] Preserve existing data and document any optional cleanup without deleting student work; check that the README and SQL example agree.
+
+**Why:** The README and replication SQL insert `sale_id=99999999`, and `sales_regular` has no uniqueness constraint. Repeating the demonstration can add duplicates; the Replica query may find an older row instead of proving the latest insert replicated. This conclusion follows from the SQL source and has not been tested against a live database.
+
+**Starting points:** `labs/02-partitioning-replication/README.md`, `labs/02-partitioning-replication/sql/03_replication_checks.sql`, `labs/02-partitioning-replication/sql/01_schema.sql`.
+
+**Acceptance:** Consecutive demonstrations use distinct markers, query the corresponding new rows and preserve other data. Test repeat runs and replication behavior in a fresh database when available.
+
+**Effort:** Small–medium, approximately 0.5–1 day.
 
 ## Verification before closing the backlog
 
