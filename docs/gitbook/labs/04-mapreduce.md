@@ -4,26 +4,32 @@
 
 **You will practice:** Key-value mapping, grouping, reducer partitioning, combiners, mean/variance aggregation and skew.
 
-!!! info "Your work"
+!!! info "Choose how to work"
 
-    **Guided workspace:** From the repository root, run `make lab-mapreduce-workspace`. Keep the terminal open and use the Codespace **Ports** tab to open private port **8768** in a browser. Work on a separate draft of `student_tasks.py`, add task notes, run examples and the lab tests. Explicitly save and download your code and notes. The original file remains available as an alternative.
+    Choose **one** path below. The guided workspace uses a separate draft of `student_tasks.py`; the Codespace editor and terminal commands use the original file in the lab folder. Changes do not automatically sync between them.
 
-    **Edit:** In your Codespace Explorer, open `labs → 04-mapreduce → student_tasks.py` and implement the functions while preserving their signatures. The GitHub link below shows the starter; edit your own Codespace copy.
+    **Option A — Guided workspace**
 
-    **Run and check:** From the repository root, enter the lab folder and run the demo and tests:
+    1. From the repository root, run `make lab-mapreduce-workspace`. Keep that terminal open. In the Codespace **Ports** tab, open private port **8768** in a browser.
+    2. Edit the Python draft and add task notes. Use **Run example** to explore and **Run tests** to check the code currently in the workspace editor; these do not test the separate file in Explorer.
+    3. Select **Save work** to save the draft in the Codespace; edits are not autosaved. Use **Download Python** for `student_tasks.py`, **Download notes** for your reasoning and **Download test output** after running the tests. Keep these copies outside the Codespace and add any remaining report material separately. Workspace drafts live in the Git-ignored `.workspace-data/` folder, so committing and pushing a fork does not back up those drafts.
 
-    ```bash
-    cd labs/04-mapreduce
-    python mapreduce_demo.py
-    python -m unittest tests.test_demo -v
-    python -m unittest discover -s tests -v
-    ```
+    **Option B — Codespace editor**
 
-    The demo tests check the reference implementation. The full suite also checks student functions and initially fails until you implement them; passing tests are helpful checks, not a complete grade of your report or reasoning.
+    1. In Explorer, open `labs → 04-mapreduce → student_tasks.py`. Implement the functions without changing their signatures and save the file (**Ctrl+S** on Windows/Linux or **⌘S** on Mac).
+    2. From the repository root, enter the lab folder and run:
 
-    **Keep and submit:** Save `student_tasks.py`, a short report with the requested trace and explanations, passing test output, and a 200–300 word discussion. Follow the [full assignment](https://github.com/OrPerets/postgres-data-engineering-student/blob/main/labs/04-mapreduce/STUDENT_ASSIGNMENT.md) and your instructor's submission instructions.
+       ```bash
+       cd labs/04-mapreduce
+       python mapreduce_demo.py
+       python -m unittest tests.test_demo -v
+       python -m unittest discover -s tests -v
+       ```
 
-    **Back up:** Download copies from Explorer or commit and push your work to your own GitHub fork. Saving in the editor alone does not submit or back up your work. See [environment setup](../getting-started.md) and [troubleshooting](../troubleshooting.md).
+       The full test suite checks the `student_tasks.py` file in that folder, not the guided draft. The demo tests check the reference implementation.
+    3. Keep the test output with your report: for example, rerun `python -m unittest discover -s tests -v > test-output.txt 2>&1` from the lab folder to capture it in a file. This replaces any existing `test-output.txt`; choose another filename or back up the old file if you need it. Download your edited `student_tasks.py`, report and output from Explorer, or commit and push those files to your own fork, to keep copies outside the Codespace.
+
+    **Both paths — submission checklist:** Keep your completed `student_tasks.py`, the requested passing test output, and a short report with the trace, explanations and 200–300 word discussion. Downloaded notes help prepare the report but may not contain every required item. Student tests initially fail until you implement the functions; passing tests provide feedback, not an official grade. Follow the [full assignment](https://github.com/OrPerets/postgres-data-engineering-student/blob/main/labs/04-mapreduce/STUDENT_ASSIGNMENT.md) and your instructor's submission instructions and deadline. Saving or downloading does not submit your work. See [environment setup](../getting-started.md) and [troubleshooting](../troubleshooting.md).
 
 ## 1. Get ready
 
@@ -64,7 +70,7 @@ python mapreduce_demo.py
 
 ## 4. Build your own functions
 
-Open `student_tasks.py`. Implement a word mapper, a WHERE-like filter mapper, mergeable mean states and mergeable population-variance states.
+In your chosen path, implement a word mapper, a WHERE-like filter mapper, mergeable mean states and mergeable population-variance states in the Python draft or `student_tasks.py` file.
 
 ### Mini challenge — Why not average averages?
 
@@ -103,6 +109,8 @@ Try the assignment yourself first; expand a hint when you need direction. These 
 <details><summary>11 — Shuffle and mapper cost</summary><p>Distinguish local computation from intermediate-data movement, then compare a one-process simulation with a real networked cluster.</p></details>
 
 ## 5. Validate your work
+
+In the guided workspace, select **Run tests** to check the Python draft. If you chose the Codespace editor, run these commands from `labs/04-mapreduce` to check the file there:
 
 ```bash
 python -m unittest tests.test_demo -v
@@ -273,7 +281,7 @@ TASK
 - Did you count occurrences rather than number of input lines?
 - Did your combiner preserve enough information to produce the correct final aggregate?
 
-**Finish:** Implement the functions in `student_tasks.py` and run `python -m unittest discover -s tests -v`. Student tests initially fail until implementations are complete.
+**Finish:** Implement the functions in your chosen Python draft or file. In the guided workspace use **Run tests**; in the lab folder run `python -m unittest discover -s tests -v` to test the editor file. Student tests initially fail until implementations are complete.
 
 **Remember:** This tutorial simulates MapReduce on one machine; it does not measure a real network shuffle.
 

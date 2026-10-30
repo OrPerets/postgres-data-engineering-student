@@ -4,25 +4,33 @@
 
 **You will practice:** Rank propagation, normalization, damping, dangling nodes, convergence and MapReduce-style computation.
 
-!!! info "Your work"
+!!! info "Choose how to work"
 
-    **Guided workspace:** From the repository root, run `make lab-pagerank-workspace`. Keep the terminal open and use the Codespace **Ports** tab to open private port **8769** in a browser. Work on a separate draft of `student_tasks.py`, add task notes, run examples and the lab tests. Explicitly save and download your code and notes. The original file remains available as an alternative.
+    Choose **one** path below. The guided workspace uses a separate draft of `student_tasks.py`; the Codespace editor and terminal commands use the original file in the lab folder. Changes do not automatically sync between them.
 
-    **Edit in Codespaces:** In Explorer, open `labs → 05-pagerank → student_tasks.py` and implement the assigned functions. Save your changes with **Ctrl+S** (Windows/Linux) or **⌘S** (Mac).
+    **Option A — Guided workspace**
 
-    **Run and check:** From the repository root, start with `make lab-pagerank`. Then enter the lab folder and run the tests:
+    1. From the repository root, run `make lab-pagerank-workspace`. Keep that terminal open. In the Codespace **Ports** tab, open private port **8769** in a browser.
+    2. Edit the Python draft and add task notes. Use **Run example** to explore, **Run demo tests** for the reference checks, and **Run all tests** to check the code currently in the workspace editor; the latter does not test the separate file in Explorer.
+    3. Select **Save work** to save the draft in the Codespace; edits are not autosaved. Use **Download Python**, **Download notes** and the test **Download output** button to keep copies outside the Codespace. Add any remaining required report material separately. Workspace drafts live in the Git-ignored `.workspace-data/` folder, so committing and pushing a fork does not back up those drafts.
 
-    ```bash
-    cd labs/05-pagerank
-    python -m unittest tests.test_demo -v
-    python -m unittest discover -s tests -v
-    ```
+       **Download Python** produces `lab05_student_tasks.py`. The assignment names `student_tasks.py`: keep the downloaded file as a backup and, if needed for submission, rename a separate copy to `student_tasks.py` according to your instructor's instructions. Terminal tests import the lab folder's `student_tasks.py`, not the downloaded file; use **Run all tests** for the workspace draft. If you later move a downloaded copy into the lab folder for terminal testing, first back up the existing file so it is not accidentally overwritten.
 
-    The demo test checks the reference example; student tests intentionally fail until you implement the functions. Passing tests helps check the code but does not assess your report or all assignment requirements.
+    **Option B — Codespace editor**
 
-    **Keep for submission:** Your completed `student_tasks.py` and a short report with hand calculations, screenshots or test output, convergence observations and discussion. Follow the [assignment](https://github.com/OrPerets/postgres-data-engineering-student/blob/main/labs/05-pagerank/STUDENT_ASSIGNMENT.md) and your instructor's submission instructions.
+    1. In Explorer, open `labs → 05-pagerank → student_tasks.py`. Implement the functions and save the file (**Ctrl+S** on Windows/Linux or **⌘S** on Mac).
+    2. From the repository root, run `make lab-pagerank`, then enter the lab folder and run:
 
-    **Back up:** Download your files from the Codespace Explorer or commit and push them to your own GitHub fork. Saving in the editor alone does not submit your work or keep a copy outside the Codespace.
+       ```bash
+       cd labs/05-pagerank
+       python -m unittest tests.test_demo -v
+       python -m unittest discover -s tests -v
+       ```
+
+       The full test suite checks the `student_tasks.py` file in that folder, not the guided draft. The demo tests check the reference example.
+    3. Keep any test output with your report: for example, rerun `python -m unittest discover -s tests -v > test-output.txt 2>&1` from the lab folder to capture it in a file. This replaces any existing `test-output.txt`; choose another filename or back up the old file if you need it. Download your edited `student_tasks.py`, report and evidence from Explorer, or commit and push those files to your own fork, to keep copies outside the Codespace.
+
+    **Both paths — submission checklist:** Keep your completed `student_tasks.py` and a short report with hand calculations, screenshots or test output, convergence observations and discussion. Downloaded notes help prepare the report but may not contain every required item. Student tests initially fail until you implement the functions; passing tests provide feedback, not an official grade. Follow the [assignment](https://github.com/OrPerets/postgres-data-engineering-student/blob/main/labs/05-pagerank/STUDENT_ASSIGNMENT.md) and your instructor's submission instructions and deadline. Saving or downloading does not submit your work.
 
 ## 1. Get ready
 
@@ -73,7 +81,7 @@ new_rank(p) = (1-d)/N + d*(incoming_contributions + dangling_mass/N)
 
 ## 5. Implement and validate
 
-Complete contribution mapping, shuffle grouping, dangling mass, one damped update and convergence in `student_tasks.py`.
+Complete contribution mapping, shuffle grouping, dangling mass, one damped update and convergence in your Python draft or `student_tasks.py` file. In the guided workspace, use **Run demo tests** to check the reference example and **Run all tests** to check the draft. For the Codespace editor path, run these commands from `labs/05-pagerank` to check the file there:
 
 ```bash
 python -m unittest tests.test_demo -v
@@ -167,7 +175,7 @@ The missing 0.25 link contribution is dangling mass from D. Teleportation and da
 
 **Predict:** What would happen to the sum of ranks if the algorithm simply discarded D's rank?
 
-**Try it:** Run `python pagerank_demo.py` and compare the first iteration to this table. Then implement the functions in `student_tasks.py`.
+**Try it:** Run `python pagerank_demo.py` from the lab folder and compare the first iteration to this table. Then implement the functions in your chosen Python draft or `student_tasks.py` file.
 
 ### Performance: what is and isn't measured
 
@@ -313,7 +321,7 @@ Try the [performance benchmark](https://github.com/OrPerets/postgres-data-engine
 - Was damping applied to both incoming contributions and redistributed dangling mass?
 - Did your convergence check use a consistent distance measure?
 
-**Finish:** Complete `student_tasks.py` and run `python -m unittest discover -s tests -v`.
+**Finish:** Complete your Python draft or file. Use **Run all tests** in the guided workspace, or run `python -m unittest discover -s tests -v` from the lab folder to check the Codespace editor file.
 
 ## Try the interactive simulator (preview)
 

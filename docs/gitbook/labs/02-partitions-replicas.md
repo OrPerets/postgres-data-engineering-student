@@ -6,28 +6,26 @@
 
 !!! info "Your work"
 
-    **Work in the guided workspace:** After `make lab-partitions` finishes, run `make lab-partitions-workspace` from the repository root. Keep the terminal running, then open port **8766** from the Codespace **Ports** tab in your browser. Keep the port private. Select **Primary** or **Replica** for each statement and check which server is shown with its result.
+    Choose **one** route after `make lab-partitions` finishes. The guided draft and the original `sql/student_exercises.sql` worksheet are separate copies and do not automatically sync. A query runs the SQL selected in the workspace or entered at the terminal, not the other copy.
+
+    **Route A — Guided workspace:** From the repository root, run `make lab-partitions-workspace`. Keep that terminal running, then open private port **8766** from the Codespace **Ports** tab. Write your draft, select **Primary** or **Replica** for each statement, and check which server is shown with its result. Use **Save answers** regularly; edits are not autosaved. Use **Download SQL** to keep a copy outside the Codespace, and label your Primary and Replica statements with SQL comments.
 
     **Run carefully:** Primary read mode rolls back; the explicit apply action commits a successful statement to Primary, including DDL and inserts. The Replica handles writes as a real standby and rejects them. Each run is one statement in its own transaction; use the terminal for an interactive multi-statement transaction. Replication is asynchronous, so a new Primary row may take time to appear on Replica.
 
-    **Save and back up:** Use **Save answers** in the workspace and download the SQL file as a separate copy. Edits are not autosaved. Workspace drafts and the original `sql/student_exercises.sql` worksheet are separate. Label your statements for Primary or Replica in your SQL comments. The workspace does not grade or submit your work.
-
-    **Prefer the worksheet?** In Explorer, edit `labs → 02-partitioning-replication → sql → student_exercises.sql` instead. Save with **Ctrl+S** (Windows/Linux) or **⌘S** (Mac).
-
-    **Check your environment:** After starting the lab, run `make test LAB=02-partitioning-replication` from the repository root. It checks that the sales tables contain data and that Primary and Replica report the expected roles; it **does not grade your answers**.
-
-    **Run your SQL:** From the repository root, first run `cd labs/02-partitioning-replication`. Then use either command to open a SQL prompt on the appropriate server:
+    **Route B — Codespace editor:** In Explorer, edit `labs → 02-partitioning-replication → sql → student_exercises.sql` and save it with **Ctrl+S** (Windows/Linux) or **⌘S** (Mac). To check its statements, open a SQL prompt on the appropriate server. From the repository root, first run `cd labs/02-partitioning-replication`, then use the relevant command:
 
     ```bash
     docker compose exec primary psql -U lab -d engineering
     docker compose exec replica psql -U lab -d engineering
     ```
 
-    Run selected statements on the correct server, not the entire mixed worksheet. Use Primary for writes. Run the exercise that attempts a write on the read-only Replica separately; it should produce an error. Exit each `psql` prompt with `\q` before opening another.
+    Copy selected statements from your saved worksheet into the correct prompt, not the entire mixed worksheet. Use Primary for writes. Run the exercise that attempts a write on the read-only Replica separately; it should produce an error. Exit each `psql` prompt with `\q` before opening another. Download the saved worksheet from Explorer or commit and push it to your own fork to keep a copy outside the Codespace.
 
-    **Keep for submission:** Your completed SQL file and a brief `report.md` or PDF with timings, execution plans, screenshots and the D2 explanation, as described in the [assignment](https://github.com/OrPerets/postgres-data-engineering-student/blob/main/labs/02-partitioning-replication/assignments/STUDENT_ASSIGNMENT.md). Submit using your instructor's instructions.
+    **Check for either route:** From the repository root, `make test LAB=02-partitioning-replication` checks that the sales tables contain data and that Primary and Replica report the expected roles; it does not test either answer copy. Neither this check nor the workspace grades your SQL, and saving or downloading does not submit your work.
 
-    **Back up:** Keep copies outside the Codespace: download your files from Explorer or commit and push them to your own GitHub fork. Saving in the editor alone does not submit or back up your work. See [environment setup](../getting-started.md) and [troubleshooting](../troubleshooting.md).
+    **Prepare your work:** Keep your completed SQL with answers A1–D1 and Primary/Replica labels, plus a brief `report.md` or PDF with timings, execution plans, screenshots and the D2 explanation, as described in the [assignment](https://github.com/OrPerets/postgres-data-engineering-student/blob/main/labs/02-partitioning-replication/assignments/STUDENT_ASSIGNMENT.md). On Route A, **Download SQL** exports the draft as `lab02_student_exercises.sql`; prepare and back up the report separately. **Download results CSV**, when useful as additional evidence, includes only the displayed rows. On Route B, back up the saved worksheet and report from Explorer or your own fork.
+
+    **Back up and submit:** Guided drafts live in `.workspace-data/`, which Git ignores; committing or pushing the original worksheet does not back up the guided draft. Download your SQL, report and required evidence outside the Codespace. The assignment names `student_exercises.sql`; if your instructor asks for that filename, rename a copy of the downloaded SQL without overwriting your original worksheet. Follow your instructor's submission method and deadline. See [environment setup](../getting-started.md) and [troubleshooting](../troubleshooting.md).
 
 ## 1. Get ready
 
@@ -103,7 +101,7 @@ Insert a new row **on Primary** and query it on Replica. Inspect replication sta
 
 ## 5. Complete the SQL exercises
 
-Work in [sql/student_exercises.sql](https://github.com/OrPerets/postgres-data-engineering-student/blob/main/labs/02-partitioning-replication/sql/student_exercises.sql). The assignment covers monthly partition creation, replica diagnostics, running totals, ranking, `LAG`, moving averages and a combined pruning/window query.
+Work in the guided workspace or in your Codespace copy of [sql/student_exercises.sql](https://github.com/OrPerets/postgres-data-engineering-student/blob/main/labs/02-partitioning-replication/sql/student_exercises.sql). The assignment covers monthly partition creation, replica diagnostics, running totals, ranking, `LAG`, moving averages and a combined pruning/window query.
 
 ### Optional hints for the assignment
 
