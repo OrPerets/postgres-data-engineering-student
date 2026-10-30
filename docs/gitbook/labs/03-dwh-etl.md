@@ -6,24 +6,24 @@
 
 !!! info "Your work"
 
-    **Guided workspace:** From the repository root, run `make lab-dwh` and then `make lab-dwh-workspace`. Keep the terminal open and use the Codespace **Ports** tab to open private port **8767** in a browser. The workspace shows the questions, schema and SQL results. Save drafts explicitly and download your SQL; keep your report separately. The original worksheet remains separate.
+    Choose **one** route after starting the lab with `make lab-dwh` from the repository root. The workspace draft and original worksheet are separate copies; they do not automatically sync. A query runs whichever SQL you select in the workspace or enter at the terminal.
 
-    **Edit in Codespaces:** In Explorer, open `labs → 03-dwh-etl → sql → student_exercises.sql` and write your SQL answers there. Keep your explanations in a separate Markdown or PDF report. The provided `01_stage.sql` and `02_dwh.sql` are lab setup scripts; do not edit them for your answers.
+    **Route A — Guided workspace:** Run `make lab-dwh-workspace` from the repository root. Keep that terminal open and use the Codespace **Ports** tab to open private port **8767**. Write your draft and select **Run query** to execute one read-only statement. **Apply changes** commits a successful statement to the lab database; preserve your work first. Each click is one transaction, so use the terminal for multi-statement transactions and the provided repeat-load exercise. Test any unsafe insert only in an isolated disposable setup. Use **Save answers** regularly; edits are not autosaved. Use **Download SQL** to keep the draft outside the Codespace, and keep your report separately.
 
-    **Start and check:** From the repository root, run `make lab-dwh` to initialize the sample, then `make test LAB=03-dwh-etl` to inspect sample data and check that the source and fact tables are nonempty. This check **does not grade your answers**.
-
-    **Run your SQL:** From the repository root, open a SQL prompt:
+    **Route B — Codespace editor:** In Explorer, open `labs → 03-dwh-etl → sql → student_exercises.sql`, write your answers and save with **Ctrl+S** (Windows/Linux) or **⌘S** (Mac). Keep explanations in a separate Markdown or PDF report. The provided `01_stage.sql` and `02_dwh.sql` are lab setup scripts; do not edit them for your answers. From the repository root, open a SQL prompt:
 
     ```bash
     cd labs/03-dwh-etl
     docker compose exec postgres psql -U student -d dwh_etl_lab
     ```
 
-    Run your queries in the prompt and compare the output with the assignment. Exit with `\q`. For the repeated-load exercises, preserve your work first; test any unsafe insert only in an isolated disposable setup.
+    Copy your queries from the saved worksheet into the prompt and compare the output with the assignment. Exit with `\q`. For the repeated-load exercises, preserve your work first; test any unsafe insert only in an isolated disposable setup. Download the saved worksheet from Explorer or commit and push it to your own fork to keep a copy outside the Codespace.
 
-    **Keep and submit:** Save your completed SQL worksheet and short reasoning report in Markdown or PDF, including the requested explanations and star schema. Follow your instructor's submission instructions.
+    **Check for either route:** From the repository root, `make test LAB=03-dwh-etl` checks that the source and fact tables are nonempty; it does not test either answer copy. Neither this check nor the workspace grades your SQL, and saving or downloading does not submit your work.
 
-    **Back up:** Download your files from the Codespace Explorer or commit and push them to your own GitHub fork. Saving in the editor alone does not submit or back up your work. Back up any database changes you need before a reset or rebuild. See [troubleshooting](../troubleshooting.md).
+    **Prepare your work:** Keep your completed SQL answers and a short reasoning report in Markdown or PDF, including the requested explanations and star schema. On Route A, **Download SQL** exports the draft as `lab03_student_exercises.sql`; prepare and back up the report separately. **Download results CSV**, when useful as additional evidence, includes only the displayed rows. On Route B, back up the saved worksheet and report from Explorer or your own fork.
+
+    **Back up and submit:** Guided drafts live in `.workspace-data/`, which Git ignores; committing or pushing the original worksheet does not back up the guided draft. Download your SQL, report and any required evidence outside the Codespace. The assignment names `student_exercises.sql`; if your instructor asks for that filename, rename a copy of the downloaded SQL without overwriting your original worksheet. Back up any database changes you need before a reset or rebuild. Follow your instructor's submission method and deadline. See [troubleshooting](../troubleshooting.md).
 
 ## 1. Get ready
 
@@ -126,7 +126,7 @@ Try each question first. Expand a hint for guidance without revealing a full sol
 
 ## 6. Complete and reflect
 
-Write the SQL in [student_exercises.sql](https://github.com/OrPerets/postgres-data-engineering-student/blob/main/labs/03-dwh-etl/sql/student_exercises.sql) and the explanations from the [assignment](https://github.com/OrPerets/postgres-data-engineering-student/blob/main/labs/03-dwh-etl/STUDENT_ASSIGNMENT.md).
+Write your SQL in the guided workspace or your Codespace copy of [student_exercises.sql](https://github.com/OrPerets/postgres-data-engineering-student/blob/main/labs/03-dwh-etl/sql/student_exercises.sql), and prepare the explanations from the [assignment](https://github.com/OrPerets/postgres-data-engineering-student/blob/main/labs/03-dwh-etl/STUDENT_ASSIGNMENT.md).
 
 Explain:
 - The grain of a fact row.

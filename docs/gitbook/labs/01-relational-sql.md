@@ -8,20 +8,24 @@
 
 !!! info "Your work"
 
-    **Work in the guided workspace:** After running `make lab-sql` from the repository root, run `make lab-sql-workspace`. Keep the terminal running, then open port **8765** from the Codespace **Ports** tab in your browser. Keep the port private. Work through one question at a time and run read-only SQL against your Codespace database. [Opening and saving your work](../start-lab01.md#4-write-and-save-your-answers).
+    Choose **one** route after starting the lab with `make lab-sql` from the repository root. The guided draft and the SQL worksheet are separate copies; they do not automatically sync. A query runs whichever SQL you select in the workspace or enter in the terminal.
 
-    **Save and back up:** Use **Save answers** to keep drafts in the Codespace, and **Download SQL** to keep a separate copy outside it. Edits are not saved automatically. The workspace does not grade your answers or submit them for you.
+    **Route A — Guided workspace:** Run `make lab-sql-workspace` from the repository root. Keep that terminal running and open private port **8765** from the Codespace **Ports** tab. Write your draft one question at a time and select **Run query** to execute the current or selected statement as read-only SQL. Compare the result with the question. Select **Save answers** regularly: edits are not autosaved. Select **Download SQL** to keep your draft outside the Codespace. [Opening and saving your work](../start-lab01.md#4-write-and-save-your-answers).
 
-    **Prefer the SQL file?** In Explorer, edit `labs → 01-relational-sql → sql → student_answers.sql` instead. The worksheet and guided drafts are separate and do not overwrite each other. Run the saved worksheet from the lab folder:
+    **Route B — Codespace editor:** In Explorer, edit `labs → 01-relational-sql → sql → student_answers.sql` and save it with **Ctrl+S** (Windows/Linux) or **⌘S** (Mac). Run that saved worksheet from the lab folder:
 
     ```bash
     cd labs/01-relational-sql
     docker compose exec -T postgres psql -v ON_ERROR_STOP=1 -U student -d query_lab < sql/student_answers.sql
     ```
 
-    Read the output and compare it with each question's requirements. From the repository root, `make test LAB=01-relational-sql` checks sample data and services; it **does not grade your answers**.
+    Read the output and compare it with each question's requirements. Download the saved worksheet from Explorer or commit and push it to your own fork to keep a copy outside the Codespace.
 
-    **Keep and submit:** Save your completed SQL, short explanations for questions 6, 7 and 15, and query plans for selected queries. Follow your instructor's submission instructions. [How to save a copy outside the Codespace](../start-lab01.md#4-write-and-save-your-answers).
+    **Check for either route:** From the repository root, `make test LAB=01-relational-sql` checks sample data and services, not either copy of your answers. Neither this check nor the workspace grades your SQL, and saving or downloading does not submit your work.
+
+    **Prepare your work:** Keep your completed SQL, short explanations for questions 6, 7 and 15, and query plans for selected queries. On Route A, **Download SQL** exports the current draft as `lab01_student_answers.sql`; keep the explanations and plans separately if they are not included in your SQL. On Route B, back up the saved worksheet and any separate explanation or plan files from Explorer or your own fork.
+
+    **Back up and submit:** Guided drafts live in `.workspace-data/`, which Git ignores; committing or pushing the original worksheet does not back up the guided draft. Download the SQL and any separate evidence outside the Codespace. Saving or downloading is not submission: follow your instructor's method and deadline. [How to save a copy outside the Codespace](../start-lab01.md#4-write-and-save-your-answers).
 
 ## 1. Get ready
 

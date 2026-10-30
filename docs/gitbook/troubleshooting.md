@@ -8,6 +8,41 @@ If it still cannot connect, try another browser and check [GitHub's connection t
 
 Do not delete the Codespace or rebuild its container until you have backed up any work you need. If the editor asks whether you trust the workspace, review the repository and choose **Trust** when you are comfortable enabling its features.
 
+## The guided workspace will not open
+
+The workspace server runs in a Codespace terminal; opening a forwarded port does not start it. If a workspace page is still open with unsaved edits, download them **before** reloading or closing the page as described below.
+
+1. In the Codespace, check the terminal where you started the workspace. If it is still running, leave it open. If it stopped, open **Terminal → New Terminal**, check that you are at the repository root (the folder containing `Makefile`), and run the command for your lab:
+
+    | Lab | Workspace command | Private port |
+    |---|---|---|
+    | [01 — SQL](labs/01-relational-sql.md) | `make lab-sql-workspace` | 8765 |
+    | [02 — Partitions and replicas](labs/02-partitions-replicas.md) | `make lab-partitions-workspace` | 8766 |
+    | [03 — DWH and ETL](labs/03-dwh-etl.md) | `make lab-dwh-workspace` | 8767 |
+    | [04 — MapReduce](labs/04-mapreduce.md) | `make lab-mapreduce-workspace` | 8768 |
+    | [05 — PageRank](labs/05-pagerank.md) | `make lab-pagerank-workspace` | 8769 |
+    | [06 — TF-IDF](labs/06-tfidf.md) | `make lab-tfidf-workspace` | 8770 |
+
+2. Wait for the workspace-ready message and keep that terminal running. In the Codespace **Ports** tab, find the listed port and choose **Open in Browser**. Keep its visibility private. If the port is missing, check the terminal for an error and rerun the command only after identifying why the server stopped. If the address is already in use, check whether the workspace is already running in another terminal; do not stop an unknown process.
+3. If the page cannot reach the server, check the running terminal and the correct port. After preserving any edits, reopen or reload the page. If the server starts but SQL queries report the database is unavailable, use a **second** terminal and follow that lab's initializer and recovery guidance. Do not reset a database to fix a forwarded port.
+
+The [Lab 06 tutorial](labs/06-tfidf.md) also explains how to start its separate PostgreSQL component for the SQL questions.
+
+## A workspace save failed or another tab changed the draft
+
+Leave the page open. If the workspace loaded and its download controls are available, download the current work before reloading: **Download SQL** in Labs 01–03; **Download Python**, **Download notes** and, if used, **Download example** in Labs 04–06; also **Download SQL** for Lab 06's SQL answer. Save any needed test output or evidence separately. If download controls are unavailable, copy the visible text to a separate file before leaving the page.
+
+If the message says another tab changed the draft, preserve copies from both tabs when possible. The rejected save did not overwrite the other saved version. Compare the copies and decide which text to keep; do not repeatedly retry an older tab over a newer version. For a connection error, check the server terminal and private port, then retry only after preserving your work. When reopening, check the saved content before editing: reopening the same Codespace can load an intact saved draft, but unsaved edits from a closed page may be lost.
+
+## Continue from a downloaded workspace backup
+
+The workspaces do not import an exported file back into the guided draft automatically. Keep the downloaded files unchanged as your backup, and compare them with any draft that is already saved before copying anything:
+
+- **SQL workspaces:** Open the downloaded `.sql` file and manually copy each answer into its matching question in the guided workspace. For Labs 02–03, also keep any report and evidence separately; labels and comments in the export help identify the questions. Save answers and download a fresh backup when finished.
+- **Python workspaces:** Open the downloaded Python file and manually copy its code into the guided editor. Copy any needed task notes from the downloaded notes file into the corresponding task, and copy a saved example into the scratchpad if needed. For Lab 06, also copy the downloaded Q9 SQL answer into its SQL editor. Select **Save work** and download a fresh backup.
+
+Alternatively, use your lab's Codespace editor route with a separate copy of the downloaded file. Workspace drafts and editor files do not sync; back up an existing file before replacing it. Downloaded output is evidence, not a restored workspace state. Follow the lab's submission instructions, and keep a copy outside the Codespace.
+
 ## `docker: command not found`
 You may be in a Codespaces recovery container, or Docker tooling is unavailable. Check Codespaces creation logs and the repository's `.devcontainer/devcontainer.json`. Back up your work before rebuilding or recreating the Codespace using the current configuration; don't install Docker on your laptop just to fix the cloud container.
 
