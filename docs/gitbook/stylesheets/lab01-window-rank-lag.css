@@ -1,0 +1,53 @@
+/* Interactive SQL examples, scoped to avoid changing the rest of the book. */
+.md-typeset .window-demo {
+  --window-ink: #2d2223;
+  --window-accent: #7e2633;
+  color: var(--window-ink);
+  border: 1px solid #d9c8c7;
+  border-top: 4px solid var(--window-accent);
+  border-radius: .35rem;
+  background: #fff;
+  padding: clamp(1rem, 3vw, 1.7rem);
+  margin: 1.3rem 0 2rem;
+}
+.md-typeset .window-demo h3 { margin: .2rem 0 .5rem; color: #331f23; }
+.md-typeset .window-demo > p { margin: .6rem 0 1rem; }
+.md-typeset .window-demo .window-demo__eyebrow {
+  margin: 0; color: #762430; font-size: .62rem; font-weight: 800;
+  letter-spacing: .12em;
+}
+.md-typeset .window-demo__source { display: flex; flex-wrap: wrap; gap: .5rem; margin: .8rem 0 1rem; }
+.md-typeset .window-demo__source span { background: #f5efee; border: 1px solid #e3d7d5; border-radius: .25rem; padding: .4rem .75rem; }
+.md-typeset .window-demo__source strong { margin-right: .5rem; }
+.md-typeset .window-demo__choices { border: 1px solid #e3d7d5; background: #fcfaf9; padding: .8rem 1rem 1rem; margin: .8rem 0 1rem; }
+.md-typeset .window-demo__choices legend { font-weight: 700; padding: 0 .3rem; }
+.md-typeset .window-demo__choices label { display: block; margin: .3rem 0; cursor: pointer; }
+.md-typeset .window-demo__choices input { accent-color: #7e2633; margin-right: .35rem; }
+.md-typeset .window-demo__choices small { display: block; color: #5a4f4e; margin-top: .55rem; }
+.md-typeset .window-demo__button {
+  border: 1px solid #71212d; border-radius: .25rem; padding: .55rem 1rem;
+  background: #7e2633; color: #fff; font: inherit; font-weight: 700; cursor: pointer;
+}
+.md-typeset .window-demo__button:hover { background: #5f1b26; }
+.md-typeset .window-demo__label { display: block; font-weight: 700; margin: 1rem 0 .35rem; }
+.md-typeset .window-demo select { width: min(100%, 20rem); min-height: 2.6rem; border: 1px solid #82716f; background: #fff; color: #211a1a; padding: .45rem .6rem; font: inherit; }
+.md-typeset .window-demo :is(button, input, select, summary, [tabindex]):focus-visible { outline: 3px solid #b75d4e; outline-offset: 3px; }
+.md-typeset .window-demo__insight { border-left: 3px solid #7e2633; background: #f8f1ef; padding: .7rem .9rem; margin: 1rem 0; line-height: 1.6; }
+.md-typeset .window-demo__table-wrap { overflow-x: auto; margin: .8rem 0; }
+.md-typeset .window-demo table { width: 100%; margin: 0; font-size: .7rem; }
+.md-typeset .window-demo caption { text-align: left; font-weight: 700; padding: .4rem 0; }
+.md-typeset .window-demo th { background: #f7f1ef; }
+.md-typeset .window-demo details { margin: .8rem 0; }
+.md-typeset .window-demo details summary { cursor: pointer; font-weight: 700; }
+.md-typeset .window-demo details pre { margin: .6rem 0; overflow-x: auto; }
+.md-typeset .window-demo__timeline { display: grid; grid-template-columns: repeat(5, minmax(5.4rem, 1fr)); gap: .4rem; overflow-x: auto; margin: 1rem 0; padding: .15rem; }
+.md-typeset .window-demo__order { min-width: 5.4rem; border: 1px solid #d7c6c3; border-radius: .25rem; background: #faf7f6; padding: .55rem; }
+.md-typeset .window-demo__order strong, .md-typeset .window-demo__order span, .md-typeset .window-demo__order small { display: block; }
+.md-typeset .window-demo__order span { font-size: .6rem; margin: .15rem 0; }
+.md-typeset .window-demo__order small { font-size: .57rem; line-height: 1.4; }
+.md-typeset .window-demo__order.is-current { border: 2px solid #7e2633; background: #f9eeeb; padding: calc(.55rem - 1px); }
+.md-typeset .window-demo__order.is-excluded { border-style: dashed; background: #f3f1f0; color: #5e5553; }
+.md-typeset .window-demo__footnote { color: #5b504f; font-size: .68rem; line-height: 1.55; margin-bottom: 0 !important; }
+@media (prefers-reduced-motion: no-preference) {
+  .md-typeset .window-demo__order { transition: background-color .2s ease, border-color .2s ease; }
+}

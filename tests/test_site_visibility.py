@@ -38,6 +38,15 @@ class SiteVisibilityTests(unittest.TestCase):
             all_pages = "\n".join(p.read_text() for p in out.rglob("*.html")) + search
             self.assertEqual((out / "start-lab01" / "index.html").exists(), "01" in active)
             self.assertEqual((out / "labs" / "01-window-functions" / "index.html").exists(), "01" in active)
+            if "01" in active:
+                lesson = (out / "labs" / "01-window-functions" / "index.html").read_text()
+                for mount in ("lab01-window-ranking", "lab01-window-lag", "lab01-window-frame"):
+                    self.assertIn(f'id="{mount}"', lesson)
+            for asset in ("javascripts/lab01-window-frame.js", "javascripts/lab01-window-rank-lag.js",
+                          "stylesheets/lab01-window-frame.css", "stylesheets/lab01-window-rank-lag.css"):
+                self.assertEqual((out / asset).exists(), "01" in active, asset)
+                if "01" not in active:
+                    self.assertNotIn(asset, all_pages)
             if "01" not in active:
                 self.assertNotIn("start-lab01/", all_pages)
                 self.assertNotIn("labs/01-window-functions/", all_pages)

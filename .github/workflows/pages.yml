@@ -33,6 +33,7 @@ jobs:
       - run: python -m unittest discover -s labs/06-tfidf/workspace/tests -q
       - run: for lab in 03-dwh-etl 04-mapreduce 05-pagerank 06-tfidf; do node --check "labs/$lab/workspace/app.js" || exit 1; done
       - run: node --test tests/test_lab01_join.cjs tests/test_lab02_partitions.cjs tests/test_learning_packs.cjs
+      - run: node --test tests/test_lab01_window_frame.cjs tests/test_lab01_window_rank_lag.cjs
       - run: node --test labs/02-partitioning-replication/workspace/tests/test_results_csv.cjs labs/06-tfidf/workspace/tests/test_csv_export.cjs
       - run: python scripts/build_site.py --site-dir site
       - uses: actions/upload-pages-artifact@v3

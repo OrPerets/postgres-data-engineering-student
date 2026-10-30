@@ -77,6 +77,12 @@ A **partition** is the group of input rows used by a window, not a physical tabl
 
 ## 3 · Order and peers: ranking
 
+Try the interactive ranking playground: predict the results before revealing the rankings, then change the tie-breaker to see what happens to peers. This is a browser simulation, not a live PostgreSQL query.
+
+<div id="lab01-window-ranking"></div>
+
+<noscript>The ranking playground needs JavaScript. The comparison table and worksheet below remain available without it.</noscript>
+
 Rows tied on every expression in a window's `ORDER BY` are **peers**. Here is a small illustration with two equal scores:
 
 | Customer | Revenue | `ROW_NUMBER` with customer ID as tie-breaker | `RANK` by revenue | `DENSE_RANK` by revenue |
@@ -94,6 +100,12 @@ Rows tied on every expression in a window's `ORDER BY` are **peers**. Here is a 
 The `ORDER BY` **inside** `OVER` controls the window's sequence or peers. A final `ORDER BY` controls the order in which results are displayed; use both where needed.
 
 ## 4 · Look backward with `LAG`
+
+Use the timeline to compare filtering to March before and after `LAG` is calculated. This is a browser simulation using the lab's synthetic data.
+
+<div id="lab01-window-lag"></div>
+
+<noscript>The LAG timeline needs JavaScript. The order table and SQL example below remain available without it.</noscript>
 
 Customer 1's order history, sorted by date and then ID:
 
@@ -125,6 +137,12 @@ ORDER BY order_date, order_id;
 **Predict and test:** If you filter to March *before* calculating `LAG`, what does order 104 see? What if you calculate `LAG` over the full order history first and filter to March in an outer query? Complete worksheet section 4 and explain the difference. Filtering to a whole customer partition, as above, does not remove earlier orders from that customer's partition.
 
 ## 5 · See the frame move
+
+Explore the current row and the rows in its frame. Step through the orders or start the optional animation, then compare the calculation with the displayed SQL. This browser simulation uses customer 1's synthetic orders; run your worksheet to verify them in PostgreSQL.
+
+<div id="lab01-window-frame"></div>
+
+<noscript>The frame explorer needs JavaScript. The worked examples and tables below remain available without it.</noscript>
 
 For the three-order moving average, the frame is the current order plus **up to two preceding orders**. Its size grows until three orders are available:
 
