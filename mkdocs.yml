@@ -42,6 +42,10 @@ extra_javascript:
   - javascripts/lab01-null.js
   - javascripts/lab01-window-frame.js
   - javascripts/lab01-window-rank-lag.js
+  - javascripts/lab01-family-aggregate.js
+  - javascripts/lab01-family-ranking.js
+  - javascripts/lab01-family-navigation.js
+  - javascripts/lab01-function-explorer.js
   - javascripts/lab02-explorer.js
   - javascripts/lab02-quiz.js
   - javascripts/lab02-months.js

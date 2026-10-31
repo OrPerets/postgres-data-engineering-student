@@ -48,6 +48,8 @@ class SiteVisibilityTests(unittest.TestCase):
                 self.assertIn('id="lab01-practice-quiz"', quiz)
                 for mount in ("lab01-window-ranking", "lab01-window-lag", "lab01-window-frame"):
                     self.assertIn(f'id="{mount}"', lesson)
+                for family in ("aggregate", "ranking", "offsets", "values", "distribution"):
+                    self.assertIn(f'data-window-family="{family}"', lesson)
                 self.assertIn('class="mkdocs-h5p"', lesson)
                 self.assertIn('../../assets/h5p-player/main.bundle.js', lesson)
                 self.assertTrue((out / "assets/h5p/lab01-window-partitions.h5p").is_file())
@@ -60,6 +62,8 @@ class SiteVisibilityTests(unittest.TestCase):
                 self.assertFalse((out / "assets/h5p/lab01-window-partitions.h5p").exists())
                 self.assertFalse(list((out / "assets/h5p-content").glob("lab01-window-partitions-*")))
             for asset in ("javascripts/lab01-window-frame.js", "javascripts/lab01-window-rank-lag.js",
+                          "javascripts/lab01-family-aggregate.js", "javascripts/lab01-family-ranking.js",
+                          "javascripts/lab01-family-navigation.js", "javascripts/lab01-function-explorer.js",
                           "stylesheets/lab01-window-frame.css", "stylesheets/lab01-window-rank-lag.css"):
                 self.assertEqual((out / asset).exists(), "01" in active, asset)
                 if "01" not in active:

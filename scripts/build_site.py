@@ -57,6 +57,8 @@ def filter_docs(directory: Path, enabled: dict[str, bool]) -> None:
         (directory / "images" / "setup" / "01-github-codespaces.png").unlink()
         for asset in ("javascripts/lab01-join.js", "javascripts/lab01-quiz.js", "javascripts/lab01-null.js",
                       "javascripts/lab01-window-frame.js", "javascripts/lab01-window-rank-lag.js",
+                      "javascripts/lab01-family-aggregate.js", "javascripts/lab01-family-ranking.js",
+                      "javascripts/lab01-family-navigation.js", "javascripts/lab01-function-explorer.js",
                       "stylesheets/lab01-join.css", "stylesheets/lab01-quiz.css", "stylesheets/lab01-null.css",
                       "stylesheets/lab01-window-frame.css", "stylesheets/lab01-window-rank-lag.css"):
             (directory / asset).unlink()
@@ -173,7 +175,9 @@ def filtered_config(text: str, enabled: dict[str, bool]) -> str:
         for asset in ("stylesheets/lab01-join.css", "stylesheets/lab01-quiz.css", "stylesheets/lab01-null.css",
                       "stylesheets/lab01-window-frame.css", "stylesheets/lab01-window-rank-lag.css",
                       "javascripts/lab01-join.js", "javascripts/lab01-quiz.js", "javascripts/lab01-null.js",
-                      "javascripts/lab01-window-frame.js", "javascripts/lab01-window-rank-lag.js"):
+                      "javascripts/lab01-window-frame.js", "javascripts/lab01-window-rank-lag.js",
+                      "javascripts/lab01-family-aggregate.js", "javascripts/lab01-family-ranking.js",
+                      "javascripts/lab01-family-navigation.js", "javascripts/lab01-function-explorer.js"):
             text = require_replace(text, f"  - {asset}\n", "", f"Lab 01 asset {asset}")
     if not enabled["02"]:
         text = require_replace(text, "      - Partitioning practice & quiz: activities/lab02-learning-pack.md\n", "", "Lab 02 practice nav")

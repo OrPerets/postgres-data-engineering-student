@@ -85,6 +85,13 @@ The worksheet includes completed orders, subtracts discounts, treats a `NULL` di
 
 ## 1 · Aggregate windows
 
+<div data-window-family="aggregate"></div>
+
+<noscript>The interactive explorer needs JavaScript. Open the explanation and worked SQL below to learn this family without it.</noscript>
+
+<details markdown="1">
+<summary>Aggregate windows: the complete explanations, examples and existing frame activities</summary>
+
 `SUM`, `AVG`, `COUNT`, `MIN`, and `MAX` can run as windows: add `OVER` to an ordinary aggregate to calculate over related rows while keeping the output rows.
 
 Five orders for one customer have revenues **300, 200, 200, 400, 120**. Their total is **1,220**.
@@ -231,7 +238,16 @@ PostgreSQL's default ordered frame runs from the partition start through the cur
 The columns above change both the ordering and the frame. In worksheet section 5, isolate those choices: first compare default and explicit `ROWS` with date and ID for both; then compare them with date only for both. Date-only `ROWS` does not guarantee which tied February order receives the intermediate sum. Repeated identical results do not prove a guaranteed order; use a stable tie-breaker when needed.
 </details>
 
+</details>
+
 ## 2 · Ranking functions
+
+<div data-window-family="ranking"></div>
+
+<noscript>The interactive explorer needs JavaScript. Open the explanation and worked SQL below to learn this family without it.</noscript>
+
+<details markdown="1">
+<summary>Ranking: examples, tie rules and the comparison playground</summary>
 
 `ROW_NUMBER` numbers individual rows. `RANK` and `DENSE_RANK` compare peer groups: tied rows share a rank.
 
@@ -267,7 +283,16 @@ ORDER BY revenue DESC, order_id;
 The revenues are 400, 300, 200, 200, 120. The two 200 orders share rank **3**; the next rank is **5**, while the next dense rank is **4**. The ID appears only in `ROW_NUMBER`'s ordering so that the other windows preserve equal-revenue peers. A `ROW_NUMBER` ordering with a unique ID makes the result reproducible.
 </details>
 
+</details>
+
 ## 3 · Previous and next rows
+
+<div data-window-family="offsets"></div>
+
+<noscript>The interactive explorer needs JavaScript. Open the explanation and worked SQL below to learn this family without it.</noscript>
+
+<details markdown="1">
+<summary>Previous and next rows: examples, filtering and the timeline</summary>
 
 `LAG` looks backward and `LEAD` looks forward within the ordered partition. Both use existing rows, not a calendar interval.
 
@@ -320,7 +345,16 @@ ORDER BY order_date, order_id;
 For order 104, the previous revenue is **200**, the next is **120**, and two orders back is **200**. The third argument is used only when the requested row does **not exist**. If the target row exists but its value is `NULL`, it remains `NULL`; PostgreSQL does not support the SQL-standard `IGNORE NULLS` option here. The functions use the partition and order, not the window frame.
 </details>
 
+</details>
+
 ## 4 · First, last and nth values
+
+<div data-window-family="values"></div>
+
+<noscript>The interactive explorer needs JavaScript. Open the explanation and worked SQL below to learn this family without it.</noscript>
+
+<details markdown="1">
+<summary>Value functions: complete SQL and frame details</summary>
 
 `FIRST_VALUE`, `LAST_VALUE` and `NTH_VALUE` read from the **current frame**. Use a full frame when the question asks about the first, last, or nth order in the whole customer history.
 
@@ -346,7 +380,16 @@ For all five orders, the first revenue is **300**, the last is **120**, and the 
 **Default-frame surprise:** With `ORDER BY` and no explicit frame, PostgreSQL's frame ends at the current row's last peer. Thus `LAST_VALUE` often returns the current value rather than the final value in the partition. Without window `ORDER BY`, the default frame is the full partition, but no chronological first or last is defined. PostgreSQL respects `NULL` values for these functions; it does not implement `IGNORE NULLS` or `NTH_VALUE ... FROM LAST`.
 </details>
 
+</details>
+
 ## 5 · Distribution and buckets
+
+<div data-window-family="distribution"></div>
+
+<noscript>The interactive explorer needs JavaScript. Open the explanation and worked SQL below to learn this family without it.</noscript>
+
+<details markdown="1">
+<summary>Distribution: complete SQL and bucket details</summary>
 
 `PERCENT_RANK` and `CUME_DIST` locate a row relative to its partition; `NTILE` divides ordered rows into a requested number of roughly equal-sized buckets.
 
@@ -366,6 +409,8 @@ ORDER BY revenue DESC, order_id;
 For customer 1, the descending revenues are **400, 300, 200, 200, 120**. Both 200 rows are peers: each has percent rank **0.5** and cumulative distribution **0.8**. `PERCENT_RANK` is `(rank − 1) / (partition rows − 1)` and returns 0 for a one-row partition. `CUME_DIST` counts rows through the current peer group, divided by the partition size.
 
 `NTILE(3)` assigns bucket numbers **1, 1, 2, 2, 3** here. It counts rows and can split equal values between buckets. The ID makes this example's bucket assignment reproducible; it is deliberately absent from the two distribution orderings so equal revenues remain peers.
+</details>
+
 </details>
 
 ## Apply · Calculate first, then filter
