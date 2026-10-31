@@ -26,6 +26,7 @@ extra_css:
   - stylesheets/lab01-null.css
   - stylesheets/lab01-window-frame.css
   - stylesheets/lab01-window-rank-lag.css
+  - stylesheets/lab01-practice.css
   - stylesheets/lab02-explorer.css
   - stylesheets/lab02-quiz.css
   - stylesheets/lab02-months.css
@@ -46,6 +47,7 @@ extra_javascript:
   - javascripts/lab01-family-ranking.js
   - javascripts/lab01-family-navigation.js
   - javascripts/lab01-function-explorer.js
+  - javascripts/lab01-practice.js
   - javascripts/lab02-explorer.js
   - javascripts/lab02-quiz.js
   - javascripts/lab02-months.js

@@ -55,12 +55,15 @@ def filter_docs(directory: Path, enabled: dict[str, bool]) -> None:
         (directory / "assets" / "h5p" / "lab01-window-partitions.h5p").unlink()
         (directory / "start-lab01.md").unlink()
         (directory / "images" / "setup" / "01-github-codespaces.png").unlink()
+        shutil.rmtree(directory / "assets" / "lab01-practice")
         for asset in ("javascripts/lab01-join.js", "javascripts/lab01-quiz.js", "javascripts/lab01-null.js",
                       "javascripts/lab01-window-frame.js", "javascripts/lab01-window-rank-lag.js",
                       "javascripts/lab01-family-aggregate.js", "javascripts/lab01-family-ranking.js",
                       "javascripts/lab01-family-navigation.js", "javascripts/lab01-function-explorer.js",
+                      "javascripts/lab01-practice.js", "javascripts/lab01-practice-worker.js",
                       "stylesheets/lab01-join.css", "stylesheets/lab01-quiz.css", "stylesheets/lab01-null.css",
-                      "stylesheets/lab01-window-frame.css", "stylesheets/lab01-window-rank-lag.css"):
+                      "stylesheets/lab01-window-frame.css", "stylesheets/lab01-window-rank-lag.css",
+                      "stylesheets/lab01-practice.css"):
             (directory / asset).unlink()
     if "02" in hidden:
         (directory / "activities" / "lab02-learning-pack.md").unlink()
@@ -182,11 +185,11 @@ def filtered_config(text: str, enabled: dict[str, bool]) -> str:
             text = require_replace(text, f"      - {label}: labs/{page}\n", "", f"Lab 01 {label} nav")
         text = require_replace(text, "      - SQL practice & quiz: activities/lab01-learning-pack.md\n", "", "Lab 01 practice nav")
         for asset in ("stylesheets/lab01-join.css", "stylesheets/lab01-quiz.css", "stylesheets/lab01-null.css",
-                      "stylesheets/lab01-window-frame.css", "stylesheets/lab01-window-rank-lag.css",
+                      "stylesheets/lab01-window-frame.css", "stylesheets/lab01-window-rank-lag.css", "stylesheets/lab01-practice.css",
                       "javascripts/lab01-join.js", "javascripts/lab01-quiz.js", "javascripts/lab01-null.js",
                       "javascripts/lab01-window-frame.js", "javascripts/lab01-window-rank-lag.js",
                       "javascripts/lab01-family-aggregate.js", "javascripts/lab01-family-ranking.js",
-                      "javascripts/lab01-family-navigation.js", "javascripts/lab01-function-explorer.js"):
+                      "javascripts/lab01-family-navigation.js", "javascripts/lab01-function-explorer.js", "javascripts/lab01-practice.js"):
             text = require_replace(text, f"  - {asset}\n", "", f"Lab 01 asset {asset}")
     if not enabled["02"]:
         text = require_replace(text, "      - Partitioning practice & quiz: activities/lab02-learning-pack.md\n", "", "Lab 02 practice nav")

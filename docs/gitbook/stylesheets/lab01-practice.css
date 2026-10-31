@@ -1,0 +1,24 @@
+/* SQL practice is scoped to the chapter and follows the course's editorial palette. */
+.md-typeset .lab01-practice { margin: 1.5rem 0 2.5rem; }
+.md-typeset .lab01-practice-actions,
+.md-typeset .lab01-editor-actions { display: flex; flex-wrap: wrap; align-items: center; gap: .6rem; }
+.md-typeset .lab01-question { margin: 2rem 0; padding: 1.2rem 0 1.6rem; border-top: 2px solid #8b2029; }
+.md-typeset .lab01-question h3 { margin: 0 0 .7rem; }
+.md-typeset .lab01-question pre { overflow-x: auto; }
+.md-typeset .lab01-editor { margin-top: 1rem; padding: 1rem; border: 1px solid #ded7d3; background: #f9f6f3; }
+.md-typeset .lab01-editor label { display: block; margin-bottom: .4rem; color: #342f2f; font-size: .8rem; font-weight: 700; }
+.md-typeset .lab01-editor textarea { display: block; width: 100%; min-height: 8rem; resize: vertical; padding: .75rem; border: 1px solid #aaa09a; border-radius: 2px; background: #fff; color: #232020; font: .75rem/1.55 ui-monospace, SFMono-Regular, Consolas, monospace; tab-size: 2; }
+.md-typeset .lab01-practice button { min-height: 2.3rem; padding: .45rem .85rem; border: 1px solid #8b2029; border-radius: 2px; background: #fff; color: #751d27; font: inherit; font-size: .72rem; font-weight: 700; cursor: pointer; }
+.md-typeset .lab01-practice [data-run] { background: #8b2029; color: white; }
+.md-typeset .lab01-practice button:hover:not(:disabled) { background: #66151c; color: #fff; }
+.md-typeset .lab01-practice button:disabled { opacity: .55; cursor: not-allowed; }
+.md-typeset .lab01-editor-actions { margin-top: .65rem; }
+.md-typeset .lab01-status { margin: .5rem 0 0; font-size: .73rem; color: #514a47; }
+.md-typeset .lab01-result { overflow-x: auto; max-width: 100%; }
+.md-typeset .lab01-result:empty { display: none; }
+.md-typeset .lab01-result table { display: table; margin: .75rem 0 0; font-size: .7rem; }
+.md-typeset .lab01-result th, .md-typeset .lab01-result td { padding: .4rem .6rem; white-space: nowrap; }
+@media screen and (max-width: 600px) {
+  .md-typeset .lab01-editor { padding: .75rem; }
+  .md-typeset .lab01-editor textarea { min-height: 9rem; font-size: .8rem; }
+}

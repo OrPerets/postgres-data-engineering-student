@@ -1,6 +1,7 @@
 """Test published-site visibility, not access to the public source repository."""
 import importlib.util
 from pathlib import Path
+import re
 import subprocess
 import sys
 import tempfile
@@ -45,6 +46,11 @@ class SiteVisibilityTests(unittest.TestCase):
             if "01" in active:
                 lesson = (out / "labs" / "01-window-functions" / "index.html").read_text()
                 quiz = (out / "labs" / "01-test-yourself" / "index.html").read_text()
+                tutorial = (out / "labs" / "01-tutorial-practice" / "index.html").read_text()
+                self.assertIn('id="lab01-practice"', tutorial)
+                self.assertEqual(re.findall(r'<section\b[^>]*\bdata-question="(\d+)"', tutorial), [str(n) for n in range(1, 16)])
+                self.assertEqual(len(re.findall(r'<textarea\b[^>]*\bdata-sql(?:\s|=|>)', tutorial)), 15)
+                self.assertEqual(len(re.findall(r'<button\b[^>]*\bdata-run(?:\s|=|>)', tutorial)), 15)
                 self.assertIn('id="lab01-practice-quiz"', quiz)
                 for mount in ("lab01-window-ranking", "lab01-window-lag", "lab01-window-frame"):
                     self.assertIn(f'id="{mount}"', lesson)
@@ -61,10 +67,13 @@ class SiteVisibilityTests(unittest.TestCase):
             else:
                 self.assertFalse((out / "assets/h5p/lab01-window-partitions.h5p").exists())
                 self.assertFalse(list((out / "assets/h5p-content").glob("lab01-window-partitions-*")))
+                self.assertFalse((out / "assets/lab01-practice").exists())
             for asset in ("javascripts/lab01-window-frame.js", "javascripts/lab01-window-rank-lag.js",
                           "javascripts/lab01-family-aggregate.js", "javascripts/lab01-family-ranking.js",
                           "javascripts/lab01-family-navigation.js", "javascripts/lab01-function-explorer.js",
-                          "stylesheets/lab01-window-frame.css", "stylesheets/lab01-window-rank-lag.css"):
+                          "javascripts/lab01-practice.js", "javascripts/lab01-practice-worker.js",
+                          "stylesheets/lab01-window-frame.css", "stylesheets/lab01-window-rank-lag.css",
+                          "stylesheets/lab01-practice.css", "assets/lab01-practice/schema.sql", "assets/lab01-practice/seed.sql"):
                 self.assertEqual((out / asset).exists(), "01" in active, asset)
                 if "01" not in active:
                     self.assertNotIn(asset, all_pages)
@@ -127,6 +136,12 @@ class SiteVisibilityTests(unittest.TestCase):
             self.assertIn(f"Lab {number}", index)
         self.assertEqual(index.count('class="course-lab-status"'), 5)
         self.assertEqual(index.count('class="course-lab-disabled"'), 5)
+
+    def test_browser_practice_uses_lab_schema_and_seed(self):
+        lab = ROOT / "labs/01-relational-sql/sql"
+        browser = ROOT / "docs/gitbook/assets/lab01-practice"
+        for source, copy in (("01_schema.sql", "schema.sql"), ("02_seed.sql", "seed.sql")):
+            self.assertEqual((lab / source).read_bytes(), (browser / copy).read_bytes(), copy)
 
     def test_only_second_workshop(self):
         self.build({"02"})
