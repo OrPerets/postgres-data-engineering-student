@@ -68,6 +68,15 @@ class WorkspaceTests(unittest.TestCase):
         self.assertIn('WHERE city NOT IN (', questions[6]['question'])
         self.assertIn('WHERE filter', questions[5]['hint'])
         self.assertTrue(all(question['hint'] for question in questions))
+        self.assertIn('parentheses', questions[0]['hint'])
+        self.assertIn('ROW_NUMBER', questions[7]['hint'])
+        self.assertIn('same-day', questions[14]['hint'])
+
+    def test_missing_optional_hints_do_not_block_worksheet(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            questions = server.questions_from_worksheet(hints_path=Path(tmp) / 'missing.md')
+        self.assertEqual([item['id'] for item in questions], list(range(1, 16)))
+        self.assertTrue(all(question['hint'] == '' for question in questions))
 
     def test_save_load_unicode_and_corrupt_file_protection(self):
         with tempfile.TemporaryDirectory() as tmp:
