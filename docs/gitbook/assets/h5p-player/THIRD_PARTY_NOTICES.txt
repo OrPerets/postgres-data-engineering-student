@@ -11,6 +11,12 @@ https://github.com/h5p. The Font Awesome 4 CSS is MIT licensed; its fonts are
 SIL OFL 1.1 licensed, Copyright Dave Gandy. See FONT-AWESOME-OFL.txt and
 https://fontawesome.com/v4/license/.
 
+The H5P.MultiChoice stylesheet identifies its bundled IcoMoon icon font as
+licensed under the GNU General Public License. The upstream stylesheet does
+not specify a version or copyright holder. See its original notice in
+H5P.MultiChoice-1.16/css/multichoice.css within the activity package and
+https://www.gnu.org/licenses/gpl.html.
+
 MIT License
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of

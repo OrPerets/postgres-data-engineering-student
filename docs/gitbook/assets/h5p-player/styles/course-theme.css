@@ -1,0 +1,56 @@
+/* Course theme for the H5P iframe. Content-type CSS is loaded after frame CSS,
+   so important declarations intentionally keep the course palette consistent. */
+.h5p-content .h5p-multichoice {
+  color: #252020;
+  font-family: "Helvetica Neue", Arial, sans-serif;
+  line-height: 1.55;
+}
+.h5p-content .h5p-multichoice .h5p-answer .h5p-alternative-container {
+  background: #fffdfb !important;
+  border: 1px solid #d8c9c4 !important;
+  border-radius: .35em;
+  box-shadow: none !important;
+  color: #302827 !important;
+  padding-top: .5em;
+  padding-bottom: .5em;
+}
+.h5p-content .h5p-multichoice .h5p-answer:not([aria-disabled="true"]):hover .h5p-alternative-container {
+  background: #f9f2ef !important;
+  border-color: #a76c69 !important;
+}
+.h5p-content .h5p-multichoice .h5p-answer .h5p-alternative-container:before {
+  top: .5em;
+}
+.h5p-content .h5p-multichoice .h5p-answer[aria-checked="true"]:not(.h5p-correct):not(.h5p-wrong) .h5p-alternative-container {
+  background: #f9edeb !important;
+  border: 2px solid #81242d !important;
+  color: #67151d !important;
+}
+.h5p-content .h5p-multichoice .h5p-answer.h5p-correct .h5p-alternative-container {
+  background: #e9f3ec !important;
+  border-color: #619173 !important;
+  color: #204c32 !important;
+}
+.h5p-content .h5p-multichoice .h5p-answer.h5p-wrong .h5p-alternative-container {
+  background: #fbecea !important;
+  border-color: #b7665f !important;
+  color: #8a2626 !important;
+}
+.h5p-content .h5p-multichoice .h5p-answer:focus .h5p-alternative-container {
+  outline: 3px solid #bf6855 !important;
+  outline-offset: 2px;
+}
+.h5p-content .h5p-question-buttons .h5p-joubelui-button {
+  background: #81242d !important;
+  border: 1px solid #81242d !important;
+  border-radius: .25em !important;
+  color: #fff !important;
+  font-weight: 700;
+}
+.h5p-content .h5p-question-buttons .h5p-joubelui-button:hover {
+  background: #67151d !important;
+}
+.h5p-content .h5p-question-buttons .h5p-joubelui-button:focus-visible {
+  outline: 3px solid #bf6855 !important;
+  outline-offset: 3px;
+}

@@ -120,7 +120,11 @@ A **partition** contains the customer’s orders. A **frame** is the subset used
 
 Select the orders you think belong in the frame, then check your answer. This is a browser activity using the lab's synthetic data; it does not run SQL or record your answers.
 
+<div class="lab01-h5p" markdown="1">
+
 ![h5p Build the window](assets/h5p/lab01-window-partitions.h5p)
+
+</div>
 
 <noscript>Paper alternative: the ordered IDs are 101, 102, 103, 104, 134. For order 104, choose the current row and up to two preceding rows. Check your prediction with the worked example below.</noscript>
 

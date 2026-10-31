@@ -47,6 +47,9 @@ class SiteVisibilityTests(unittest.TestCase):
                 self.assertTrue((out / "assets/h5p/lab01-window-partitions.h5p").is_file())
                 self.assertTrue(list((out / "assets/h5p-content").glob("lab01-window-partitions-*/h5p.json")))
                 self.assertTrue((out / "assets" / "h5p-player" / "main.bundle.js").is_file())
+                frame_style = out / "assets/h5p-player/styles/h5p.css"
+                self.assertIn("course-theme.css", frame_style.read_text())
+                self.assertTrue((frame_style.parent / "course-theme.css").is_file())
             else:
                 self.assertFalse((out / "assets/h5p/lab01-window-partitions.h5p").exists())
                 self.assertFalse(list((out / "assets/h5p-content").glob("lab01-window-partitions-*")))

@@ -72,3 +72,14 @@
 @media (prefers-reduced-motion: no-preference) {
   .md-typeset .window-frame__card { transition: background-color .25s ease, border-color .25s ease, color .25s ease; }
 }
+
+/* Match the H5P prediction activity to the window explorer. */
+.md-typeset .lab01-h5p {
+  margin: 1.2rem 0 1.6rem;
+  padding: clamp(1rem, 3vw, 1.7rem);
+  border: 1px solid #d8c9c4;
+  border-top: 4px solid #81242d;
+  border-radius: .4rem;
+  background: #fff;
+  box-shadow: 0 6px 22px rgba(77, 41, 39, .06);
+}
