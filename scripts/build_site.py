@@ -6,6 +6,7 @@ The GitHub repository is public: hiding a lab here is not an access control.
 from __future__ import annotations
 
 import argparse
+import hashlib
 from pathlib import Path
 import re
 import shutil
@@ -191,6 +192,18 @@ def filtered_config(text: str, enabled: dict[str, bool]) -> str:
                       "javascripts/lab01-family-aggregate.js", "javascripts/lab01-family-ranking.js",
                       "javascripts/lab01-family-navigation.js", "javascripts/lab01-function-explorer.js", "javascripts/lab01-practice.js"):
             text = require_replace(text, f"  - {asset}\n", "", f"Lab 01 asset {asset}")
+    else:
+        # GitHub Pages/CDNs can retain old assets after deployment. Use content
+        # fingerprints in the generated URLs, including the worker in the JS
+        # version so a worker-only change also forces a fresh download.
+        for asset, inputs in (
+            ("stylesheets/lab01-practice.css", ("stylesheets/lab01-practice.css",)),
+            ("javascripts/lab01-practice.js", ("javascripts/lab01-practice.js", "javascripts/lab01-practice-worker.js")),
+        ):
+            digest = hashlib.sha256()
+            for filename in inputs:
+                digest.update((ROOT / "docs" / "gitbook" / filename).read_bytes())
+            text = require_replace(text, f"  - {asset}\n", f"  - {asset}?v={digest.hexdigest()[:12]}\n", f"Lab 01 asset {asset}")
     if not enabled["02"]:
         text = require_replace(text, "      - Partitioning practice & quiz: activities/lab02-learning-pack.md\n", "", "Lab 02 practice nav")
         for asset in ("stylesheets/lab02-explorer.css", "stylesheets/lab02-quiz.css", "stylesheets/lab02-months.css",

@@ -1,6 +1,7 @@
 """Test published-site visibility, not access to the public source repository."""
 import importlib.util
 import html
+import hashlib
 from html.parser import HTMLParser
 from pathlib import Path
 import re
@@ -111,6 +112,14 @@ class SiteVisibilityTests(unittest.TestCase):
                 lesson = (out / "labs" / "01-window-functions" / "index.html").read_text()
                 quiz = (out / "labs" / "01-test-yourself" / "index.html").read_text()
                 tutorial = (out / "labs" / "01-tutorial-practice" / "index.html").read_text()
+                docs = ROOT / "docs/gitbook"
+                script_digest = hashlib.sha256(
+                    (docs / "javascripts/lab01-practice.js").read_bytes()
+                    + (docs / "javascripts/lab01-practice-worker.js").read_bytes()
+                ).hexdigest()[:12]
+                style_digest = hashlib.sha256((docs / "stylesheets/lab01-practice.css").read_bytes()).hexdigest()[:12]
+                self.assertIn(f'javascripts/lab01-practice.js?v={script_digest}', tutorial)
+                self.assertIn(f'stylesheets/lab01-practice.css?v={style_digest}', tutorial)
                 self.assertIn('id="lab01-practice"', tutorial)
                 self.assertEqual(re.findall(r'<section\b[^>]*\bdata-question="(\d+)"', tutorial), [str(n) for n in range(1, 16)])
                 self.assertEqual(len(re.findall(r'<textarea\b[^>]*\bdata-sql(?:\s|=|>)', tutorial)), 15)

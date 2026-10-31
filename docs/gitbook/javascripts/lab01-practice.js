@@ -17,6 +17,7 @@
   const script = document.currentScript;
   if (!script || !script.src) return;
   const workerUrl = new URL('lab01-practice-worker.js', script.src);
+  workerUrl.search = new URL(script.src).search;
   const storagePrefix = 'lab01-practice-answer-v1-';
   const maxSql = 50000;
   let worker = null;
