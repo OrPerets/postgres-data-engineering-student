@@ -11,6 +11,9 @@
 
 * [Lab 01 — Relational SQL & Query Optimization](labs/01-relational-sql.md)
 * [Window functions](labs/01-window-functions.md)
+* [Tutorial & practice](labs/01-tutorial-practice.md)
+* [Job interview questions](labs/01-interview.md)
+* [Test yourself](labs/01-test-yourself.md)
 * [Lab 02 — Partitioning & Replication](labs/02-partitions-replicas.md)
 * [Lab 03 — Data Warehouse & ETL](labs/03-dwh-etl.md)
 

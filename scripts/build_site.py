@@ -49,6 +49,8 @@ def filter_docs(directory: Path, enabled: dict[str, bool]) -> None:
         (directory / "labs" / LABS[number][0]).unlink()
     if "01" in hidden:
         (directory / "labs" / "01-window-functions.md").unlink()
+        for page in ("01-tutorial-practice.md", "01-interview.md", "01-test-yourself.md"):
+            (directory / "labs" / page).unlink()
         (directory / "activities" / "lab01-learning-pack.md").unlink()
         (directory / "assets" / "h5p" / "lab01-window-partitions.h5p").unlink()
         (directory / "start-lab01.md").unlink()
@@ -81,6 +83,7 @@ def filter_docs(directory: Path, enabled: dict[str, bool]) -> None:
     hidden_patterns = [re.compile(re.escape(LABS[n][0])) for n in hidden]
     if "01" in hidden:
         hidden_patterns.append(re.compile(re.escape("01-window-functions.md")))
+        hidden_patterns.extend(re.compile(re.escape(page)) for page in ("01-tutorial-practice.md", "01-interview.md", "01-test-yourself.md"))
     for page in directory.rglob("*.md"):
         text = page.read_text(encoding="utf-8")
         lines = text.splitlines(keepends=True)
@@ -162,6 +165,10 @@ def filtered_config(text: str, enabled: dict[str, bool]) -> str:
     if not enabled["01"]:
         text = require_replace(text, "      - First SQL lab: start-lab01.md\n", "", "Lab 01 walkthrough nav")
         text = require_replace(text, "      - Window functions: labs/01-window-functions.md\n", "", "Lab 01 window lesson nav")
+        for label, page in (("Tutorial & practice", "01-tutorial-practice.md"),
+                            ("Job interview questions", "01-interview.md"),
+                            ("Test yourself", "01-test-yourself.md")):
+            text = require_replace(text, f"      - {label}: labs/{page}\n", "", f"Lab 01 {label} nav")
         text = require_replace(text, "      - SQL practice & quiz: activities/lab01-learning-pack.md\n", "", "Lab 01 practice nav")
         for asset in ("stylesheets/lab01-join.css", "stylesheets/lab01-quiz.css", "stylesheets/lab01-null.css",
                       "stylesheets/lab01-window-frame.css", "stylesheets/lab01-window-rank-lag.css",

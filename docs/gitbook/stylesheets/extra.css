@@ -42,6 +42,12 @@ body {
 }
 .md-footer { background-color: #252020; }
 
+/* A compact chapter hub keeps the choices close to the top of Lab 01. */
+.md-typeset .course-hero.lab01-landing-hero { padding: clamp(1.25rem, 3vw, 2rem); margin-bottom: 1.4rem; }
+.md-typeset .course-hero.lab01-landing-hero h1 { max-width: none; margin: .25rem 0 .5rem; font-size: clamp(1.8rem, 4vw, 2.7rem); }
+.md-typeset .lab01-landing-hero .course-kicker { margin-bottom: .5rem; }
+.md-typeset .lab01-landing-hero .course-actions { margin-top: 1rem; }
+
 /* The homepage classes are kept independent of the lab page structure. */
 .md-typeset .course-hero {
   position: relative;

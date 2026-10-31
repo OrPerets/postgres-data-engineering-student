@@ -1,6 +1,8 @@
 # Window functions — keep the rows, see the bigger picture
 
-**Lab 01 · visual lesson · 60–90 minutes**
+**Lab 01 · Chapter 1 · visual lesson · 60–90 minutes**
+
+[← Lab 01 chapters](01-relational-sql.md) · [Go to tutorial & practice →](01-tutorial-practice.md)
 
 How can you show an order **and** its customer’s total on the same row? A window function looks across related rows without collapsing the rows you started with. Follow the visuals, make a prediction, and then check it in PostgreSQL.
 
@@ -11,6 +13,46 @@ flowchart LR
 ```
 
 The interactive examples are **browser simulations** using synthetic data, not live PostgreSQL queries. The [worksheet](https://github.com/OrPerets/postgres-data-engineering-student/blob/main/labs/01-relational-sql/windows/worksheet.sql) lets you try the same ideas on the lab database. The [full lesson and optional challenges](https://github.com/OrPerets/postgres-data-engineering-student/blob/main/labs/01-relational-sql/windows/README.md) provide more detail.
+
+## The shape of a window function
+
+Read this example from the inside out: keep orders for each customer together, put them in a stable order, and add up the rows from the first order through the current order.
+
+```sql
+SUM(revenue) OVER (
+    PARTITION BY customer_id          -- which customer's rows?
+    ORDER BY order_date, order_id      -- in what order?
+    ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW -- which rows contribute?
+) AS running_revenue
+```
+
+`OVER` turns the calculation into a window calculation: each input order stays visible. `PARTITION BY`, window `ORDER BY`, and the frame are optional where applicable; choose them according to the question. `ORDER BY` inside `OVER` does not guarantee the final display order.
+
+<details markdown="1">
+<summary>Explore common window functions</summary>
+
+| What you want to see | Functions | What they do |
+|---|---|---|
+| Order rows or compare positions | `ROW_NUMBER()`, `RANK()`, `DENSE_RANK()` | Number rows; the rank functions treat peers as ties. |
+| Compare neighboring rows | `LAG(value)`, `LEAD(value)` | Read an earlier or later row in the partition; return `NULL` by default when that row does not exist. |
+| Add a group or moving measure | `SUM(value)`, `AVG(value)`, `COUNT(*)` | Apply an aggregate as a window without collapsing input rows. The frame determines which rows contribute. |
+| Inspect a position in a frame | `FIRST_VALUE(value)`, `LAST_VALUE(value)`, `NTH_VALUE(value, n)` | Return the first, last, or *n*th value in the current frame. |
+| Compare distributions or divide rows | `PERCENT_RANK()`, `CUME_DIST()`, `NTILE(n)` | Describe relative rank or divide ordered rows into buckets. `NTILE` can split tied rows across buckets. |
+
+For example, `LAG(revenue) OVER (PARTITION BY customer_id ORDER BY order_date, order_id)` compares each order with the previous **existing order**. A unique tie-breaker makes the sequence reproducible.
+
+In PostgreSQL, an ordered window's default frame ends at the current row's last **peer**. Without a window `ORDER BY`, the default frame covers the whole partition. So `LAST_VALUE` with the default ordered frame usually does **not** mean the last value in the whole partition. To ask for the final value of the partition, specify a full frame:
+
+```sql
+LAST_VALUE(revenue) OVER (
+    PARTITION BY customer_id
+    ORDER BY order_date, order_id
+    ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
+) AS final_order_revenue
+```
+
+The `ROWS` frame uses positions in the specified ordering. Ranking functions and `LAG`/`LEAD` do not use that frame in the same way as `SUM`, `AVG`, `FIRST_VALUE`, or `LAST_VALUE`.
+</details>
 
 ## 1 · Start with one row per order
 
@@ -185,6 +227,6 @@ The worksheet creates `window_lab_order_revenue` as a **temporary view**. It exi
 
 ## Finish and apply
 
-Explain what one row represents, how partition and order affect the result, why the March filter changes `LAG`, and why same-day orders can share a default-frame sum. Then return to [Lab 01](01-relational-sql.md) questions 8–11 and 14–15.
+Explain what one row represents, how partition and order affect the result, why the March filter changes `LAG`, and why same-day orders can share a default-frame sum. Then continue to [Tutorial & practice](01-tutorial-practice.md) and apply these ideas in questions 8–11 and 14–15, or return to the [Lab 01 chapters](01-relational-sql.md).
 
 Explore `LAST_VALUE`, missing months, threshold crossings, and the [performance challenge](https://github.com/OrPerets/postgres-data-engineering-student/blob/main/labs/01-relational-sql/benchmarks/README.md) in the full lesson. A window function is not guaranteed to be faster; measure equivalent queries.

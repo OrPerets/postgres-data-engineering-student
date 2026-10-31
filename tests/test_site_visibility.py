@@ -38,8 +38,14 @@ class SiteVisibilityTests(unittest.TestCase):
             all_pages = "\n".join(p.read_text() for p in out.rglob("*.html")) + search
             self.assertEqual((out / "start-lab01" / "index.html").exists(), "01" in active)
             self.assertEqual((out / "labs" / "01-window-functions" / "index.html").exists(), "01" in active)
+            for chapter in ("01-tutorial-practice", "01-interview", "01-test-yourself"):
+                self.assertEqual((out / "labs" / chapter / "index.html").exists(), "01" in active, chapter)
+                if "01" not in active:
+                    self.assertNotIn(f"labs/{chapter}/", all_pages)
             if "01" in active:
                 lesson = (out / "labs" / "01-window-functions" / "index.html").read_text()
+                quiz = (out / "labs" / "01-test-yourself" / "index.html").read_text()
+                self.assertIn('id="lab01-practice-quiz"', quiz)
                 for mount in ("lab01-window-ranking", "lab01-window-lag", "lab01-window-frame"):
                     self.assertIn(f'id="{mount}"', lesson)
                 self.assertIn('class="mkdocs-h5p"', lesson)

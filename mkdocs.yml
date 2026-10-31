@@ -80,6 +80,9 @@ nav:
   - Relational Data Engineering:
       - Lab 01 — Relational SQL & Query Optimization: labs/01-relational-sql.md
       - Window functions: labs/01-window-functions.md
+      - Tutorial & practice: labs/01-tutorial-practice.md
+      - Job interview questions: labs/01-interview.md
+      - Test yourself: labs/01-test-yourself.md
       - SQL practice & quiz: activities/lab01-learning-pack.md
       - Lab 02 — Partitioning & Replication: labs/02-partitions-replicas.md
       - Partitioning practice & quiz: activities/lab02-learning-pack.md

@@ -88,7 +88,7 @@ From the repository root, run:
 make test LAB=01-relational-sql
 ```
 
-This checks basic sample data and services. It **does not grade your SQL answers**. Use the checkpoints and the [SQL practice and quiz](activities/lab01-learning-pack.md) to review your understanding, then complete the [Lab 01 tutorial](labs/01-relational-sql.md).
+This checks basic sample data and services. It **does not grade your SQL answers**. Use the checkpoints and the [SQL practice and quiz](activities/lab01-learning-pack.md) to review your understanding, then complete the [Lab 01 tutorial](labs/01-tutorial-practice.md).
 
 When you are finished, stop the Codespace from [Your Codespaces](https://github.com/codespaces) to stop compute usage. Closing the browser tab alone does not necessarily stop it immediately. A stopped Codespace can still consume storage; avoid deleting it until you have backed up your work. [GitHub: stopping and starting a Codespace](https://docs.github.com/en/codespaces/developing-in-a-codespace/stopping-and-starting-a-codespace).
 

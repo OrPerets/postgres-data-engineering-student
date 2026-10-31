@@ -20,7 +20,7 @@ Predict how a returned city's NULL affects the filter, then compare the three-va
 
 ## Check your understanding
 
-Try five short questions on JOINs, NULLs and window functions. You will see an explanation after each answer. This self-check is for practice; no results are recorded or submitted.
+Try ten short questions on JOINs, NULLs and window functions. You will see an explanation after each answer. This self-check is for practice; no results are recorded or submitted.
 
 <div id="lab01-practice-quiz"></div>
 
@@ -28,4 +28,4 @@ Try five short questions on JOINs, NULLs and window functions. You will see an e
 
 ## Continue the workshop
 
-Return to [Lab 01](../labs/01-relational-sql.md) for the full SQL worksheet, optional hints, benchmark and submission instructions.
+Continue to [Tutorial & practice](../labs/01-tutorial-practice.md) for the SQL worksheet, hints, benchmark and submission instructions, or return to [Lab 01 chapters](../labs/01-relational-sql.md).

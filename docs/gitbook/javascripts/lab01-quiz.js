@@ -37,6 +37,41 @@
       choices: ["Both frames must return 10 then 30", "RANGE gives both tied rows 30; ROWS can give a first row 10 or 20, then 30", "ROWS gives both rows 30; RANGE always gives 10 then 30"],
       answer: 1,
       explanation: "With UNBOUNDED PRECEDING through CURRENT ROW, RANGE includes all peers with the same ordering value, so both tied rows total 30. ROWS advances by physical rows; without a tie-breaker, the first tied row is not deterministic."
+    },
+    {
+      topic: "Window functions and GROUP BY",
+      prompt: "A customer has five order rows. What does SUM(revenue) OVER (PARTITION BY customer_id) add to those rows?",
+      choices: ["One customer row replaces the orders", "The customer total appears beside each of the five orders", "A different total is created for every order"],
+      answer: 1,
+      explanation: "The window calculates over the customer's partition without collapsing the five input rows. GROUP BY customer_id would instead produce one row per customer."
+    },
+    {
+      topic: "Partitions",
+      prompt: "For LAG(revenue) OVER (PARTITION BY customer_id ORDER BY order_date, order_id), which previous order can LAG read?",
+      choices: ["The previous order belonging to the same customer", "Any earlier order in the table", "Only an order from the previous calendar month"],
+      answer: 0,
+      explanation: "PARTITION BY keeps customers separate. LAG reads the previous existing row in that customer's specified order; it does not create missing months."
+    },
+    {
+      topic: "Ranking with ties",
+      prompt: "Three customers have revenues 600, 600 and 300. What ranks does DENSE_RANK give when ordered by revenue descending?",
+      choices: ["1, 2, 3", "1, 1, 3", "1, 1, 2"],
+      answer: 2,
+      explanation: "DENSE_RANK gives peers the same rank and does not leave a gap after the tie. A unique ID in that same ordering would break the revenue tie."
+    },
+    {
+      topic: "Filtering and LAG",
+      prompt: "A March order follows a February order. What does LAG see for the first March order if WHERE keeps only March rows before the window is calculated?",
+      choices: ["The February order", "No previous row in the remaining March partition", "A generated February row with zero revenue"],
+      answer: 1,
+      explanation: "WHERE removes the February row before the window runs. Calculate LAG over the full history in a subquery or CTE, then filter outside to keep the February predecessor."
+    },
+    {
+      topic: "Moving frames",
+      prompt: "For order 104 in the sequence 101, 102, 103, 104, 134, which rows are in ROWS BETWEEN 2 PRECEDING AND CURRENT ROW?",
+      choices: ["101, 102, 103", "102, 103, 104", "103, 104, 134"],
+      answer: 1,
+      explanation: "The frame contains the current row 104 and the two rows immediately before it: 102 and 103. ROWS counts ordered rows, not calendar months."
     }
   ];
 
@@ -60,7 +95,7 @@
       if (current >= questions.length) {
         const title = element("h3", "lab01-quiz__title", "Practice complete");
         title.tabIndex = -1;
-        root.append(title, element("p", "lab01-quiz__intro", "You have worked through all five questions. This practice is not graded or saved."));
+        root.append(title, element("p", "lab01-quiz__intro", `You have worked through all ${questions.length} questions. This practice is not graded or saved.`));
         const restart = element("button", "lab01-quiz__button", "Try the questions again");
         restart.type = "button";
         restart.addEventListener("click", function () { current = 0; checked = false; render(true); });
