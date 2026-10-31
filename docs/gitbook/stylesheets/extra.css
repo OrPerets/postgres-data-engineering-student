@@ -149,6 +149,21 @@ body {
 }
 .md-typeset .course-section li::marker { color: #8b2029; font-weight: 700; }
 .md-typeset .course-section li a { font-weight: 700; }
+.md-typeset .course-section .course-lab-disabled { color: #676767; }
+.md-typeset .course-lab-unavailable { color: #555; font-weight: 700; }
+.md-typeset .course-lab-status {
+  display: inline-block;
+  margin-left: .4rem;
+  padding: .08rem .4rem;
+  border: 1px solid #d4d1cf;
+  border-radius: .25rem;
+  color: #555;
+  background: #f1efed;
+  font-size: .58rem;
+  font-weight: 700;
+  letter-spacing: .02em;
+  white-space: nowrap;
+}
 .md-typeset .course-flow {
   margin: 2rem 0;
   padding: 1.5rem 1.75rem;
@@ -167,6 +182,22 @@ body {
   .md-typeset .course-actions { align-items: stretch; }
   .md-typeset .course-actions a { justify-content: center; }
 }
+
+/* A quieter course introduction leaves the lab choices closer to the top. */
+.md-typeset .course-hero.course-home-hero {
+  margin-bottom: 1.6rem;
+  padding: clamp(1.2rem, 3vw, 2rem);
+}
+.md-typeset .course-home-hero .course-kicker { margin-bottom: .55rem; }
+.md-typeset .course-hero.course-home-hero h1 {
+  max-width: none;
+  margin-bottom: .5rem;
+  font-size: clamp(1.8rem, 3.6vw, 2.65rem);
+  line-height: 1.1;
+}
+.md-typeset .course-home-hero .course-hero__lead { font-size: .9rem; }
+.md-typeset .course-home-hero .course-actions { margin-top: 1rem; }
+.md-typeset .course-home-hero .course-actions a { min-height: 2.2rem; padding: .45rem .8rem; }
 
 @media (prefers-reduced-motion: reduce) {
   .md-typeset .course-actions a { transition: none; }

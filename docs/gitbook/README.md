@@ -1,4 +1,4 @@
-<div class="course-hero" markdown="1">
+<div class="course-hero course-home-hero" markdown="1">
 
 <p class="course-kicker">DATA ENGINEERING &nbsp; / &nbsp; HANDS-ON LABORATORY</p>
 

@@ -123,7 +123,10 @@ class SiteVisibilityTests(unittest.TestCase):
     def test_only_first_workshop(self):
         index = self.build({"01"})
         self.assertIn("Lab 01", index)
-        self.assertNotIn("Lab 02", index)
+        for number in ("02", "03", "04", "05", "06"):
+            self.assertIn(f"Lab {number}", index)
+        self.assertEqual(index.count('class="course-lab-status"'), 5)
+        self.assertEqual(index.count('class="course-lab-disabled"'), 5)
 
     def test_only_second_workshop(self):
         self.build({"02"})

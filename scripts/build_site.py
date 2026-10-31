@@ -88,6 +88,15 @@ def filter_docs(directory: Path, enabled: dict[str, bool]) -> None:
         hidden_patterns.extend(re.compile(re.escape(page)) for page in ("01-tutorial-practice.md", "01-interview.md", "01-test-yourself.md"))
     for page in directory.rglob("*.md"):
         text = page.read_text(encoding="utf-8")
+        if page == directory / "README.md":
+            # Keep the course roadmap visible without linking to unreleased lessons.
+            # Generate this from the source links so changing visibility restores
+            # the normal link automatically.
+            for number in hidden:
+                pattern = re.compile(r"^- \[([^\]]+)\]\(labs/" + re.escape(LABS[number][0]) + r"\)([^\n]*)$", re.MULTILINE)
+                text, count = pattern.subn(r'- <span class="course-lab-disabled"><span class="course-lab-unavailable">\1</span> <span class="course-lab-status">Coming soon</span>\2</span>', text)
+                if count != 1:
+                    raise ValueError(f"Expected one homepage entry for Lab {number}; found {count}.")
         lines = text.splitlines(keepends=True)
         text = "".join(line for line in lines if not any(p.search(line) for p in hidden_patterns))
         page.write_text(text, encoding="utf-8")

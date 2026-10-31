@@ -4,8 +4,8 @@
 # history remain accessible to everyone. Do not use it to protect secrets.
 labs:
   '01': true
-  '02': true
-  '03': true
-  '04': true
-  '05': true
-  '06': true
+  '02': false
+  '03': false
+  '04': false
+  '05': false
+  '06': false
