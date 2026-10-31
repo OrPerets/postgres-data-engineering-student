@@ -1,5 +1,7 @@
 """Test published-site visibility, not access to the public source repository."""
 import importlib.util
+import html
+from html.parser import HTMLParser
 from pathlib import Path
 import re
 import subprocess
@@ -20,6 +22,68 @@ PAGES = {
     "05": "05-pagerank",
     "06": "06-tfidf",
 }
+
+
+class PracticeStructure(HTMLParser):
+    """Inspect actual HTML nesting so a successful build cannot hide broken UI."""
+
+    VOID = {'area', 'base', 'br', 'col', 'embed', 'hr', 'img', 'input',
+            'link', 'meta', 'param', 'source', 'track', 'wbr'}
+
+    def __init__(self):
+        super().__init__(convert_charrefs=True)
+        self.active = False
+        self.stack = []
+        self.errors = []
+        self.tables = []
+        self.questions = []
+        self.controls = {}
+
+    def handle_starttag(self, tag, attributes):
+        attrs = dict(attributes)
+        classes = attrs.get('class', '').split()
+        if not self.active:
+            if 'lab01-practice-layout' not in classes:
+                return
+            self.active = True
+        ancestors = [item[1] for item in self.stack]
+        if 'data-reference-table' in attrs:
+            table = attrs['data-reference-table']
+            self.tables.append(table)
+            if not any('lab01-reference' in item.get('class', '').split() for item in ancestors):
+                self.errors.append(f'{table} is outside its sidebar')
+            self.controls[table] = set()
+        if 'data-question' in attrs:
+            self.questions.append(attrs['data-question'])
+            if not any('lab01-practice-questions' in item.get('class', '').split() for item in ancestors):
+                self.errors.append(f"Question {attrs['data-question']} is outside the practice layout")
+        if any(key in attrs for key in ('data-sample', 'data-view-all', 'data-reference-status', 'data-reference-result')):
+            table = next((item['data-reference-table'] for item in reversed(ancestors) if 'data-reference-table' in item), None)
+            if table is None:
+                self.errors.append('Reference control is outside its table')
+            else:
+                self.controls[table].update(key for key in ('data-sample', 'data-view-all', 'data-reference-status', 'data-reference-result') if key in attrs)
+        if tag not in self.VOID:
+            self.stack.append((tag, attrs))
+
+    def handle_startendtag(self, tag, attributes):
+        self.handle_starttag(tag, attributes)
+        if tag not in self.VOID:
+            self.handle_endtag(tag)
+
+    def handle_endtag(self, tag):
+        if not self.active:
+            return
+        if not self.stack or self.stack[-1][0] != tag:
+            self.errors.append(f'Unexpected closing {tag}')
+            return
+        self.stack.pop()
+        if not self.stack:
+            self.active = False
+
+    def handle_data(self, data):
+        if self.active and any(marker in data for marker in ('<div data-reference', '<p data-reference', '<section data-question')):
+            self.errors.append('Reference HTML was displayed as text')
 
 
 @unittest.skipUnless(importlib.util.find_spec("mkdocs") and importlib.util.find_spec("yaml"),
@@ -51,6 +115,30 @@ class SiteVisibilityTests(unittest.TestCase):
                 self.assertEqual(re.findall(r'<section\b[^>]*\bdata-question="(\d+)"', tutorial), [str(n) for n in range(1, 16)])
                 self.assertEqual(len(re.findall(r'<textarea\b[^>]*\bdata-sql(?:\s|=|>)', tutorial)), 15)
                 self.assertEqual(len(re.findall(r'<button\b[^>]*\bdata-run(?:\s|=|>)', tutorial)), 15)
+                structure = PracticeStructure()
+                structure.feed(tutorial)
+                self.assertEqual(structure.errors, [])
+                self.assertEqual(structure.tables, ['customers', 'orders', 'order_items'])
+                self.assertEqual(structure.questions, [str(n) for n in range(1, 16)])
+                for table in structure.tables:
+                    self.assertEqual(structure.controls[table], {'data-sample', 'data-view-all', 'data-reference-status', 'data-reference-result'}, table)
+                # Students can find each table's schema and explicitly choose
+                # a sample or full table; the static schema remains useful
+                # when JavaScript is unavailable.
+                references = dict(re.findall(r'<details\s+data-reference-table="([^"]+)"[^>]*>(.*?)</details>', tutorial, re.DOTALL))
+                self.assertEqual(set(references), {'customers', 'orders', 'order_items'})
+                columns = {
+                    'customers': [('customer_id', 'integer · PK · required'), ('full_name', 'varchar(120) · required'), ('city', 'varchar(80) · nullable')],
+                    'orders': [('order_id', 'integer · PK · required'), ('customer_id', 'integer · FK → customers.customer_id · required'), ('order_date', 'date · required'), ('status', 'varchar(20) · required')],
+                    'order_items': [('order_id', 'integer · PK, FK → orders.order_id · required'), ('line_no', 'integer · PK · required'), ('product_name', 'text · required'), ('category', 'text · required'), ('quantity', 'integer · required'), ('unit_price', 'numeric(12,2) · required'), ('discount_pct', 'numeric(5,2) · nullable')],
+                }
+                for table, content in references.items():
+                    actual = [(html.unescape(name), html.unescape(info)) for name, info in re.findall(r'<li>\s*<code>([^<]+)</code>\s*<span>([^<]+)</span>\s*</li>', content)]
+                    self.assertEqual(actual, columns[table], table)
+                    self.assertIn(f'data-sample="{table}"', content)
+                    self.assertIn(f'data-view-all="{table}"', content)
+                    self.assertIn('data-reference-result', content)
+                    self.assertRegex(content, r'data-reference-status[^>]+role="status"')
                 self.assertIn('id="lab01-practice-quiz"', quiz)
                 for mount in ("lab01-window-ranking", "lab01-window-lag", "lab01-window-frame"):
                     self.assertIn(f'id="{mount}"', lesson)

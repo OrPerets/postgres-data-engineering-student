@@ -4,7 +4,15 @@
   function formatDownload(answers) {
     return answers.map(({ number, sql }) => `-- Question ${number}\n${sql}\n;\n`).join('\n');
   }
-  if (typeof module !== 'undefined' && module.exports) module.exports = { formatDownload };
+  function sampleQuery(table, allRows = false) {
+    const queries = {
+      customers: 'SELECT * FROM customers ORDER BY customer_id',
+      orders: 'SELECT * FROM orders ORDER BY order_id',
+      order_items: 'SELECT * FROM order_items ORDER BY order_id, line_no',
+    };
+    return Object.prototype.hasOwnProperty.call(queries, table) ? queries[table] + (allRows ? '' : ' LIMIT 5') : null;
+  }
+  if (typeof module !== 'undefined' && module.exports) module.exports = { formatDownload, sampleQuery };
   if (typeof document === 'undefined') return;
   const script = document.currentScript;
   if (!script || !script.src) return;
@@ -142,6 +150,32 @@
           status.textContent = storageAvailable ? 'Query complete.' : 'Query complete. Browser storage is unavailable; download your work.';
         }).catch((error) => { status.textContent = `Could not run: ${error.message}`; })
           .finally(() => { button.disabled = false; });
+      });
+    });
+    root.querySelectorAll('[data-reference-table]').forEach((reference) => {
+      const buttons = [...reference.querySelectorAll('[data-sample], [data-view-all]')];
+      const status = reference.querySelector('[data-reference-status]');
+      const output = reference.querySelector('[data-reference-result]');
+      if (!buttons.length || !status || !output) return;
+      buttons.forEach((button) => {
+      button.addEventListener('click', () => {
+        const allRows = button.hasAttribute('data-view-all');
+        const sql = sampleQuery(button.dataset.sample || button.dataset.viewAll, allRows);
+        if (!sql) { status.textContent = 'This sample is not available.'; return; }
+        buttons.forEach((control) => { control.disabled = true; });
+        status.textContent = ready ? 'Loading sample rows…' : 'Starting the browser database and loading sample rows…';
+        output.replaceChildren();
+        const run = queue.catch(() => {}).then(() => execute(sql));
+        queue = run;
+        run.then((results) => {
+          render(output, results);
+          output.tabIndex = 0;
+          output.setAttribute('role', 'region');
+          output.setAttribute('aria-label', `Rows from ${reference.dataset.referenceTable}`);
+          status.textContent = allRows ? 'Showing the lab table rows.' : 'Showing up to five rows from the lab sample data.';
+        }).catch((error) => { status.textContent = `Could not load rows: ${error.message}`; })
+          .finally(() => { buttons.forEach((control) => { control.disabled = false; }); });
+      });
       });
     });
     const download = root.querySelector('[data-practice-export]');

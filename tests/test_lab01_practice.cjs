@@ -4,7 +4,7 @@ const assert = require('node:assert/strict');
 const fs = require('node:fs/promises');
 const path = require('node:path');
 const { pathToFileURL } = require('node:url');
-const { formatDownload } = require('../docs/gitbook/javascripts/lab01-practice.js');
+const { formatDownload, sampleQuery } = require('../docs/gitbook/javascripts/lab01-practice.js');
 
 const assets = path.resolve(__dirname, '../docs/gitbook/assets/lab01-practice');
 
@@ -29,6 +29,23 @@ test('browser PostgreSQL runs the lab data, window queries and multiple statemen
     assert.deepEqual(results[2].rows, [[1, 2]]);
     assert.deepEqual(results[3].rows, [[101, null], [102, 101]]);
     assert.deepEqual(results[4].rows, [[null]]);
+    // The reference panel uses the same actual database and deterministic
+    // order as the exercises, with a deliberately small sample for each table.
+    for (const [table, expectedFields, expectedFirst, expectedTotal] of [
+      ['customers', ['customer_id', 'full_name', 'city'], [1, 'Dana Cohen', 'Haifa'], 15],
+      ['orders', ['order_id', 'customer_id', 'order_date', 'status'], [101, 1], 34],
+      ['order_items', ['order_id', 'line_no', 'product_name', 'category', 'quantity', 'unit_price', 'discount_pct'], [101, 1, 'Novel', 'books'], 43],
+    ]) {
+      const sample = (await db.exec(sampleQuery(table), { rowMode: 'array' }))[0];
+      assert.deepEqual(sample.fields.map(field => field.name), expectedFields, table);
+      assert.equal(sample.rows.length, 5, table);
+      assert.deepEqual(sample.rows[0].slice(0, expectedFirst.length), expectedFirst, table);
+      const allRows = (await db.exec(sampleQuery(table, true), { rowMode: 'array' }))[0];
+      assert.equal(allRows.rows.length, expectedTotal, table);
+      assert.deepEqual(allRows.rows.slice(0, 5), sample.rows, table);
+    }
+    // User-controlled input must never be interpolated into reference SQL.
+    assert.ok(!sampleQuery('customers; DROP TABLE customers;'));
     const downloaded = formatDownload([
       { number: 1, sql: 'SELECT 1 -- a trailing comment' },
       { number: 2, sql: 'SELECT 2;' },

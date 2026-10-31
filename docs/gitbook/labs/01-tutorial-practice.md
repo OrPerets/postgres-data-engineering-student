@@ -148,6 +148,12 @@ Your SQL drafts are saved in this browser on this device. They do not sync with 
 
 <div class="lab01-practice-actions"><button type="button" data-practice-export>Download answers</button></div>
 
+<div class="lab01-practice-layout" markdown="1">
+
+<aside class="lab01-reference" aria-labelledby="lab01-reference-title"><h3 id="lab01-reference-title">Tables &amp; schema</h3><p>One customer → many orders → many item lines. Expand a table to see its columns, sample rows, or the full table.</p><p class="lab01-reference-legend"><strong>PK</strong> primary key · <strong>FK</strong> foreign key · <strong>Required</strong> cannot be NULL</p><details data-reference-table="customers"><summary><code>customers</code> <span>one row per customer</span></summary><ul><li><code>customer_id</code> <span>integer · PK · required</span></li><li><code>full_name</code> <span>varchar(120) · required</span></li><li><code>city</code> <span>varchar(80) · nullable</span></li></ul><div class="lab01-reference-actions"><button type="button" data-sample="customers">Sample rows</button><button type="button" data-view-all="customers">View all rows</button></div><p data-reference-status role="status" aria-live="polite"></p><div class="lab01-reference-result" data-reference-result></div></details><details data-reference-table="orders"><summary><code>orders</code> <span>one row per order</span></summary><ul><li><code>order_id</code> <span>integer · PK · required</span></li><li><code>customer_id</code> <span>integer · FK → customers.customer_id · required</span></li><li><code>order_date</code> <span>date · required</span></li><li><code>status</code> <span>varchar(20) · required</span></li></ul><div class="lab01-reference-actions"><button type="button" data-sample="orders">Sample rows</button><button type="button" data-view-all="orders">View all rows</button></div><p data-reference-status role="status" aria-live="polite"></p><div class="lab01-reference-result" data-reference-result></div></details><details data-reference-table="order_items"><summary><code>order_items</code> <span>one row per item line</span></summary><ul><li><code>order_id</code> <span>integer · PK, FK → orders.order_id · required</span></li><li><code>line_no</code> <span>integer · PK · required</span></li><li><code>product_name</code> <span>text · required</span></li><li><code>category</code> <span>text · required</span></li><li><code>quantity</code> <span>integer · required</span></li><li><code>unit_price</code> <span>numeric(12,2) · required</span></li><li><code>discount_pct</code> <span>numeric(5,2) · nullable</span></li></ul><p>The primary key is the pair <code>(order_id, line_no)</code>.</p><div class="lab01-reference-actions"><button type="button" data-sample="order_items">Sample rows</button><button type="button" data-view-all="order_items">View all rows</button></div><p data-reference-status role="status" aria-live="polite"></p><div class="lab01-reference-result" data-reference-result></div></details><noscript>Enable JavaScript to load sample rows; the schema above remains available.</noscript></aside>
+
+<div class="lab01-practice-questions" markdown="1">
+
 <section class="lab01-question" data-question="1" markdown="1">
 
 ### Question 01
@@ -447,6 +453,10 @@ You can include your written explanation as SQL comments, using `--`.
 </div>
 
 </section>
+
+</div>
+
+</div>
 
 </div>
 

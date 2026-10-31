@@ -1,5 +1,29 @@
 /* SQL practice is scoped to the chapter and follows the course's editorial palette. */
 .md-typeset .lab01-practice { margin: 1.5rem 0 2.5rem; }
+.md-typeset .lab01-practice-layout { display: grid; grid-template-columns: minmax(0, 1fr); gap: 1.1rem; margin-top: 1.5rem; align-items: start; }
+.md-typeset .lab01-practice-questions { min-width: 0; }
+.md-typeset .lab01-reference { min-width: 0; padding: 1rem; border: 1px solid #ded7d3; border-top: 3px solid #8b2029; background: #faf8f5; font-size: .7rem; line-height: 1.45; }
+.md-typeset .lab01-reference h3 { margin: 0 0 .4rem; font-size: .95rem; }
+.md-typeset .lab01-reference p { margin: .5rem 0; }
+.md-typeset .lab01-reference .lab01-reference-legend { color: #514a47; font-size: .62rem; }
+.md-typeset .lab01-reference details { margin: .55rem 0; box-shadow: none; border: 1px solid #ded7d3; background: #fff; font-size: .7rem; }
+.md-typeset .lab01-reference summary { padding: .55rem .7rem .55rem 1.7rem; }
+.md-typeset .lab01-reference summary span { display: block; color: #5e5653; font-size: .62rem; font-weight: 400; }
+.md-typeset .lab01-reference ul { margin: .5rem .6rem; padding: 0; list-style: none; }
+.md-typeset .lab01-reference li { margin: .4rem 0; }
+.md-typeset .lab01-reference li span { display: block; color: #514a47; font-size: .62rem; overflow-wrap: anywhere; }
+.md-typeset .lab01-reference-actions { display: flex; flex-wrap: wrap; gap: .35rem; margin: .6rem; }
+.md-typeset .lab01-reference-actions button { font-size: .62rem; padding: .35rem .5rem; }
+.md-typeset .lab01-reference details > p, .md-typeset .lab01-reference-result { margin-left: .65rem; margin-right: .65rem; }
+.md-typeset .lab01-reference [data-reference-status] { font-size: .62rem; }
+.md-typeset .lab01-reference-result { max-width: calc(100% - 1.3rem); max-height: 15rem; overflow: auto; }
+.md-typeset .lab01-reference-result table { display: table; margin: .5rem 0; font-size: .62rem; }
+.md-typeset .lab01-reference-result th, .md-typeset .lab01-reference-result td { padding: .35rem .5rem; white-space: nowrap; }
+@media screen and (min-width: 1100px) {
+  .md-typeset .lab01-practice-layout { grid-template-columns: minmax(0, 1fr) 14rem; gap: 1.25rem; }
+  .md-typeset .lab01-reference { grid-column: 2; grid-row: 1; position: sticky; top: 3.5rem; max-height: calc(100vh - 4rem); overflow-y: auto; }
+  .md-typeset .lab01-practice-questions { grid-column: 1; grid-row: 1; }
+}
 .md-typeset .lab01-practice-actions,
 .md-typeset .lab01-editor-actions { display: flex; flex-wrap: wrap; align-items: center; gap: .6rem; }
 .md-typeset .lab01-question { margin: 2rem 0; padding: 1.2rem 0 1.6rem; border-top: 2px solid #8b2029; }
