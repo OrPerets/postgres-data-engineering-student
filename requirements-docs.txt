@@ -1,2 +1,4 @@
 # Documentation site generator and bundled search/Mermaid support.
 mkdocs-material==9.8.0
+# Browser-based interactive exercises, rendered from local .h5p packages.
+mkdocs-h5p==0.4.0

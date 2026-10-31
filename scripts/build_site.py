@@ -50,6 +50,7 @@ def filter_docs(directory: Path, enabled: dict[str, bool]) -> None:
     if "01" in hidden:
         (directory / "labs" / "01-window-functions.md").unlink()
         (directory / "activities" / "lab01-learning-pack.md").unlink()
+        (directory / "assets" / "h5p" / "lab01-window-partitions.h5p").unlink()
         (directory / "start-lab01.md").unlink()
         (directory / "images" / "setup" / "01-github-codespaces.png").unlink()
         for asset in ("javascripts/lab01-join.js", "javascripts/lab01-quiz.js", "javascripts/lab01-null.js",

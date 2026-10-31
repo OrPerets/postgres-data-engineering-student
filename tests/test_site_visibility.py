@@ -42,6 +42,14 @@ class SiteVisibilityTests(unittest.TestCase):
                 lesson = (out / "labs" / "01-window-functions" / "index.html").read_text()
                 for mount in ("lab01-window-ranking", "lab01-window-lag", "lab01-window-frame"):
                     self.assertIn(f'id="{mount}"', lesson)
+                self.assertIn('class="mkdocs-h5p"', lesson)
+                self.assertIn('../../assets/h5p-player/main.bundle.js', lesson)
+                self.assertTrue((out / "assets/h5p/lab01-window-partitions.h5p").is_file())
+                self.assertTrue(list((out / "assets/h5p-content").glob("lab01-window-partitions-*/h5p.json")))
+                self.assertTrue((out / "assets" / "h5p-player" / "main.bundle.js").is_file())
+            else:
+                self.assertFalse((out / "assets/h5p/lab01-window-partitions.h5p").exists())
+                self.assertFalse(list((out / "assets/h5p-content").glob("lab01-window-partitions-*")))
             for asset in ("javascripts/lab01-window-frame.js", "javascripts/lab01-window-rank-lag.js",
                           "stylesheets/lab01-window-frame.css", "stylesheets/lab01-window-rank-lag.css"):
                 self.assertEqual((out / asset).exists(), "01" in active, asset)

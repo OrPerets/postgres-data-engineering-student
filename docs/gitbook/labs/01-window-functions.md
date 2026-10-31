@@ -116,6 +116,16 @@ Filtering to a whole customer partition, as here, does not remove earlier orders
 
 A **partition** contains the customer’s orders. A **frame** is the subset used by a frame-sensitive calculation for the current row. Step through the orders and watch which rows contribute to the result.
 
+### Predict · Build the window
+
+Select the orders you think belong in the frame, then check your answer. This is a browser activity using the lab's synthetic data; it does not run SQL or record your answers.
+
+![h5p Build the window](assets/h5p/lab01-window-partitions.h5p)
+
+<noscript>Paper alternative: the ordered IDs are 101, 102, 103, 104, 134. For order 104, choose the current row and up to two preceding rows. Check your prediction with the worked example below.</noscript>
+
+**Explore:** Now use the frame explorer to check the same idea and see the calculation move through the partition.
+
 <div id="lab01-window-frame"></div>
 
 <noscript>For a moving average of the current order and up to two preceding orders, the averages for orders 101, 102, 103, 104 and 134 are 300, 250, 233.33…, 266.67… and 240. For order 104, the frame contains orders 102, 103 and 104.</noscript>

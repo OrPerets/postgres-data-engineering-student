@@ -54,6 +54,9 @@ extra_javascript:
 
 plugins:
   - search
+  - h5p:
+      h5p_dir: assets/h5p-content
+      player_url: assets/h5p-player
 
 markdown_extensions:
   - admonition
