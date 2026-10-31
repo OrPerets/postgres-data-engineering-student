@@ -9,7 +9,7 @@ From relational databases to distributed data processing. Learn by building, tes
 
 <div class="course-actions" markdown="1">
 
-[Start learning](getting-started.md){: .course-action-primary } [Explore the course](#explore-the-course){: .course-action-secondary }
+[Start learning](labs/01-relational-sql.md){: .course-action-primary } [Explore the course](#explore-the-course){: .course-action-secondary }
 
 </div>
 </div>
@@ -48,13 +48,9 @@ Start with a concrete question, try the example, and use the checks to explain w
 
 ### Ready to begin?
 
-Follow the [first SQL lab walkthrough](start-lab01.md) to open a Codespace, run your first query, and choose how to work: in the guided workspace or in a SQL file in the editor.
+Begin with [Lab 01](labs/01-relational-sql.md): review SQL foundations, explore window functions, and work through the questions in your browser. No setup is needed for browser practice.
 
-Alternatively, open the [student repository](https://github.com/OrPerets/postgres-data-engineering-student) in Codespaces, then run this from the repository root:
-
-```bash
-make lab-sql
-```
+Prefer a Codespace? The [first SQL lab walkthrough](start-lab01.md) explains how to start PostgreSQL and save work there. The browser and Codespace databases and drafts are separate.
 
 For help, see [Environment Setup](getting-started.md), [Troubleshooting](troubleshooting.md), or the [Glossary](glossary.md).
 

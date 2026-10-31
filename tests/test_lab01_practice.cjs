@@ -14,7 +14,7 @@ test('browser PostgreSQL runs the lab data, window queries and multiple statemen
   try {
     await db.exec(await fs.readFile(path.join(assets, 'schema.sql'), 'utf8'));
     await db.exec(await fs.readFile(path.join(assets, 'seed.sql'), 'utf8'));
-    await db.exec('SET default_transaction_read_only = on');
+    await db.exec(await fs.readFile(path.join(assets, 'read-only.sql'), 'utf8'));
     const results = await db.exec(`
       SELECT count(*) FROM customers;
       SELECT count(*) FROM orders;
@@ -59,6 +59,21 @@ test('browser PostgreSQL runs the lab data, window queries and multiple statemen
     await assert.rejects(db.exec('SELECT * FROM unknown_table'), /does not exist/);
     await assert.rejects(db.exec('DELETE FROM customers'), /read-only/);
     assert.deepEqual((await db.exec('SELECT count(*) FROM customers', { rowMode: 'array' }))[0].rows, [[15]]);
+    // A setting is not an access boundary: even if a student changes the
+    // session default, the reader role cannot mutate the classroom tables.
+    await db.exec('SET default_transaction_read_only = off');
+    await assert.rejects(db.exec('DELETE FROM customers'), /permission denied/);
+    await db.exec('RESET SESSION AUTHORIZATION');
+    await assert.rejects(db.exec('DELETE FROM customers'), /permission denied/);
+    assert.deepEqual((await db.exec('SELECT count(*) FROM customers', { rowMode: 'array' }))[0].rows, [[15]]);
+
+    // A failed transaction must not trap the student behind the worker's SET
+    // preamble: they can issue ROLLBACK and then run another query.
+    const { executeStudentQuery } = await import(pathToFileURL(path.resolve(__dirname, '../docs/gitbook/javascripts/lab01-practice-worker.js')).href);
+    await assert.rejects(executeStudentQuery(db, 'BEGIN; SELECT 1 / 0;'), /division by zero/);
+    await executeStudentQuery(db, 'ROLLBACK');
+    assert.deepEqual((await executeStudentQuery(db, 'SELECT count(*) FROM customers'))[0].rows, [[15]]);
+    await assert.rejects(executeStudentQuery(db, 'DELETE FROM customers'), /read-only|permission denied/);
   } finally {
     await db.close();
   }

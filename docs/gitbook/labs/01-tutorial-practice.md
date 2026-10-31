@@ -2,7 +2,7 @@
 
 **Chapter 2 of 4 · PostgreSQL and customer orders**
 
-Learn what each row represents, then solve the 15 SQL questions in your browser. No Codespace setup is needed for browser practice. Need a refresher first? Visit [Window functions](01-window-functions.md). [← All Lab 01 chapters](01-relational-sql.md)
+Learn the data and business rules, then solve the 15 SQL questions in your browser. Start with the earlier [window functions chapter](01-window-functions.md) if you have not yet explored it. A Codespace is optional and has a separate database and drafts. [← All Lab 01 chapters](01-relational-sql.md)
 
 [Jump to the 15 questions and SQL editors ↓](#lab01-practice)
 
@@ -24,8 +24,7 @@ flowchart LR
 
 A customer can have no orders; the schema also permits an order with no item lines. If an order has two lines, joining it to `order_items` produces two rows, but it is still **one order**. [Try the JOIN explorer](../activities/lab01-learning-pack.md#explore-joins).
 
-<details markdown="1">
-<summary>Business rules for the questions</summary>
+### Business rules for the questions
 
 - Use only `completed` orders for revenue unless a question says otherwise. A returned order represents a full return.
 - A `NULL` discount means no discount. A completed order with a 100% discount still counts as an order, even though the discounted line contributes zero revenue.
@@ -36,74 +35,21 @@ quantity * unit_price * (1 - COALESCE(discount_pct, 0) / 100.0)
 ```
 
 A completed order without item lines has zero revenue when included in an order-level revenue calculation. The exercise schema is in `labs/01-relational-sql/sql/01_schema.sql`.
-</details>
 
-## 2 · Optional: start the lab in a Codespace
+### Before you begin
 
-The browser editors below have their own copy of the sample data. Follow this section only if you also want to work with the lab database in a Codespace.
-
-Open the [student repository](https://github.com/OrPerets/postgres-data-engineering-student) in GitHub Codespaces. From the **repository root**, run:
-
-```bash
-make lab-sql
-```
-
-On a fresh lab, the initializer creates the classroom tables and loads the synthetic sample data. Existing tables are preserved; an incomplete setup is reported instead of being silently recreated. [Follow the illustrated setup walkthrough](../start-lab01.md) if this is your first Codespace.
-
-<details markdown="1">
-<summary>Check that PostgreSQL and the sample data are available</summary>
-
-From a shell terminal, open PostgreSQL:
-
-```bash
-cd labs/01-relational-sql
-docker compose exec postgres psql -U student -d query_lab
-```
-
-Then try these queries in `psql`:
+Use the schema and sample rows in the reference panel above the questions. For example, run this in any editor to see what an order row looks like:
 
 ```sql
-SELECT COUNT(*) FROM customers;
-SELECT * FROM orders LIMIT 5;
+SELECT order_id, customer_id, order_date, status
+FROM orders
+ORDER BY order_id
+LIMIT 5;
 ```
 
-You should see records. Enter `\q` to exit. If the service does not start, see [Troubleshooting](../troubleshooting.md). The schema creation script itself drops and recreates the exercise tables; do not use it for routine startup.
-</details>
+As you work, `WHERE` filters rows, while `GROUP BY` combines them into groups. A `LEFT JOIN` can retain customers without matching orders; check whether a later `WHERE` condition removes those rows. Use `IS NULL` to test missing values and `COALESCE` when a rule defines a replacement. For multi-step questions, a common table expression (`WITH`) can give an intermediate result a name. Window functions then calculate across related rows without collapsing them; review [partitions, ordering and frames](01-window-functions.md) before questions 8–15.
 
-## 3 · Optional: write answers in a Codespace
-
-Both routes use the same lab database, but the drafts are **separate copies** and do not automatically synchronize.
-
-<details markdown="1">
-<summary>Route A · Guided workspace</summary>
-
-From the repository root, run:
-
-```bash
-make lab-sql-workspace
-```
-
-Keep that terminal running and open private port **8765** from the Codespace **Ports** tab. Choose a question and write your SQL. **Run query** runs the current or selected statement as read-only SQL.
-
-Select **Save answers** regularly; edits are not autosaved. Select **Download SQL** to keep the current draft outside the Codespace. The guided draft is stored in `.workspace-data/`, which Git ignores: committing the original worksheet does not back up this draft. [See how to open and save your work](../start-lab01.md#4-write-and-save-your-answers).
-</details>
-
-<details markdown="1">
-<summary>Route B · Codespace editor and psql</summary>
-
-Edit `labs/01-relational-sql/sql/student_answers.sql` in the Explorer and save it with **Ctrl+S** (Windows/Linux) or **⌘S** (Mac). From the lab folder run:
-
-```bash
-cd labs/01-relational-sql
-docker compose exec -T postgres psql -v ON_ERROR_STOP=1 -U student -d query_lab < sql/student_answers.sql
-```
-
-Download the saved worksheet from Explorer or commit and push it to your own fork to keep a copy outside the Codespace. The [starter worksheet on GitHub](https://github.com/OrPerets/postgres-data-engineering-student/blob/main/labs/01-relational-sql/sql/student_answers.sql) contains all 15 complete question descriptions and blank answer sections.
-</details>
-
-**Check and submit:** If you use a Codespace, `make test LAB=01-relational-sql` from the repository root checks the sample data and services; it does **not** grade your SQL. Whether you use the browser or Codespace, keep your completed answers, short explanations for questions 6, 7 and 15, and any requested plans or worksheet work. Download your browser answers and keep separate explanations or plans as needed. Saving or downloading is not submission: follow your instructor's method and deadline.
-
-## 4 · Work through the 15 questions
+## 2 · Work through the 15 questions {#4-work-through-the-15-questions}
 
 Write and run your own SQL for each question below. Try each question yourself before opening a hint.
 
@@ -117,7 +63,7 @@ Write and run your own SQL for each question below. Try each question yourself b
 <details markdown="1">
 <summary>See the question roadmap</summary>
 
-These are short prompts; use the worksheet for the full conditions and supplied queries.
+These are short prompts. The complete conditions and supplied queries appear with each editor below and in the optional worksheet.
 
 1. Select January orders that match the stated customer and status conditions.
 2. Calculate completed-order metrics for every customer, including those with no completed orders.
@@ -142,7 +88,7 @@ These are short prompts; use the worksheet for the full conditions and supplied 
 
 Run read-only PostgreSQL queries directly in this browser using a separate copy of the sample data. The first run may take a moment to load; results show up to 100 rows. The browser database starts fresh when you reload the page or a query is interrupted; it is separate from your Codespace database.
 
-<noscript>Enable JavaScript to run queries here. You can also use the optional Codespace routes above.</noscript>
+<noscript>Enable JavaScript to run queries here. You can also use the optional Codespace routes later on this page.</noscript>
 
 Your SQL drafts are saved in this browser on this device. They do not sync with the guided workspace or worksheet. Download your answers to keep a backup or submit them as instructed. To run only part of an answer, select that SQL before choosing **Run query**.
 
@@ -350,6 +296,8 @@ For every completed order, display its revenue, the previous completed order’s
 
 For each customer with a completed order, identify the category in which they spent the most. Break ties alphabetically by category name. Display the category’s revenue and its percentage of the customer’s total revenue. Return NULL for the percentage when total revenue is zero.
 
+The schema permits completed orders without item lines. If a customer has no categories in their completed orders, the question does not specify how to represent their result; ask your instructor for clarification.
+
 <details><summary>Question 10 — Top category</summary><p>Summarize revenue at customer-and-category grain, then choose one category per customer with a deterministic tie-break. Compare that amount with the customer's total, including the zero-total case.</p></details>
 
 <div class="lab01-editor">
@@ -461,6 +409,71 @@ You can include your written explanation as SQL comments, using `--`.
 </div>
 
 **Checkpoint:** Does your join multiply order counts? Are customers without orders kept where required? Are `NULL` values handled? Is the order deterministic when dates or amounts tie?
+
+## 3 · Optional: start the lab in a Codespace {#2-optional-start-the-lab-in-a-codespace}
+
+The browser editors above have their own copy of the sample data. Follow this section only if you also want to work with the lab database in a Codespace.
+
+Open the [student repository](https://github.com/OrPerets/postgres-data-engineering-student) in GitHub Codespaces. From the **repository root**, run:
+
+```bash
+make lab-sql
+```
+
+On a fresh lab, the initializer creates the classroom tables and loads the synthetic sample data. Existing tables are preserved; an incomplete setup is reported instead of being silently recreated. [Follow the illustrated setup walkthrough](../start-lab01.md) if this is your first Codespace.
+
+<details markdown="1">
+<summary>Check that PostgreSQL and the sample data are available</summary>
+
+From a shell terminal, open PostgreSQL:
+
+```bash
+cd labs/01-relational-sql
+docker compose exec postgres psql -U student -d query_lab
+```
+
+Then try these queries in `psql`:
+
+```sql
+SELECT COUNT(*) FROM customers;
+SELECT * FROM orders LIMIT 5;
+```
+
+You should see records. Enter `\q` to exit. If the service does not start, see [Troubleshooting](../troubleshooting.md). The schema creation script itself drops and recreates the exercise tables; do not use it for routine startup.
+</details>
+
+## 4 · Optional: write answers in a Codespace {#3-optional-write-answers-in-a-codespace}
+
+The two Codespace routes below use the same Codespace lab database, but their drafts are **separate copies** and do not automatically synchronize. Neither route synchronizes with the browser editors.
+
+<details markdown="1">
+<summary>Route A · Guided workspace</summary>
+
+From the repository root, run:
+
+```bash
+make lab-sql-workspace
+```
+
+Keep that terminal running and open private port **8765** from the Codespace **Ports** tab. Choose a question and write your SQL. **Run query** runs the current or selected statement as read-only SQL.
+
+Select **Save answers** regularly; edits are not autosaved. Select **Download SQL** to keep the current draft outside the Codespace. The guided draft is stored in `.workspace-data/`, which Git ignores: committing the original worksheet does not back up this draft. [See how to open and save your work](../start-lab01.md#4-write-and-save-your-answers).
+</details>
+
+<details markdown="1">
+<summary>Route B · Codespace editor and psql</summary>
+
+Edit `labs/01-relational-sql/sql/student_answers.sql` in the Explorer and save it with **Ctrl+S** (Windows/Linux) or **⌘S** (Mac). From the lab folder run:
+
+```bash
+cd labs/01-relational-sql
+docker compose exec -T postgres psql -v ON_ERROR_STOP=1 -U student -d query_lab < sql/student_answers.sql
+```
+
+Download the saved worksheet from Explorer or commit and push it to your own fork to keep a copy outside the Codespace. The [starter worksheet on GitHub](https://github.com/OrPerets/postgres-data-engineering-student/blob/main/labs/01-relational-sql/sql/student_answers.sql) contains all 15 complete question descriptions and blank answer sections.
+</details>
+
+**Check and submit:** If you use a Codespace, `make test LAB=01-relational-sql` from the repository root checks the sample data and services; it does **not** grade your SQL. Whether you use the browser or Codespace, keep your completed answers, short explanations for questions 6, 7 and 15, and any requested plans or worksheet work. Download your browser answers and keep separate explanations or plans as needed. Saving or downloading is not submission: follow your instructor's method and deadline.
 
 ## 5 · Optional performance experiment
 

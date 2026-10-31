@@ -6,7 +6,7 @@ const base = new URL('../assets/lab01-practice/', import.meta.url);
 
 async function initialize() {
   if (database) return database;
-  const [schema, seed] = await Promise.all(['schema.sql', 'seed.sql'].map(async (file) => {
+  const [schema, seed, readOnly] = await Promise.all(['schema.sql', 'seed.sql', 'read-only.sql'].map(async (file) => {
     const response = await fetch(new URL(file, base));
     if (!response.ok) throw new Error(`Could not load the sample data (${response.status}).`);
     return response.text();
@@ -15,7 +15,7 @@ async function initialize() {
   try {
     await instance.exec(schema);
     await instance.exec(seed);
-    await instance.exec('SET default_transaction_read_only = on');
+    await instance.exec(readOnly);
     database = instance;
     return database;
   } catch (error) {
@@ -24,12 +24,26 @@ async function initialize() {
   }
 }
 
-self.onmessage = async (event) => {
+// PostgreSQL rejects SET while a transaction is aborted. Allow the student's
+// next statement through in that case so ROLLBACK can recover the session.
+// The reader role still protects the classroom tables while it is aborted.
+export async function executeStudentQuery(db, sql) {
+  try {
+    await db.exec('SET default_transaction_read_only = on');
+  } catch (error) {
+    if (error?.code !== '25P02') throw error;
+  }
+  return db.exec(sql, { rowMode: 'array' });
+}
+
+if (typeof self !== 'undefined') self.onmessage = async (event) => {
   const { id, sql } = event.data;
   try {
     const db = await initialize();
     self.postMessage({ id, initialized: true });
-    const results = await db.exec(sql, { rowMode: 'array' });
+    // Restore the default where possible; table privileges also protect the
+    // data if the student changes it or a transaction remains open.
+    const results = await executeStudentQuery(db, sql);
     const limited = results.map((result) => ({
       fields: result.fields.map((field) => field.name),
       rows: result.rows.slice(0, 100),

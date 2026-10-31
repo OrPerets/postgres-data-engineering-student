@@ -144,10 +144,18 @@
         button.disabled = true;
         status.textContent = ready ? 'Running query…' : 'Starting the browser database and running your query…';
         output.replaceChildren();
+        output.removeAttribute('tabindex');
+        output.removeAttribute('role');
+        output.removeAttribute('aria-label');
         const run = queue.catch(() => {}).then(() => execute(sql));
         queue = run;
         run.then((results) => {
           render(output, results);
+          if (output.querySelector('table')) {
+            output.tabIndex = 0;
+            output.setAttribute('role', 'region');
+            output.setAttribute('aria-label', `Query results for question ${number}`);
+          }
           status.textContent = storageAvailable ? 'Query complete.' : 'Query complete. Browser storage is unavailable; download your work.';
         }).catch((error) => { status.textContent = `Could not run: ${error.message}`; })
           .finally(() => { button.disabled = false; });

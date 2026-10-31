@@ -1,6 +1,8 @@
 # Start here: your first SQL lab
 
-This walkthrough takes you from the course repository to a saved SQL answer file. You will need a GitHub account and a browser. Allow extra time for the first Codespace and database startup.
+Start with the [Lab 01 learning path](labs/01-relational-sql.md), then open [Tutorial & practice](labs/01-tutorial-practice.md) to run SQL in your browser without a Codespace. Your browser drafts are stored on this device; download a copy to keep or submit as instructed.
+
+The steps below are an **optional Codespace route**. They take you from the repository to a saved SQL answer file and require a GitHub account. Allow extra time for startup. The browser and Codespace databases and drafts are separate and do not synchronize.
 
 ```mermaid
 flowchart LR

@@ -84,7 +84,7 @@
 
   function start() {
     const root = document.getElementById("lab01-practice-quiz");
-    if (!root || root.dataset.quizReady === "true") return;
+    if (!root || root.hasAttribute("data-quiz-link") || root.dataset.quizReady === "true") return;
     root.dataset.quizReady = "true";
     root.classList.add("lab01-quiz");
     let current = 0;

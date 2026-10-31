@@ -4,7 +4,7 @@ Use this map to connect the 2027 lecture materials with the hands-on labs. The l
 
 ## Before you begin
 
-- For Labs 01–03, review basic SQL: `SELECT`, filtering, joins, grouping and subqueries. You will use PostgreSQL in Codespaces.
+- For Labs 01–03, review basic SQL: `SELECT`, filtering, joins, grouping and subqueries. [Lab 01 SQL foundations](labs/01-relational-sql.md#sql-foundations) provides a starting point; its practice runs in the browser, with a separate Codespace option.
 - For Labs 04–06, you will write Python functions. Be comfortable with variables, loops, conditionals, lists, dictionaries, function arguments and return values. Review these topics before Lab 04 if they are new to you; the earlier SQL labs do not teach Python.
 - The exercises use synthetic data. Follow [environment setup](getting-started.md) and the [lab workflow](how-to-learn.md) before starting.
 

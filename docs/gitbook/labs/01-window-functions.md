@@ -4,6 +4,8 @@
 
 [← Lab 01 chapters](01-relational-sql.md) · [Go to tutorial & practice →](01-tutorial-practice.md)
 
+Review [SQL foundations](01-relational-sql.md#sql-foundations) first if joins, grouping or `NULL` are new to you.
+
 How can you show an order **and** its customer’s total on the same row? A window function looks across related rows without collapsing the rows you started with. Follow the visuals, make a prediction, and then check it in PostgreSQL.
 
 ```mermaid
@@ -223,19 +225,18 @@ Select the orders you think belong in the frame, then check your answer. This is
 <details markdown="1">
 <summary>Explore same-day ties and the default frame</summary>
 
-The two February orders share a date. Compare a row-by-row sum ordered by date **and ID** with the default ordered frame using **date only**:
+Consider this separate illustrative sequence. Orders B and C share a date. Compare a row-by-row sum ordered by date **and ID** with the default ordered frame using **date only**:
 
-| Order | Revenue | Explicit `ROWS`: date, ID | Default frame: date only |
-|---:|---:|---:|---:|
-| 101 | 300 | 300 | 300 |
-| 102 | 200 | 500 | 700 |
-| 103 | 200 | 700 | 700 |
-| 104 | 400 | 1,100 | 1,100 |
-| 134 | 120 | 1,220 | 1,220 |
+| Order | Date | Revenue | Explicit `ROWS`: date, ID | Default frame: date only |
+|---|---|---:|---:|---:|
+| A | Apr 1 | 10 | 10 | 10 |
+| B | Apr 2 | 20 | 30 | 60 |
+| C | Apr 2 | 30 | 60 | 60 |
+| D | Apr 3 | 40 | 100 | 100 |
 
-PostgreSQL's default ordered frame runs from the partition start through the current row's **last peer**. With date-only ordering, both February orders are peers, so both are included together. Not every window function uses the frame in the same way.
+PostgreSQL's default ordered frame runs from the partition start through the current row's **last peer**. With date-only ordering, B and C are peers, so both are included together. Not every window function uses the frame in the same way.
 
-The columns above change both the ordering and the frame. In worksheet section 5, isolate those choices: first compare default and explicit `ROWS` with date and ID for both; then compare them with date only for both. Date-only `ROWS` does not guarantee which tied February order receives the intermediate sum. Repeated identical results do not prove a guaranteed order; use a stable tie-breaker when needed.
+The columns above change both the ordering and the frame. In worksheet section 5, isolate those choices: first compare default and explicit `ROWS` with date and ID for both; then compare them with date only for both. Date-only `ROWS` does not guarantee which tied order receives the intermediate sum. Repeated identical results do not prove a guaranteed order; use a stable tie-breaker when needed.
 </details>
 
 </details>
@@ -419,34 +420,29 @@ A window result cannot be filtered in `WHERE` at the same query level in Postgre
 
 ```mermaid
 flowchart LR
-    A["Customer totals"] --> B["CTE<br/>calculate rank"] --> C["Outer query<br/>keep ranks 1 and 2"]
+    A["Order revenues"] --> B["CTE<br/>calculate rank"] --> C["Outer query<br/>keep ranks 1 and 2"]
 ```
 
-**Try it:** In worksheet section 6, use customer revenue and `DENSE_RANK` to find the two highest **distinct revenue levels** per city, including ties. Consider customers with at least one completed order.
+**Try it:** Find the two highest **distinct order-revenue levels** for each customer, including ties. Calculate the rank before filtering it.
 
 <details markdown="1">
 <summary>Example · Filter a ranking after it is calculated</summary>
 
 ```sql
-WITH customer_totals AS (
-    SELECT c.customer_id, c.city, SUM(r.revenue) AS total_revenue
-    FROM customers AS c
-    JOIN window_lab_order_revenue AS r ON r.customer_id = c.customer_id
-    GROUP BY c.customer_id, c.city
-), ranked AS (
-    SELECT customer_id, city, total_revenue,
+WITH ranked_orders AS (
+    SELECT customer_id, order_id, revenue,
            DENSE_RANK() OVER (
-               PARTITION BY city ORDER BY total_revenue DESC
+               PARTITION BY customer_id ORDER BY revenue DESC
            ) AS revenue_rank
-    FROM customer_totals
+    FROM window_lab_order_revenue
 )
-SELECT customer_id, city, total_revenue, revenue_rank
-FROM ranked
+SELECT customer_id, order_id, revenue, revenue_rank
+FROM ranked_orders
 WHERE revenue_rank <= 2
-ORDER BY city, revenue_rank, customer_id;
+ORDER BY customer_id, revenue_rank, order_id;
 ```
 
-First the CTE makes one revenue total per customer, then the window ranks those totals within each city, and finally the outer query keeps the top two distinct revenue levels—including ties. The join includes only customers with at least one completed order; a `NULL` city forms its own partition.
+The CTE ranks individual orders within each customer, then the outer query keeps the top two distinct order-revenue levels, including ties. The final `ORDER BY` affects display, not which rows are peers. Worksheet section 6 asks you to apply the same idea at a different grain.
 </details>
 
 ## Run the worksheet
