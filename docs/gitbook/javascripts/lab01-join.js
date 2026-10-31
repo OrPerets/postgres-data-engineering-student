@@ -56,7 +56,7 @@
     root.innerHTML = `
       <div class="join-explorer__intro">
         <p class="join-explorer__eyebrow">INTERACTIVE EXAMPLE</p>
-        <p>Three customers, three orders, four items. Try each combination and predict who stays in the result.</p>
+        <p>Predict who stays in the result, then change the join and filter to check.</p>
       </div>
       <div class="join-explorer__source" aria-label="Example source data">
         <div><strong>Customers</strong><span>Maya · Amir · Noa</span></div>
@@ -71,12 +71,12 @@
           <select id="lab01-join-filter"><option value="all">No status filter</option><option value="completed">Completed orders only</option></select>
         </div>
       </div>
-      <div class="join-explorer__sql"><strong>SQL shape</strong><pre><code></code></pre></div>
       <p class="join-explorer__result-label" id="lab01-join-summary" role="status" aria-live="polite"></p>
       <div class="join-explorer__table-wrap" role="region" aria-label="Joined result table" tabindex="0">
-        <table><caption>Joined result — one row per matched item</caption><thead><tr><th scope="col">Customer</th><th scope="col">Order</th><th scope="col">Status</th><th scope="col">Item</th></tr></thead><tbody></tbody></table>
+        <table><caption>Joined result — item matches and any unmatched rows kept by LEFT JOIN</caption><thead><tr><th scope="col">Customer</th><th scope="col">Order</th><th scope="col">Status</th><th scope="col">Item</th></tr></thead><tbody></tbody></table>
       </div>
       <p class="join-explorer__explanation"></p>
+      <details class="join-explorer__sql"><summary>See the SQL</summary><pre><code></code></pre></details>
       <p class="join-explorer__note">This is a small browser simulation, not a PostgreSQL query. NULL means there is no matching value.</p>`;
 
     const joinSelect = root.querySelector('#lab01-join-type');

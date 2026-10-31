@@ -45,23 +45,25 @@
     root.dataset.initialized = 'true';
     root.classList.add('window-frame');
     root.innerHTML = `
-      <div class="window-frame__heading"><span class="window-frame__eyebrow">INTERACTIVE EXPLORER</span><h3>Follow the moving frame</h3><p>Choose a calculation, then step through customer 1's completed orders. Predict the result before each step.</p></div>
+      <div class="window-frame__heading"><span class="window-frame__eyebrow">EXPLORE THE WINDOW</span><h3>Watch the frame move</h3><p>One customer, five orders. Move through the rows and see which values contribute.</p></div>
       <div class="window-frame__controls">
-        <label for="window-frame-mode">Calculation<select id="window-frame-mode"><option value="running">Running sum · ROWS</option><option value="moving">Average · last 3 orders</option><option value="default">Running sum · default frame</option></select></label>
-        <label for="window-frame-order">Window ordering<select id="window-frame-order"><option value="date_id">Date, then order ID</option><option value="date">Date only</option></select></label>
-        <label for="window-frame-row">Current order<select id="window-frame-row"></select></label>
+        <label for="window-frame-mode">1 · Choose a calculation<select id="window-frame-mode"><option value="running">Running sum</option><option value="moving">Average of last 3 orders</option><option value="default">Running sum · default frame</option></select></label>
       </div>
+      <details class="window-frame__advanced"><summary>Explore ordering and ties</summary><label for="window-frame-order">Window ordering<select id="window-frame-order"><option value="date_id">Date, then order ID</option><option value="date">Date only</option></select></label></details>
+      <div class="window-frame__stage"><div class="window-frame__stage-heading"><strong>2 · Move through the orders</strong><span class="window-frame__progress"></span></div>
+      <p class="window-frame__hint">Select an order or use the arrows. The tinted cards are in the frame; the outlined card is the current row.</p>
+      <div class="window-frame__strip" role="group" aria-label="Orders in the customer partition"></div>
       <div class="window-frame__actions" aria-label="Move through orders">
         <button type="button" data-action="previous">← Previous</button><button type="button" data-action="next">Next →</button><button type="button" data-action="play" aria-pressed="false">Play</button><button type="button" data-action="reset">Reset</button>
-      </div>
-      <p class="window-frame__hint">All five rows belong to this customer's partition. The row labels identify the current row and which rows contribute.</p>
-      <div class="window-frame__table-wrap" role="region" aria-label="Order rows and current frame" tabindex="0"><table><caption>Customer 1 · completed orders</caption><thead><tr><th scope="col">Order</th><th scope="col">Date</th><th scope="col">Revenue</th><th scope="col">Role in calculation</th></tr></thead><tbody></tbody></table></div>
-      <div class="window-frame__result" role="status" aria-live="polite" aria-atomic="true"><strong class="window-frame__result-title"></strong><p class="window-frame__math"></p><p class="window-frame__detail"></p></div>
+      </div></div>
+      <div class="window-frame__result" role="status" aria-live="polite" aria-atomic="true"><span class="window-frame__result-label">3 · CALCULATE</span><strong class="window-frame__result-title"></strong><p class="window-frame__math"></p><p class="window-frame__detail"></p></div>
+      <details class="window-frame__data"><summary>See the row table</summary><div class="window-frame__table-wrap" role="region" aria-label="Order rows and current frame" tabindex="0"><table><caption>Customer 1 · completed orders</caption><thead><tr><th scope="col">Order</th><th scope="col">Date</th><th scope="col">Revenue</th><th scope="col">Role in calculation</th></tr></thead><tbody></tbody></table></div></details>
       <details class="window-frame__sql"><summary>Show matching SQL</summary><pre><code></code></pre></details>
       <p class="window-frame__note">Browser simulation of the lab's synthetic data; it does not execute SQL or connect to PostgreSQL. Run the worksheet to verify the query.</p>`;
     const mode = root.querySelector('#window-frame-mode');
     const ordering = root.querySelector('#window-frame-order');
-    const selected = root.querySelector('#window-frame-row');
+    const strip = root.querySelector('.window-frame__strip');
+    const progress = root.querySelector('.window-frame__progress');
     const previous = root.querySelector('[data-action="previous"]');
     const next = root.querySelector('[data-action="next"]');
     const play = root.querySelector('[data-action="play"]');
@@ -73,12 +75,6 @@
     const code = root.querySelector('code');
     let index = 0;
     let timer = null;
-    for (const row of orders) {
-      const opt = document.createElement('option');
-      opt.value = String(row.id);
-      opt.textContent = `Order ${row.id} · ${row.date}`;
-      selected.append(opt);
-    }
     const fmt = (value) => Number.isInteger(value) ? String(value) : value.toFixed(2) + ' (rounded)';
     function stop() {
       if (timer !== null) clearInterval(timer);
@@ -88,7 +84,24 @@
     }
     function render() {
       const calc = calculateFrame(index, mode.value, ordering.value);
-      selected.value = String(calc.current.id);
+      progress.textContent = `Order ${index + 1} of ${orders.length}`;
+      strip.replaceChildren();
+      orders.forEach((row, rowIndex) => {
+        const isCurrent = row.id === calc.current.id;
+        const inFrame = calc.frame.some((member) => member.id === row.id);
+        const card = document.createElement('button');
+        card.type = 'button';
+        card.className = 'window-frame__card' + (inFrame ? ' is-in-frame' : '') + (isCurrent ? ' is-current' : '');
+        card.setAttribute('aria-pressed', String(isCurrent));
+        const name = document.createElement('span'); name.textContent = `Order ${row.id}`;
+        const value = document.createElement('strong'); value.textContent = String(row.revenue);
+        const date = document.createElement('small'); date.textContent = row.date;
+        const role = document.createElement('small'); role.className = 'window-frame__card-role';
+        role.textContent = isCurrent ? 'Current · in frame' : inFrame ? 'In frame' : 'Outside frame';
+        card.append(name, value, date, role);
+        card.addEventListener('click', () => { stop(); index = rowIndex; render(); strip.children[rowIndex].focus(); });
+        strip.append(card);
+      });
       previous.disabled = index === 0;
       next.disabled = index === orders.length - 1;
       tbody.replaceChildren();
@@ -119,7 +132,6 @@
     }
     previous.addEventListener('click', () => { stop(); if (index > 0) index -= 1; render(); });
     next.addEventListener('click', () => { stop(); if (index < orders.length - 1) index += 1; render(); });
-    selected.addEventListener('change', () => { stop(); index = orders.findIndex((row) => String(row.id) === selected.value); render(); });
     mode.addEventListener('change', () => { stop(); render(); });
     ordering.addEventListener('change', () => { stop(); render(); });
     reset.addEventListener('click', () => { stop(); index = 0; mode.value = 'running'; ordering.value = 'date_id'; render(); });

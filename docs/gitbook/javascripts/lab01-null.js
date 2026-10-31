@@ -24,7 +24,7 @@
     root.innerHTML = `
       <p class="lab01-null__eyebrow">INTERACTIVE · SQL THREE-VALUED LOGIC</p>
       <h3>Why does NOT IN exclude a city?</h3>
-      <p>The fixed returned-city set contains Haifa, Tel Aviv and NULL in the lab's synthetic data. Predict the result before revealing it. Removing NULL is a hypothetical comparison, not a change to the data.</p>
+      <p>Pick a city and predict whether <code>WHERE</code> keeps it. Then reveal the comparisons.</p>
       <div class="lab01-null__controls">
         <label for="lab01-null-city">Outer customer's city<select id="lab01-null-city"><option value="Eilat">Eilat</option><option value="Haifa">Haifa</option><option value="null">NULL (unknown)</option></select></label>
         <label for="lab01-null-set">Returned-city set<select id="lab01-null-set"><option value="present">Haifa, Tel Aviv, NULL</option><option value="absent">Haifa, Tel Aviv (NULL removed)</option></select></label>
@@ -32,14 +32,16 @@
       <p>Predict: is <code>city NOT IN (returned cities)</code> TRUE, FALSE, or UNKNOWN? Will <code>WHERE</code> keep the row?</p>
       <button type="button" id="lab01-null-reveal" aria-expanded="false" aria-controls="lab01-null-result">Reveal comparison</button>
       <div id="lab01-null-result" hidden>
-        <p class="lab01-null__equation">For this nonempty set, <code>NOT IN</code> combines the following <code>&lt;&gt;</code> comparisons with AND:</p>
-        <div class="lab01-null__table-wrap" role="region" aria-label="Individual comparisons" tabindex="0"><table><caption>Comparison with each returned city</caption><thead><tr><th scope="col">Comparison</th><th scope="col">Result</th></tr></thead><tbody></tbody></table></div>
         <p class="lab01-null__summary" role="status" aria-live="polite" aria-atomic="true"></p>
-        <p>Filter descriptions below are pseudocode. Use a correlated subquery for <code>NOT EXISTS</code> in SQL. Scroll horizontally to see all table columns if needed.</p>
+        <p class="lab01-null__equation">For this nonempty set, <code>NOT IN</code> combines these comparisons with AND:</p>
+        <div class="lab01-null__table-wrap" role="region" aria-label="Individual comparisons" tabindex="0"><table><caption>Comparison with each returned city</caption><thead><tr><th scope="col">Comparison</th><th scope="col">Result</th></tr></thead><tbody></tbody></table></div>
+        <details class="lab01-null__more"><summary>Compare with NOT EXISTS</summary>
+        <p>These filter descriptions are pseudocode. Use a correlated subquery for <code>NOT EXISTS</code> in SQL.</p>
         <div class="lab01-null__table-wrap" role="region" aria-label="Filter comparison" tabindex="0"><table class="lab01-null__alternatives"><caption>Compare filters for this one outer city</caption><thead><tr><th scope="col">Filter</th><th scope="col">Predicate result</th><th scope="col">WHERE keeps row?</th></tr></thead><tbody></tbody></table></div>
         <p class="lab01-null__explain"></p>
+        </details>
       </div>
-      <p class="lab01-null__note">Browser simulation, not a PostgreSQL query. The set is nonempty in both options. WHERE retains only TRUE; FALSE and UNKNOWN are excluded.</p>`;
+      <p class="lab01-null__note">Browser simulation based on the lab's synthetic data, not a PostgreSQL query. Removing NULL is hypothetical. The set is nonempty in both options. WHERE retains only TRUE; FALSE and UNKNOWN are excluded.</p>`;
     const city = root.querySelector('#lab01-null-city'), set = root.querySelector('#lab01-null-set');
     const reveal = root.querySelector('#lab01-null-reveal'), result = root.querySelector('#lab01-null-result');
     const comparisonBody = root.querySelector('.lab01-null__table-wrap tbody'), alternatives = root.querySelector('.lab01-null__alternatives tbody');

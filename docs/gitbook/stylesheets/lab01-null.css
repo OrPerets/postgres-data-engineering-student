@@ -5,7 +5,9 @@
 .md-typeset .lab01-null label{font-weight:700;font-size:.75rem}
 .md-typeset .lab01-null select{display:block;width:100%;min-height:2.4rem;margin-top:.3rem;padding:.4rem;color:#252020;background:white;border:1px solid #857471;font:inherit}
 .md-typeset .lab01-null button{padding:.6rem 1rem;border:1px solid #81242d;background:#81242d;color:white;font:inherit;font-weight:700;cursor:pointer}
-.md-typeset .lab01-null :is(button,select):focus-visible,.md-typeset .lab01-null__table-wrap:focus-visible{outline:3px solid #bf6855;outline-offset:3px}
+.md-typeset .lab01-null :is(button,select,summary):focus-visible,.md-typeset .lab01-null__table-wrap:focus-visible{outline:3px solid #bf6855;outline-offset:3px}
+.md-typeset .lab01-null__more{margin-top:1rem}
+.md-typeset .lab01-null__more summary{color:#67151d;font-weight:700;cursor:pointer}
 .md-typeset .lab01-null__table-wrap{overflow-x:auto}
 .md-typeset .lab01-null table{width:100%;font-size:.7rem;border-collapse:collapse}
 .md-typeset .lab01-null table caption{text-align:left;font-weight:700}

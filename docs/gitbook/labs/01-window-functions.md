@@ -1,128 +1,103 @@
-# Window Functions — See the Rows Behind the Result
+# Window functions — keep the rows, see the bigger picture
 
-**Lab 01 · guided lesson · 60–90 minutes**
+**Lab 01 · visual lesson · 60–90 minutes**
 
-A window function lets you calculate across related rows while keeping each input row visible. In this lesson you will follow real orders, predict what a query will return, and check your ideas in PostgreSQL.
-
-**You will need:** the [Lab 01 environment](01-relational-sql.md), the [SQL worksheet](https://github.com/OrPerets/postgres-data-engineering-student/blob/main/labs/01-relational-sql/windows/worksheet.sql), and the [full lesson and challenges](https://github.com/OrPerets/postgres-data-engineering-student/blob/main/labs/01-relational-sql/windows/README.md). The examples use the lab's synthetic data, not actual customer records.
-
-```mermaid
-flowchart TD
-    A["1 · Choose the grain<br/>one row per order"] --> B["2 · Partition<br/>which customer?"]
-    B --> C["3 · Order<br/>which order comes first?"]
-    C --> D["4 · Frame<br/>which rows contribute?"]
-    D --> E["5 · Calculate<br/>sum, rank, previous value"]
-```
-
-Read the diagram from top to bottom. The frame matters for calculations such as `SUM`, `AVG`, and `LAST_VALUE`; not every window function uses the frame in the same way.
-
-## Start the worksheet
-
-From the repository root, start Lab 01. Then go to its folder and run the worksheet:
-
-```bash
-make lab-sql
-cd labs/01-relational-sql
-docker compose exec -T postgres psql -v ON_ERROR_STOP=1 -U student -d query_lab < windows/worksheet.sql
-```
-
-The starter queries run as supplied. Open `labs/01-relational-sql/windows/worksheet.sql` in the Codespace editor, add your answers, save, and run the command again. The worksheet is separate from the Lab 01 guided workspace draft; save and back it up separately.
-
-The worksheet creates `window_lab_order_revenue` as a **temporary view**. It exists only for that `psql` session and disappears when the command finishes. To try the snippets below interactively, start `docker compose exec postgres psql -U student -d query_lab` from the lab folder and run the view definition from the top of `windows/worksheet.sql` **in that same session**. The view does not change the source tables.
-
-## 1 · Choose your grain
-
-An order can have multiple item lines. If you join orders to item lines, an order may appear more than once. First calculate **one revenue value per completed order**, then apply a window over orders.
+How can you show an order **and** its customer’s total on the same row? A window function looks across related rows without collapsing the rows you started with. Follow the visuals, make a prediction, and then check it in PostgreSQL.
 
 ```mermaid
 flowchart LR
-    O["Order 101"] --> L1["Line 1 · 100"]
-    O --> L2["Line 2 · 200"]
-    L1 --> S["Aggregate by order"]
-    L2 --> S
-    S --> R["Order 101 · revenue 300"]
+    A["1 · Grain<br/>What is one row?"] --> B["2 · Partition<br/>Which customer?"]
+    B --> C["3 · Order<br/>Which row comes first?"] --> D["4 · Frame<br/>Which rows contribute?"]
 ```
 
-The worksheet uses the Lab 01 business rule: include completed orders, subtract the discount, and treat a `NULL` discount as zero. A completed order with no item lines remains in the order-level view with zero revenue. Cancelled, returned, and pending orders do not contribute.
+The interactive examples are **browser simulations** using synthetic data, not live PostgreSQL queries. The [worksheet](https://github.com/OrPerets/postgres-data-engineering-student/blob/main/labs/01-relational-sql/windows/worksheet.sql) lets you try the same ideas on the lab database. The [full lesson and optional challenges](https://github.com/OrPerets/postgres-data-engineering-student/blob/main/labs/01-relational-sql/windows/README.md) provide more detail.
 
-**Predict:** After the join, how many rows represent order 101? How many after aggregation? What might happen if you count orders directly from joined item rows? Run section 1 of the worksheet and check.
+## 1 · Start with one row per order
 
-## 2 · `GROUP BY` versus a window
+An order may contain multiple item lines. Joining them can repeat the order; aggregate first when the calculation needs **one row per order**.
 
-For customer 1, the completed orders have revenues **300, 200, 200, 400, 120**. Both queries can calculate the customer total, but their outputs have different grains:
+```mermaid
+flowchart LR
+    O["Order 101"] --> A["Line 1 · 100"]
+    O --> B["Line 2 · 200"]
+    A --> C["One order · 300"]
+    B --> C
+```
 
-| Input: five order rows | `GROUP BY customer_id` | `SUM(...) OVER (PARTITION BY customer_id)` |
-|---|---|---|
-| Each row is an order | One customer row: **1,220** | Five order rows, each showing **1,220** |
-| Order detail is available | Order detail is collapsed | Order detail is kept |
+**Predict:** How many rows represent this order before and after aggregation? What happens if you count orders directly from the joined lines?
 
-With the temporary view available in your session:
+The worksheet includes completed orders, subtracts discounts, treats a `NULL` discount as zero, and keeps completed orders without item lines with zero revenue. Cancelled, returned and pending orders do not contribute.
+
+## 2 · Group or window?
+
+Five orders for one customer have revenues **300, 200, 200, 400, 120**. Their total is **1,220**.
+
+```mermaid
+flowchart LR
+    I["5 order rows"] --> G["GROUP BY customer<br/>1 customer row · 1,220"]
+    I --> W["Window by customer<br/>5 order rows · 1,220 beside each"]
+```
+
+A **partition** is the logical group of input rows for a window. `PARTITION BY customer_id` puts each customer's orders together; without it, all input rows share one partition. It is not a physical table partition.
 
 ```sql
--- A customer summary
+SELECT customer_id, order_id, revenue,
+       SUM(revenue) OVER (PARTITION BY customer_id) AS customer_total
+FROM window_lab_order_revenue;
+```
+
+**Try it:** In worksheet section 2, add the completed-order count and each order’s share of the customer total. Predict the number of output rows. Use `NULLIF` to handle a zero total.
+
+<details markdown="1">
+<summary>See the GROUP BY version and when a window sees rows</summary>
+
+```sql
 SELECT customer_id, SUM(revenue) AS customer_total
 FROM window_lab_order_revenue
 GROUP BY customer_id;
-
--- The same customer total beside each order
-SELECT customer_id, order_id, revenue,
-       SUM(revenue) OVER (PARTITION BY customer_id) AS customer_total
-FROM window_lab_order_revenue
-ORDER BY customer_id, order_date, order_id;
 ```
 
-A **partition** is the group of input rows used by a window, not a physical table partition. Without `PARTITION BY`, all input rows are in one partition. The window sees rows remaining after `FROM`, `WHERE`, `GROUP BY`, and `HAVING` at its query level.
+`GROUP BY` returns one row per customer; the window adds the total to each input order row. A window sees the rows remaining after `FROM`, `WHERE`, `GROUP BY` and `HAVING` at its query level.
+</details>
 
-**Try it:** In worksheet section 2, add the number of completed orders and each order's share of customer revenue. What does a zero customer total mean for the share? Use `NULLIF` to avoid division by zero.
+## 3 · Rank customers
 
-## 3 · Order and peers: ranking
-
-Try the interactive ranking playground: predict the results before revealing the rankings, then change the tie-breaker to see what happens to peers. This is a browser simulation, not a live PostgreSQL query.
+**Predict:** If two customers tie for first place, what number should the next customer receive? Explore the ranking and change the tie-breaker. The activity shows what happens when the ordering changes.
 
 <div id="lab01-window-ranking"></div>
 
-<noscript>The ranking playground needs JavaScript. The comparison table and worksheet below remain available without it.</noscript>
+<noscript>For revenues 600, 600, 300, ROW_NUMBER with customer ID as a tie-breaker gives 1, 2, 3; RANK by revenue gives 1, 1, 3; DENSE_RANK by revenue gives 1, 1, 2.</noscript>
 
-Rows tied on every expression in a window's `ORDER BY` are **peers**. Here is a small illustration with two equal scores:
+**Your turn:** In worksheet section 3, rank customer totals within each city. Which function finds the two highest **distinct revenue levels**, including ties? Which can select exactly two customers?
 
-| Customer | Revenue | `ROW_NUMBER` with customer ID as tie-breaker | `RANK` by revenue | `DENSE_RANK` by revenue |
-|---|---:|---:|---:|---:|
-| A | 600 | 1 | 1 | 1 |
-| B | 600 | 2 | 1 | 1 |
-| C | 300 | 3 | 3 | 2 |
+<details markdown="1">
+<summary>Why do ties and ordering matter?</summary>
 
-- `ROW_NUMBER` assigns a different number to each row. Add a stable tie-breaker when you need reproducible selection.
-- `RANK` gives peers the same rank and leaves a gap after a tie.
-- `DENSE_RANK` gives peers the same rank and counts distinct rank levels without gaps.
+Rows tied on every expression in the window's `ORDER BY` are **peers**. `ROW_NUMBER` gives each row a different number; use a stable tie-breaker such as `customer_id` for reproducible selection. `RANK` gives peers the same rank and leaves a gap; `DENSE_RANK` leaves no gap. Do not add a unique ID to revenue-only ranking windows when equal revenues must remain peers.
 
-**Predict:** Which function would return the two highest *distinct revenue levels*, including ties? Which would select exactly two customers? In worksheet section 3, rank actual customer totals within each city. Use `customer_id` as a tie-breaker for `ROW_NUMBER`, but do not add it to the revenue-only ranking windows: doing so would break the revenue ties.
+The `ORDER BY` inside `OVER` controls the window's sequence or peers. A final `ORDER BY` controls displayed order; use both where needed.
+</details>
 
-The `ORDER BY` **inside** `OVER` controls the window's sequence or peers. A final `ORDER BY` controls the order in which results are displayed; use both where needed.
+## 4 · Look at the previous order
 
-## 4 · Look backward with `LAG`
-
-Use the timeline to compare filtering to March before and after `LAG` is calculated. This is a browser simulation using the lab's synthetic data.
+**Predict:** What is the previous revenue for order 104? Explore the timeline, then compare what happens when you filter to March before or after calculating `LAG`.
 
 <div id="lab01-window-lag"></div>
 
-<noscript>The LAG timeline needs JavaScript. The order table and SQL example below remain available without it.</noscript>
+<noscript>Customer 1's ordered revenues are 300, 200, 200, 400, 120. LAG returns NULL, 300, 200, 200, 400. If March is filtered first, order 104 has no preceding March order; if the full history is calculated first, its previous revenue is 200.</noscript>
 
-Customer 1's order history, sorted by date and then ID:
+`LAG` reads the previous **existing order** in the ordered customer partition. The first order returns `NULL`; missing calendar months are not created. Complete worksheet section 4 and explain why moving the March filter changes the result.
 
-| Order | Date | Revenue | Previous order revenue |
+<details markdown="1">
+<summary>See the SQL and full order sequence</summary>
+
+| Order | Date | Revenue | Previous revenue |
 |---:|---|---:|---:|
 | 101 | Jan 5 | 300 | `NULL` |
 | 102 | Feb 5 | 200 | 300 |
 | 103 | Feb 5 | 200 | 200 |
 | 104 | Mar 1 | 400 | 200 |
 | 134 | Mar 27 | 120 | 400 |
-
-```mermaid
-flowchart TD
-    A["101 · 300"] --> B["102 · 200"] --> C["103 · 200"] --> D["104 · 400"] --> E["134 · 120"]
-```
-
-`LAG(revenue)` reads the previous **existing order** in the customer's ordered partition. It returns `NULL` for the first order; it does not create missing calendar months.
 
 ```sql
 SELECT order_id, order_date, revenue,
@@ -134,33 +109,25 @@ WHERE customer_id = 1
 ORDER BY order_date, order_id;
 ```
 
-**Predict and test:** If you filter to March *before* calculating `LAG`, what does order 104 see? What if you calculate `LAG` over the full order history first and filter to March in an outer query? Complete worksheet section 4 and explain the difference. Filtering to a whole customer partition, as above, does not remove earlier orders from that customer's partition.
+Filtering to a whole customer partition, as here, does not remove earlier orders from that customer's partition. The ID makes same-date ordering deterministic.
+</details>
 
-## 5 · See the frame move
+## 5 · Watch the frame move
 
-Explore the current row and the rows in its frame. Step through the orders or start the optional animation, then compare the calculation with the displayed SQL. This browser simulation uses customer 1's synthetic orders; run your worksheet to verify them in PostgreSQL.
+A **partition** contains the customer’s orders. A **frame** is the subset used by a frame-sensitive calculation for the current row. Step through the orders and watch which rows contribute to the result.
 
 <div id="lab01-window-frame"></div>
 
-<noscript>The frame explorer needs JavaScript. The worked examples and tables below remain available without it.</noscript>
+<noscript>For a moving average of the current order and up to two preceding orders, the averages for orders 101, 102, 103, 104 and 134 are 300, 250, 233.33…, 266.67… and 240. For order 104, the frame contains orders 102, 103 and 104.</noscript>
 
-For the three-order moving average, the frame is the current order plus **up to two preceding orders**. Its size grows until three orders are available:
+**Predict:** For order 104, which three orders are in `ROWS BETWEEN 2 PRECEDING AND CURRENT ROW`? In worksheet section 5, calculate the moving average and compare it with the visual. This is a three-**order** average, not necessarily a three-month average.
 
-| Current order | Rows in `ROWS BETWEEN 2 PRECEDING AND CURRENT ROW` | Average revenue |
-|---:|---|---:|
-| 101 | **101** | 300 |
-| 102 | **101 · 102** | 250 |
-| 103 | **101 · 102 · 103** | 233.33… |
-| 104 | **102 · 103 · 104** | 266.67… |
-| 134 | **103 · 104 · 134** | 240 |
+<details markdown="1">
+<summary>Explore same-day ties and the default frame</summary>
 
-This is a three-**order** average, not necessarily a three-month average. `ROWS` uses positions in the window order. Include a stable tie-breaker, such as `order_id`, when dates can tie.
+The two February orders share a date. Compare a row-by-row sum ordered by date **and ID** with the default ordered frame using **date only**:
 
-### The same-day surprise: default frame and `ROWS`
-
-The two February orders share the same date. Compare a row-by-row sum ordered by date **and ID** with the default frame ordered by **date only**:
-
-| Order | Revenue | Explicit `ROWS`: date, ID | Default ordered frame: date only |
+| Order | Revenue | Explicit `ROWS`: date, ID | Default frame: date only |
 |---:|---:|---:|---:|
 | 101 | 300 | 300 | 300 |
 | 102 | 200 | 500 | 700 |
@@ -168,32 +135,42 @@ The two February orders share the same date. Compare a row-by-row sum ordered by
 | 104 | 400 | 1,100 | 1,100 |
 | 134 | 120 | 1,220 | 1,220 |
 
-With an ordered window, PostgreSQL's default frame runs from the partition start through the current row's **last peer**. For date-only ordering, both February orders are peers, so each includes both February values.
+PostgreSQL's default ordered frame runs from the partition start through the current row's **last peer**. With date-only ordering, both February orders are peers, so both are included together. Not every window function uses the frame in the same way.
 
-**Important experiment:** The two columns above change both ordering and frame. In worksheet section 5, isolate the choices:
+The columns above change both the ordering and the frame. In worksheet section 5, isolate those choices: first compare default and explicit `ROWS` with date and ID for both; then compare them with date only for both. Date-only `ROWS` does not guarantee which tied February order receives the intermediate sum. Repeated identical results do not prove a guaranteed order; use a stable tie-breaker when needed.
+</details>
 
-1. Compare default and explicit `ROWS` using **date and ID** for both.
-2. Compare the same frames using **date only** for both.
-3. Explain why date-only `ROWS` does not guarantee which tied February order receives the intermediate sum. Seeing the same output twice does not establish a guaranteed order.
+## 6 · Calculate first, then filter
 
-## 6 · Filter after the window
-
-You cannot filter a window result in `WHERE` at the same query level in PostgreSQL. Compute it in a subquery or common table expression (CTE), then filter the result outside:
+A window result cannot be filtered in `WHERE` at the same query level in PostgreSQL. Calculate it in a CTE or subquery, then filter outside.
 
 ```mermaid
 flowchart LR
-    A["Input rows"] --> B["CTE<br/>calculate window value"] --> C["Outer query<br/>filter that value"]
+    A["Customer totals"] --> B["CTE<br/>calculate rank"] --> C["Outer query<br/>keep ranks 1 and 2"]
 ```
 
-For example, after calculating a `ROW_NUMBER` in a CTE, an outer `WHERE` can select the first two orders per customer. In worksheet section 6, use customer revenue and `DENSE_RANK` to find the two highest **distinct revenue levels** per city, including ties. Consider only customers with at least one completed order.
+**Try it:** In worksheet section 6, use customer revenue and `DENSE_RANK` to find the two highest **distinct revenue levels** per city, including ties. Consider customers with at least one completed order.
 
-## Finish and explore
+## Run the worksheet
 
-Before returning to Lab 01 questions 8–11 and 14–15, explain aloud:
+Start the [Lab 01 environment](01-relational-sql.md), open `labs/01-relational-sql/windows/worksheet.sql` in the editor, add your answers and save. From the repository root:
 
-1. What does one input row represent? How would the result change at item-line grain?
-2. How do partition, order, peers, and frame affect your answer?
-3. Why can `LAG` change when a date filter moves before the window?
-4. Why can the two same-day orders have equal default-frame sums?
+```bash
+make lab-sql
+cd labs/01-relational-sql
+docker compose exec -T postgres psql -v ON_ERROR_STOP=1 -U student -d query_lab < windows/worksheet.sql
+```
 
-Continue with the optional `LAST_VALUE`, missing-month, threshold-crossing, and [performance](https://github.com/OrPerets/postgres-data-engineering-student/blob/main/labs/01-relational-sql/benchmarks/README.md) challenges in the full lesson. A window function is not guaranteed to be faster; the benchmark is a measured example, not a universal rule.
+The starter queries run as supplied. The worksheet is separate from the guided workspace draft; save and back it up separately.
+
+<details markdown="1">
+<summary>Trying individual queries in psql?</summary>
+
+The worksheet creates `window_lab_order_revenue` as a **temporary view**. It exists only in the current `psql` session and disappears when that session finishes. From the lab folder, start `docker compose exec postgres psql -U student -d query_lab` and run the view definition from the top of `windows/worksheet.sql` **in that same session** before trying individual snippets. The view does not change the source tables.
+</details>
+
+## Finish and apply
+
+Explain what one row represents, how partition and order affect the result, why the March filter changes `LAG`, and why same-day orders can share a default-frame sum. Then return to [Lab 01](01-relational-sql.md) questions 8–11 and 14–15.
+
+Explore `LAST_VALUE`, missing months, threshold crossings, and the [performance challenge](https://github.com/OrPerets/postgres-data-engineering-student/blob/main/labs/01-relational-sql/benchmarks/README.md) in the full lesson. A window function is not guaranteed to be faster; measure equivalent queries.

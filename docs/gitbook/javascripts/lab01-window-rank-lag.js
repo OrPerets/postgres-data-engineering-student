@@ -58,20 +58,21 @@
     root.innerHTML = `
       <p class="window-demo__eyebrow">INTERACTIVE · RANKING PLAYGROUND</p>
       <h3>What happens to tied customers?</h3>
-      <p>Customers A, B and C have IDs 1, 2 and 3. Try a tie or distinct revenues, then predict the three ranking columns. Changing an option hides the result so you can predict again.</p>
+      <p>What happens when two customers tie? Predict their ranks, then reveal the result.</p>
       <label class="window-demo__label" for="window-rank-data">Example revenues</label>
       <select id="window-rank-data"><option value="tie">Tie: A 600 · B 600 · C 300</option><option value="distinct">Distinct: A 600 · B 500 · C 300</option></select>
       <div class="window-demo__source" aria-label="Example customer revenues"><span><strong>A</strong> 600</span><span><strong>B</strong> <b id="window-rank-b-value">600</b></span><span><strong>C</strong> 300</span></div>
-      <fieldset class="window-demo__choices"><legend>Add customer ID as a tie-breaker</legend>
+      <details class="window-demo__advanced"><summary>Explore tie-breakers</summary><fieldset class="window-demo__choices"><legend>Add customer ID as a tie-breaker</legend>
         <label><input type="checkbox" id="window-rank-break"> For <code>RANK</code></label>
         <label><input type="checkbox" id="window-dense-break"> For <code>DENSE_RANK</code></label>
         <small><code>ROW_NUMBER</code> always uses customer ID to make its order reproducible.</small>
-      </fieldset>
+      </fieldset></details>
       <button type="button" class="window-demo__button" id="window-rank-reveal" aria-expanded="false" aria-controls="window-rank-result">Reveal rankings</button>
       <div id="window-rank-result" hidden>
-        <div class="window-demo__table-wrap" role="region" aria-label="Ranking result table" tabindex="0">
+        <div class="window-demo__rank-visual" aria-label="Rankings by function"></div>
+        <details class="window-demo__rank-table"><summary>See results as a table</summary><div class="window-demo__table-wrap" role="region" aria-label="Ranking result table" tabindex="0">
           <table><caption>One row per customer, highest revenue first</caption><thead><tr><th scope="col">Customer</th><th scope="col">Revenue</th><th scope="col">ROW_NUMBER</th><th scope="col">RANK</th><th scope="col">DENSE_RANK</th></tr></thead><tbody></tbody></table>
-        </div>
+        </div></details>
         <p class="window-demo__insight" role="status" aria-live="polite"></p>
         <details><summary>See the SQL window definitions</summary><pre><code></code></pre></details>
       </div>
@@ -83,6 +84,7 @@
     const button = root.querySelector('#window-rank-reveal');
     const result = root.querySelector('#window-rank-result');
     const body = root.querySelector('tbody');
+    const visual = root.querySelector('.window-demo__rank-visual');
     const message = root.querySelector('.window-demo__insight');
     const sql = root.querySelector('details code');
     let revealed = false;
@@ -91,7 +93,27 @@
       const hasRevenueTie = dataSelect.value === 'tie';
       bValue.textContent = hasRevenueTie ? '600' : '500';
       body.replaceChildren();
-      for (const item of rankRows(rankBreak.checked, denseBreak.checked, hasRevenueTie)) {
+      const ranked = rankRows(rankBreak.checked, denseBreak.checked, hasRevenueTie);
+      visual.replaceChildren();
+      for (const [label, property, explanation] of [
+        ['ROW_NUMBER', 'rowNumber', 'Every row gets a number'],
+        ['RANK', 'rank', 'Ties share a rank; gaps can follow'],
+        ['DENSE_RANK', 'denseRank', 'Ties share a rank; no rank is skipped']
+      ]) {
+        const group = document.createElement('section');
+        group.className = 'window-demo__rank-group';
+        const heading = document.createElement('strong'); heading.textContent = label;
+        const description = document.createElement('small'); description.textContent = explanation;
+        const scores = document.createElement('div'); scores.className = 'window-demo__rank-scores';
+        ranked.forEach((item) => {
+          const score = document.createElement('span');
+          score.textContent = `${item.customer}: ${item[property]}`;
+          scores.append(score);
+        });
+        group.append(heading, description, scores);
+        visual.append(group);
+      }
+      for (const item of ranked) {
         const tr = document.createElement('tr');
         appendCell(tr, item.customer, true);
         for (const v of [item.revenue, item.rowNumber, item.rank, item.denseRank]) appendCell(tr, v, false);
@@ -123,10 +145,10 @@
     root.innerHTML = `
       <p class="window-demo__eyebrow">INTERACTIVE · LAG TIMELINE</p>
       <h3>Where did the previous order go?</h3>
-      <p>Predict order 104's previous revenue. Compare what happens when the March filter moves across the window calculation.</p>
+      <p>Predict order 104’s previous revenue. Then move the March filter to see what changes.</p>
       <label class="window-demo__label" for="window-lag-filter">Apply the March filter</label>
       <select id="window-lag-filter"><option value="before">Before calculating LAG</option><option value="after">After calculating LAG</option></select>
-      <div class="window-demo__timeline" aria-label="Customer 1 order history"></div>
+      <div class="window-demo__timeline-heading"><strong>Rows seen by LAG</strong><span>Earlier → later</span></div><div class="window-demo__timeline" aria-label="Customer 1 order history"></div>
       <p class="window-demo__insight" role="status" aria-live="polite"></p>
       <div class="window-demo__table-wrap" role="region" aria-label="March order result" tabindex="0">
         <table><caption>Visible result: completed orders in March for customer 1</caption><thead><tr><th scope="col">Order</th><th scope="col">Date</th><th scope="col">Revenue</th><th scope="col">Previous revenue</th><th scope="col">Previous order</th></tr></thead><tbody></tbody></table>
@@ -144,13 +166,13 @@
       timeline.replaceChildren();
       for (const order of orders) {
         const card = document.createElement('div');
-        card.className = 'window-demo__order' + (order.id === 104 ? ' is-current' : '') + (before && order.date < '2026-03-01' ? ' is-excluded' : '');
+        card.className = 'window-demo__order' + (order.id === 104 ? ' is-current' : '') + (!before && order.id === 103 ? ' is-previous' : '') + (before && order.date < '2026-03-01' ? ' is-excluded' : '');
         const title = document.createElement('strong');
         title.textContent = `Order ${order.id}`;
         const detail = document.createElement('span');
         detail.textContent = `${order.date} · ${order.revenue}`;
         const label = document.createElement('small');
-        label.textContent = order.id === 104 ? 'Current order' : before && order.date < '2026-03-01' ? 'Excluded before LAG' : 'In LAG input';
+        label.textContent = order.id === 104 ? 'Current order' : !before && order.id === 103 ? 'Previous order →' : before && order.date < '2026-03-01' ? 'Filtered out' : 'In LAG input';
         card.append(title, detail, label);
         timeline.appendChild(card);
       }

@@ -1,31 +1,35 @@
 # Lab 01 — Relational SQL & Query Optimization
 
-> **Your mission:** Turn customer orders into reliable business insights, and discover why two queries returning identical results can have very different execution costs.
+> **Your mission:** Keep each order visible while calculating across a customer’s history.
 
-**You will practice:** JOINs, aggregation, correlated subqueries, NULL handling, window functions and query plans.
+Start with JOINs and aggregation, then see how **window functions** reveal rankings, previous values, and running totals. Finish by comparing query plans.
 
 **Environment:** PostgreSQL in GitHub Codespaces. No local Docker installation is required.
 
-!!! info "Your work"
+**Your path:** Set up → understand the data → [explore window functions](01-window-functions.md) → solve the questions → compare query plans.
 
-    Choose **one** route after starting the lab with `make lab-sql` from the repository root. The guided draft and the SQL worksheet are separate copies; they do not automatically sync. A query runs whichever SQL you select in the workspace or enter in the terminal.
+<details markdown="1">
+<summary>Choose a workspace and save your work</summary>
 
-    **Route A — Guided workspace:** Run `make lab-sql-workspace` from the repository root. Keep that terminal running and open private port **8765** from the Codespace **Ports** tab. Write your draft one question at a time and select **Run query** to execute the current or selected statement as read-only SQL. Compare the result with the question. Select **Save answers** regularly: edits are not autosaved. Select **Download SQL** to keep your draft outside the Codespace. [Opening and saving your work](../start-lab01.md#4-write-and-save-your-answers).
+Choose **one** route after starting the lab with `make lab-sql` from the repository root. The guided draft and the SQL worksheet are separate copies; they do not automatically sync. A query runs whichever SQL you select in the workspace or enter in the terminal.
 
-    **Route B — Codespace editor:** In Explorer, edit `labs → 01-relational-sql → sql → student_answers.sql` and save it with **Ctrl+S** (Windows/Linux) or **⌘S** (Mac). Run that saved worksheet from the lab folder:
+**Route A — Guided workspace:** Run `make lab-sql-workspace` from the repository root. Keep that terminal running and open private port **8765** from the Codespace **Ports** tab. Write your draft one question at a time and select **Run query** to execute the current or selected statement as read-only SQL. Compare the result with the question. Select **Save answers** regularly: edits are not autosaved. Select **Download SQL** to keep your draft outside the Codespace. [Opening and saving your work](../start-lab01.md#4-write-and-save-your-answers).
 
-    ```bash
-    cd labs/01-relational-sql
-    docker compose exec -T postgres psql -v ON_ERROR_STOP=1 -U student -d query_lab < sql/student_answers.sql
-    ```
+**Route B — Codespace editor:** In Explorer, edit `labs → 01-relational-sql → sql → student_answers.sql` and save it with **Ctrl+S** (Windows/Linux) or **⌘S** (Mac). Run that saved worksheet from the lab folder:
 
-    Read the output and compare it with each question's requirements. Download the saved worksheet from Explorer or commit and push it to your own fork to keep a copy outside the Codespace.
+```bash
+cd labs/01-relational-sql
+docker compose exec -T postgres psql -v ON_ERROR_STOP=1 -U student -d query_lab < sql/student_answers.sql
+```
 
-    **Check for either route:** From the repository root, `make test LAB=01-relational-sql` checks sample data and services, not either copy of your answers. Neither this check nor the workspace grades your SQL, and saving or downloading does not submit your work.
+Read the output and compare it with each question's requirements. Download the saved worksheet from Explorer or commit and push it to your own fork to keep a copy outside the Codespace.
 
-    **Prepare your work:** Keep your completed SQL, short explanations for questions 6, 7 and 15, and query plans for selected queries. On Route A, **Download SQL** exports the current draft as `lab01_student_answers.sql`; keep the explanations and plans separately if they are not included in your SQL. On Route B, back up the saved worksheet and any separate explanation or plan files from Explorer or your own fork.
+**Check for either route:** From the repository root, `make test LAB=01-relational-sql` checks sample data and services, not either copy of your answers. Neither this check nor the workspace grades your SQL, and saving or downloading does not submit your work.
 
-    **Back up and submit:** Guided drafts live in `.workspace-data/`, which Git ignores; committing or pushing the original worksheet does not back up the guided draft. Download the SQL and any separate evidence outside the Codespace. Saving or downloading is not submission: follow your instructor's method and deadline. [How to save a copy outside the Codespace](../start-lab01.md#4-write-and-save-your-answers).
+**Prepare your work:** Keep your completed SQL, short explanations for questions 6, 7 and 15, and query plans for selected queries. On Route A, **Download SQL** exports the current draft as `lab01_student_answers.sql`; keep the explanations and plans separately if they are not included in your SQL. On Route B, back up the saved worksheet and any separate explanation or plan files from Explorer or your own fork.
+
+**Back up and submit:** Guided drafts live in `.workspace-data/`, which Git ignores; committing or pushing the original worksheet does not back up the guided draft. Download the SQL and any separate evidence outside the Codespace. Saving or downloading is not submission: follow your instructor's method and deadline. [How to save a copy outside the Codespace](../start-lab01.md#4-write-and-save-your-answers).
+</details>
 
 ## 1. Get ready
 
@@ -124,7 +128,8 @@ Before moving on, ask:
 
 **Hint:** When an order has several items, calculate *per-order* metrics at the order grain before joining them to per-customer summaries.
 
-### Optional hints for questions 1–15
+<details markdown="1">
+<summary>Optional hints for questions 1–15</summary>
 
 Try each question on your own first. Open a hint when you need a direction; these hints do not contain the assignment answers.
 
@@ -158,11 +163,16 @@ Try each question on your own first. Open a hint when you need a direction; thes
 
 <details><summary>Question 15 — ROWS and RANGE</summary><p>Identify the ordering columns and frame for each cumulative calculation. Under a date-only ordering, consider whether same-day orders are peers and how that affects each result.</p></details>
 
+</details>
+
 ## 4. Experiment — Why can a Window Function be faster?
 
 **Goal:** Calculate each customer's running total without recomputing all previous transactions.
 
 First predict which version will be faster: a correlated subquery or `SUM(...) OVER (...)`. Both should return the same answers.
+
+<details markdown="1">
+<summary>Run the benchmark and inspect the plans</summary>
 
 **Before running setup:** The seed drops and recreates `benchmark_sales`, deleting its existing rows and indexes, including any index you added for the challenge. It does not drop the `customers`, `orders`, or `order_items` classroom tables. If you want to keep an earlier benchmark experiment, back up the table's data and schema (including index definitions) outside the Codespace before reseeding, or keep the existing table and skip the seed. Save any query plans or timing results separately.
 
@@ -187,17 +197,17 @@ You'll see:
 - Total runtime for both approaches.
 - Side-by-side sample outputs and a full-data `MATCH` / `MISMATCH` check.
 
-### Understand the result
+**Understand the result**
 
 The correlated subquery may repeatedly scan the table for each transaction. The window plan can sort and process the ordered rows with incremental running aggregation.
 
 **Important:** A Window Function is not always faster. This benchmark deliberately uses a case where repeated work is expensive. Indexes, table size and caching can change the result.
 
-### Optional challenge
+**Optional challenge**
 
 Read the [performance challenge](https://github.com/OrPerets/postgres-data-engineering-student/blob/main/labs/01-relational-sql/benchmarks/STUDENT_CHALLENGE.md). Add a composite index and compare again.
 
-## Visual checkpoint — One result, two query plans
+**Visual checkpoint — One result, two query plans**
 
 The running-total benchmark computes identical per-row results using two approaches.
 
@@ -208,7 +218,7 @@ The running-total benchmark computes identical per-row results using two approac
 | Calculate cumulative sum | Repeated aggregate per sale | One WindowAgg plan node |
 | Verify | Compare every output row | Compare every output row |
 
-### Five-row illustration (not a timing measurement)
+**Five-row illustration (not a timing measurement)**
 
 | Sale ID | Amount | Running total |
 |---|---:|---:|
@@ -222,6 +232,8 @@ The running-total benchmark computes identical per-row results using two approac
 
 **Try it:** Run `benchmarks/03_compact_report.sql` and compare the real execution counts. The five-row table is only an illustrative example; the benchmark itself uses a larger synthetic dataset.
 
+</details>
+
 ## 5. Reflect and finish
 
 Before leaving the lab, be ready to explain:
@@ -231,6 +243,9 @@ Before leaving the lab, be ready to explain:
 3. Why your two running-total queries produce identical outputs but different execution plans.
 
 ## Job interview questions
+
+<details markdown="1">
+<summary>Open the interview questions</summary>
 
 Try answering aloud before expanding each suggested answer. Use examples from this lab to support your explanation.
 
@@ -249,6 +264,8 @@ Try answering aloud before expanding each suggested answer. Use examples from th
 <details><summary>7. How do ROW_NUMBER and RANK handle ties?</summary><p><code>ROW_NUMBER()</code> assigns a different number to every row; add a stable tie-breaker for reproducible selection. <code>RANK()</code> gives equal ranks to peers and leaves gaps after ties. If ties must share a rank, do not add a unique identifier to that ranking window's ordering.</p></details>
 
 <details><summary>8. How can you filter to the three highest-ranked orders per customer?</summary><p>Compute <code>ROW_NUMBER()</code> in a subquery or CTE, partitioned by customer and ordered by the intended measure and a stable tie-breaker. Filter the resulting number in the outer query. Window results are computed after the same query level's <code>WHERE</code>, so they cannot be filtered there directly.</p></details>
+
+</details>
 
 **Deliverable:** Your completed SQL answers, together with worksheet work, explanations or benchmark evidence requested by your instructor.
 
