@@ -58,11 +58,7 @@ The running total uses `ORDER BY order_date, order_id` and `ROWS BETWEEN UNBOUND
 
 <div class="lab01-practice" id="lab01-practice" data-lab01-practice markdown="1">
 
-### Your SQL practice
-
 <noscript>Enable JavaScript to run queries here. You can also use the optional Codespace routes later on this page.</noscript>
-
-<div class="lab01-practice-actions"><button type="button" data-practice-export>Download answers</button></div>
 
 <div class="lab01-practice-layout" markdown="1">
 
@@ -734,3 +730,7 @@ The browser editors work independently; use a Codespace if you also want the lab
 ## Finish
 
 Keep your SQL and the evidence requested by your instructor. Next, practice explaining your choices in the [job interview questions](01-interview.md), or check your understanding in [Test yourself](01-test-yourself.md).
+
+### Your SQL practice
+
+<div class="lab01-practice lab01-practice-actions"><button type="button" data-practice-export>Download answers</button></div>

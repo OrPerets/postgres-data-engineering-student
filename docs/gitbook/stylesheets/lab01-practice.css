@@ -64,8 +64,8 @@
   max-width: 100%;
   margin: .75rem 0 0;
   padding: 0;
-  border: 1px solid #d7c5c2;
-  border-radius: 3px;
+  border: 1px solid #e0d2ce;
+  border-radius: 6px;
   background: #fff;
   box-shadow: none;
   font-size: .72rem;
@@ -78,7 +78,7 @@
   min-height: 2.2rem;
   margin: 0;
   padding: .4rem .75rem;
-  background: #faf6f4;
+  background: #fff;
   color: #751d27;
   font-weight: 700;
   cursor: pointer;
@@ -88,6 +88,16 @@
 .md-typeset .lab01-answer > summary:hover { background: #f3e9e8; }
 .md-typeset .lab01-answer[open] > summary { border-bottom: 1px solid #e8dbd7; }
 .md-typeset .lab01-answer > :not(summary) { margin-left: .85rem; margin-right: .85rem; }
+.md-typeset .lab01-answer .lab01-has-answer-copy .md-code__nav { display: none; }
+.md-typeset .lab01-practice button.lab01-copy-answer {
+  min-height: 2rem;
+  margin-top: .75rem;
+  padding: .3rem .7rem;
+  border-color: #d7c5c2;
+  border-radius: 4px;
+  font-size: .66rem;
+}
+.md-typeset .lab01-answer .lab01-copy-feedback { color: #514a47; font-size: .65rem; }
 .md-typeset .lab01-editor { margin-top: 1rem; padding: 1rem; border: 1px solid #ded7d3; background: #f9f6f3; }
 .md-typeset .lab01-editor label { display: block; margin-bottom: .4rem; color: #342f2f; font-size: .8rem; font-weight: 700; }
 .md-typeset .lab01-editor textarea { display: block; width: 100%; min-height: 8rem; resize: vertical; padding: .75rem; border: 1px solid #aaa09a; border-radius: 2px; background: #fff; color: #232020; font: .75rem/1.55 ui-monospace, SFMono-Regular, Consolas, monospace; tab-size: 2; }

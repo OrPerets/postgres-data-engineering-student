@@ -213,6 +213,36 @@
       const output = section.querySelector('[data-result]');
       const status = section.querySelector('[data-status]');
       if (!input || !button || !output || !status) return;
+      section.querySelectorAll('.lab01-answer .highlight').forEach((block) => {
+        const code = block.querySelector('pre code');
+        if (!code) return;
+        const copy = document.createElement('button');
+        copy.type = 'button';
+        copy.className = 'lab01-copy-answer';
+        copy.textContent = 'Copy SQL';
+        copy.setAttribute('aria-label', `Copy answer SQL for question ${number}`);
+        const feedback = document.createElement('span');
+        feedback.className = 'lab01-copy-feedback';
+        feedback.setAttribute('role', 'status');
+        block.classList.add('lab01-has-answer-copy');
+        block.before(copy, feedback);
+        copy.addEventListener('click', async () => {
+          const text = code.textContent;
+          try {
+            if (!navigator.clipboard || !navigator.clipboard.writeText) throw new Error('Clipboard unavailable');
+            await navigator.clipboard.writeText(text);
+            feedback.textContent = 'Copied';
+          } catch (_) {
+            // If clipboard access is denied, select the SQL for manual copying.
+            const range = document.createRange();
+            range.selectNodeContents(code);
+            const selection = window.getSelection();
+            selection.removeAllRanges();
+            selection.addRange(range);
+            feedback.textContent = 'SQL selected — press Ctrl+C or ⌘C to copy.';
+          }
+        });
+      });
       try { input.value = localStorage.getItem(storagePrefix + number) || ''; }
       catch (_) { storageAvailable = false; status.textContent = 'Browser storage is unavailable. Download your work before leaving.'; }
       input.addEventListener('input', () => {
@@ -270,7 +300,7 @@
       });
       });
     });
-    const download = root.querySelector('[data-practice-export]');
+    const download = document.querySelector('[data-practice-export]');
     if (download) download.addEventListener('click', () => {
       const answers = sections.map((section) => {
         const input = section.querySelector('[data-sql]');
