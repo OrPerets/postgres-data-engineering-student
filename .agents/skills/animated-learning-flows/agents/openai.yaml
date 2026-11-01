@@ -1,0 +1,4 @@
+interface:
+  display_name: "Animated Learning Flows"
+  short_description: "Build focused animations that show how concepts work"
+  default_prompt: "Use $animated-learning-flows to turn this lesson into a focused animation that shows each transformation."

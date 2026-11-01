@@ -18,7 +18,7 @@ Understand `OVER`, partitions, ordering and frames. Explore rankings, previous v
 
 ### [Tutorial & practice](01-tutorial-practice.md)
 
-Meet the customer and order tables, then work through 15 SQL questions in your browser. A Codespace is optional.
+Meet the customer and order tables, [follow an animated order journey](01-tutorial-practice.md#order-journey), then work through 15 SQL questions in your browser. A Codespace is optional.
 
 </li>
 <li markdown="block">

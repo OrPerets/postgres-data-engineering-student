@@ -134,6 +134,18 @@ class SiteVisibilityTests(unittest.TestCase):
                 style_digest = hashlib.sha256((docs / "stylesheets/lab01-practice.css").read_bytes()).hexdigest()[:12]
                 self.assertIn(f'javascripts/lab01-practice.js?v={script_digest}', tutorial)
                 self.assertIn(f'stylesheets/lab01-practice.css?v={style_digest}', tutorial)
+                for asset in ('javascripts/lab01-order-journey.js', 'stylesheets/lab01-order-journey.css'):
+                    digest = hashlib.sha256((docs / asset).read_bytes()).hexdigest()[:12]
+                    self.assertIn(f'{asset}?v={digest}', tutorial)
+                self.assertIn('id="lab01-order-journey"', tutorial)
+                self.assertIn('data-journey-fallback', tutorial)
+                self.assertIn('data-journey-example', tutorial)
+                self.assertIn('data-run-example', tutorial)
+                example = re.search(r'<textarea\b[^>]*\bdata-example-sql(?:\s|=|>)[^>]*>(.*?)</textarea>', tutorial, re.DOTALL)
+                self.assertIsNotNone(example, 'Worked example editor must remain separate from exercise drafts')
+                sql = (out / 'assets/lab01-journey/worked-example.sql').read_text()
+                self.assertEqual(html.unescape(example.group(1)).strip(), sql.strip())
+                self.assertIn('../../assets/lab01-journey/worked-example.sql', tutorial)
                 self.assertIn('id="lab01-practice"', tutorial)
                 self.assertEqual(re.findall(r'<section\b[^>]*\bdata-question="(\d+)"', tutorial), [str(n) for n in range(1, 16)])
                 self.assertEqual(len(re.findall(r'<textarea\b[^>]*\bdata-sql(?:\s|=|>)', tutorial)), 15)
@@ -182,10 +194,12 @@ class SiteVisibilityTests(unittest.TestCase):
                 self.assertFalse((out / "assets/h5p/lab01-window-partitions.h5p").exists())
                 self.assertFalse(list((out / "assets/h5p-content").glob("lab01-window-partitions-*")))
                 self.assertFalse((out / "assets/lab01-practice").exists())
+                self.assertFalse((out / "assets/lab01-journey").exists())
             for asset in ("javascripts/lab01-window-frame.js", "javascripts/lab01-window-rank-lag.js",
                           "javascripts/lab01-family-aggregate.js", "javascripts/lab01-family-ranking.js",
                           "javascripts/lab01-family-navigation.js", "javascripts/lab01-function-explorer.js",
                           "javascripts/lab01-practice.js", "javascripts/lab01-practice-worker.js",
+                          "javascripts/lab01-order-journey.js", "stylesheets/lab01-order-journey.css",
                           "stylesheets/lab01-window-frame.css", "stylesheets/lab01-window-rank-lag.css",
                           "stylesheets/lab01-practice.css", "assets/lab01-practice/schema.sql", "assets/lab01-practice/seed.sql"):
                 self.assertEqual((out / asset).exists(), "01" in active, asset)

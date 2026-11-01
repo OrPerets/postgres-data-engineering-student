@@ -1,0 +1,73 @@
+/* A single, responsive animation scene; all rules stay inside this activity. */
+.md-typeset .order-journey {
+  --journey-accent: #81242d;
+  --journey-ink: #302726;
+  margin: 1.2rem 0 1.8rem;
+  padding: clamp(.65rem, 2vw, 1.1rem);
+  border: 1px solid #ddd3cc;
+  border-radius: .5rem;
+  background: #fffdfb;
+  color: var(--journey-ink);
+  box-shadow: 0 5px 20px rgba(75, 43, 33, .04);
+}
+.md-typeset .order-journey [hidden] { display: none !important; }
+.md-typeset .order-journey__tabs { display: flex; justify-content: center; gap: .3rem; padding: .25rem; width: fit-content; max-width: 100%; margin: 0 auto .8rem; border: 1px solid #e0d5cd; border-radius: .4rem; background: #f4efea; }
+.md-typeset .order-journey button { min-height: 2.2rem; padding: .4rem .8rem; border: 1px solid #c6b8b0; border-radius: .3rem; color: #6b292e; background: #fff; font: inherit; font-size: .7rem; font-weight: 700; cursor: pointer; }
+.md-typeset .order-journey__tabs button { min-width: 5.1rem; border-color: transparent; color: #6b5b55; background: transparent; }
+.md-typeset .order-journey__tabs button[aria-selected="true"] { border-color: #d3c0b5; color: #6a1d26; background: #fff; box-shadow: 0 2px 4px rgba(88, 57, 42, .08); }
+.md-typeset .order-journey__scene { width: 100%; overflow: hidden; border-radius: .25rem; background: #fffdfb; }
+.md-typeset .order-journey__scene svg { display: block; width: 100%; height: auto; font-family: inherit; }
+.md-typeset .order-journey__scene text { fill: #443430; font-size: 12px; font-variant-numeric: tabular-nums; }
+.md-typeset .order-journey__scene .journey-heading { fill: #755b52; font-size: 13px; font-weight: 700; }
+.md-typeset .order-journey__scene .journey-card rect { fill: #fff; stroke: #d7c9bf; stroke-width: 1.3; }
+.md-typeset .order-journey__scene .journey-card__title { fill: #44302e; font-size: 13px; font-weight: 700; }
+.md-typeset .order-journey__scene .journey-card__sub { fill: #7a6961; font-size: 12px; }
+.md-typeset .order-journey__scene .journey-card.is-active rect { fill: #fcf0eb; stroke: #8b3841; stroke-width: 2; }
+.md-typeset .order-journey__scene .journey-card.is-result rect { fill: #f9e9e4; stroke: #b47772; }
+.md-typeset .order-journey__scene .journey-card.is-consumed { opacity: .28; }
+.md-typeset .order-journey__scene .journey-card.is-group rect { fill: #fcf7f0; stroke: #bfa387; }
+.md-typeset .order-journey__scene .journey-card.is-group.is-active rect { fill: #fff0dc; stroke: #a76522; }
+.md-typeset .order-journey__scene .journey-card.is-group .journey-card__sub { fill: #6c3725; font-size: 18px; font-weight: 700; }
+.md-typeset .order-journey__scene .journey-slot { fill: #faf7f2; stroke: #ded4ca; stroke-dasharray: 4 4; }
+.md-typeset .order-journey__scene .journey-slot-label { fill: #b3a398; font-size: 12px; }
+.md-typeset .order-journey__scene .journey-ribbon { fill: none; stroke: #b89b8a; stroke-width: 7; opacity: .13; }
+.md-typeset .order-journey__scene .journey-ribbon--result { stroke-width: 4; opacity: .1; }
+.md-typeset .order-journey__scene .journey-ribbon--active { stroke: #a6565b; stroke-width: 4; stroke-dasharray: 8 6; opacity: .9; }
+.md-typeset .order-journey__scene .journey-token rect { fill: #81242d; stroke: #fffdfb; stroke-width: 2; filter: drop-shadow(0 2px 3px rgba(99, 38, 38, .17)); }
+.md-typeset .order-journey__scene .journey-token text { fill: #fff; font-size: 12px; font-weight: 800; }
+.md-typeset .order-journey__scene .journey-equation { fill: #6d252d; font-size: 17px; font-weight: 700; }
+.md-typeset .order-journey__scene .journey-window-row { fill: #fff; stroke: #e4dbd3; }
+.md-typeset .order-journey__scene .journey-frame { fill: #d7eaff; fill-opacity: .6; stroke: #4a89c4; stroke-width: 2; }
+.md-typeset .order-journey__scene .journey-current { fill: none; stroke: #81242d; stroke-width: 2.5; }
+.md-typeset .order-journey__scene .journey-frame-note { fill: #42739e; font-size: 12px; }
+.md-typeset .order-journey__scene .journey-order-id { font-size: 16px; font-weight: 700; }
+.md-typeset .order-journey__scene .journey-row-date { fill: #8b786d; font-size: 12px; }
+.md-typeset .order-journey__scene .journey-number { fill: #62453e; font-size: 23px; font-weight: 700; }
+.md-typeset .order-journey__scene .journey-number.is-filled { fill: #7a2430; }
+.md-typeset .order-journey__scene .journey-number.is-empty { fill: #c4b6ab; }
+.md-typeset .order-journey__scene .journey-order-note { fill: #8c766a; font-size: 12px; }
+.md-typeset .order-journey__caption { min-height: 3em; margin: .15rem .4rem .8rem; text-align: center; color: #665148; font-size: .76rem; line-height: 1.5; }
+.md-typeset .order-journey__controls { display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: .6rem 1rem; }
+.md-typeset .order-journey__controls > div { display: flex; gap: .4rem; }
+.md-typeset .order-journey__controls [data-animation-action="play"] { min-width: 5rem; color: #fff; background: #81242d; border-color: #81242d; }
+.md-typeset .order-journey__controls > span { color: #927e72; font-size: .62rem; font-variant-numeric: tabular-nums; }
+.md-typeset .order-journey button:disabled { color: #a7968a; border-color: #ddd1c7; background: #eee7e1; cursor: default; }
+.md-typeset .order-journey__subset { margin: .8rem 0 .5rem; text-align: center; color: #948175; font-size: .61rem; line-height: 1.5; }
+.md-typeset .order-journey__details { padding-top: .5rem; margin: .4rem 0 0; border-top: 1px solid #e9dfd6; font-size: .71rem; }
+.md-typeset .order-journey__details summary { color: #79574c; font-weight: 700; cursor: pointer; }
+.md-typeset .order-journey__accessible-data { overflow-x: auto; }
+.md-typeset .order-journey__accessible-data table { display: table; width: 100%; font-size: .67rem; }
+.md-typeset .order-journey__accessible-data caption { text-align: left; }
+.md-typeset .order-journey__details pre { max-height: 20rem; overflow: auto; font-size: .65rem; }
+.md-typeset .order-journey :is(button,summary):focus-visible { outline: 3px solid #bf6855; outline-offset: 3px; }
+@media (max-width: 600px) {
+  .md-typeset .order-journey__tabs { margin-bottom: .4rem; }
+  .md-typeset .order-journey__tabs button { min-width: 4.3rem; padding: .35rem .6rem; }
+  .md-typeset .order-journey__controls > div { gap: .3rem; }
+  .md-typeset .order-journey__controls button { padding: .35rem .65rem; }
+  .md-typeset .order-journey__caption { min-height: 4.5em; font-size: .7rem; margin-top: .2rem; }
+  .md-typeset .order-journey__scene .journey-heading { font-size: 12px; }
+  .md-typeset .order-journey__scene .journey-card__title { font-size: 12px; }
+  .md-typeset .order-journey__scene .journey-card.is-group .journey-card__sub { font-size: 16px; }
+  .md-typeset .order-journey__scene .journey-equation { font-size: 16px; }
+}

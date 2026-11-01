@@ -23,6 +23,80 @@ LIMIT 5;
 
 As you work, `WHERE` filters rows, while `GROUP BY` combines them into groups. A `LEFT JOIN` can retain customers without matching orders; check whether a later `WHERE` condition removes those rows. Use `IS NULL` to test missing values and `COALESCE` when a rule defines a replacement. For multi-step questions, a common table expression (`WITH`) can give an intermediate result a name. Window functions then calculate across related rows without collapsing them; review [partitions, ordering and frames](01-window-functions.md) before questions 8–15.
 
+## Follow one customer's order journey {#order-journey}
+
+Choose **JOIN**, **GROUP BY** or **Window**, then press **Play** to watch the rows change.
+
+<div id="lab01-order-journey" data-lab01-order-journey markdown="1">
+<div data-journey-fallback markdown="1">
+
+This small example uses customer 1's completed orders **101, 102 and 103**, with **5 item lines** from the actual synthetic lab data.
+
+| Stage | Rows | What one row represents |
+|---|---:|---|
+| JOIN | 5 | One matching item line; an order can appear more than once |
+| GROUP BY order | 3 | One order, with the revenue of its lines added together |
+| Window running total | 3 | One order, with cumulative revenue beside it |
+
+Order **101** combines **100 + 200 = 300**; order **102** combines **150 + 50 = 200**; order **103** has one line worth **200**. Grouping combines lines into orders. The window keeps those three order rows.
+
+| Order | Date | Order revenue | Running total |
+|---|---|---:|---:|
+| 101 | 2026-01-05 | 300 | 300 |
+| 102 | 2026-02-05 | 200 | 500 |
+| 103 | 2026-02-05 | 200 | 700 |
+
+The running total uses `ORDER BY order_date, order_id` and `ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW`. The order ID resolves the two February 5 orders into a deterministic sequence.
+
+</div>
+<noscript>The tables above explain the three illustrated transformations. Enable JavaScript for the animation and browser SQL runner.</noscript>
+</div>
+
+<details class="lab01-journey-worked" markdown="1">
+<summary>Run the full worked example in PostgreSQL</summary>
+
+<div class="lab01-practice lab01-journey-example" data-journey-example markdown="1">
+
+### Run the worked example
+
+The animation focuses on three completed orders (101–103). This query uses all five of customer 1's completed orders in the synthetic lab data. It runs in the browser's PostgreSQL database, with separate output from your exercise answers. The first run may take a moment to load.
+
+[Download the worked SQL example](../assets/lab01-journey/worked-example.sql){ download="lab01-worked-example.sql" }
+
+<div class="lab01-editor">
+<label for="lab01-journey-sql">Worked SQL: customer 1's completed-order revenue and running total</label>
+<textarea id="lab01-journey-sql" data-example-sql rows="14" spellcheck="false" readonly>-- Worked example: customer 1's completed orders in the synthetic Lab 01 data.
+-- One row per completed order, followed by a running total.
+-- This SELECT does not change source tables or exercise answers.
+WITH completed_order_revenue AS (
+    SELECT o.order_id, o.customer_id, o.order_date,
+           COALESCE(SUM(i.quantity * i.unit_price *
+                        (1 - COALESCE(i.discount_pct, 0) / 100.0)), 0) AS revenue
+    FROM orders AS o
+    LEFT JOIN order_items AS i ON i.order_id = o.order_id
+    WHERE o.customer_id = 1 AND o.status = 'completed'
+    GROUP BY o.order_id, o.customer_id, o.order_date
+)
+SELECT order_id, customer_id, order_date, revenue,
+       SUM(revenue) OVER (
+           PARTITION BY customer_id
+           ORDER BY order_date, order_id
+           ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW
+       ) AS running_total
+FROM completed_order_revenue
+ORDER BY order_date, order_id;
+</textarea>
+<div class="lab01-editor-actions"><button type="button" data-run-example disabled>Run worked example</button></div>
+<p class="lab01-status" data-example-status role="status" aria-live="polite"></p>
+<div class="lab01-result" data-example-result></div>
+</div>
+
+<noscript>Download the SQL example and run it in your optional Codespace database after Lab 01 setup. The static journey above remains available.</noscript>
+
+</div>
+
+</details>
+
 ## 2 · Work through the 15 questions {#4-work-through-the-15-questions}
 
 Write and run your own SQL for each question below. Try each question yourself before opening a hint.

@@ -80,7 +80,18 @@
     return String(value);
   }
 
-  function render(target, results) {
+  function exampleCell(value, field) {
+    if (field === 'order_date' && value instanceof Date && !Number.isNaN(value.getTime())) {
+      return value.toISOString().slice(0, 10);
+    }
+    if ((field === 'revenue' || field === 'running_total') && typeof value === 'string' && /^-?\d+\.\d+$/.test(value)) {
+      // Keep PostgreSQL's exact digits, removing only insignificant zeroes.
+      return value.replace(/(\.\d*?[1-9])0+$|\.0+$/, '$1');
+    }
+    return cell(value);
+  }
+
+  function render(target, results, formatCell = cell) {
     target.replaceChildren();
     if (!results.length) { target.textContent = 'Query completed.'; return; }
     results.forEach((result, index) => {
@@ -106,7 +117,7 @@
         const body = table.createTBody();
         result.rows.forEach((row) => {
           const tr = body.insertRow();
-          row.forEach((value) => { tr.insertCell().textContent = cell(value); });
+          row.forEach((value, column) => { tr.insertCell().textContent = formatCell(value, result.fields[column]); });
         });
         group.appendChild(table);
         const count = document.createElement('p');
@@ -117,7 +128,44 @@
     });
   }
 
+  function mountExamples() {
+    // Worked examples share the read-only engine, but never read or save the
+    // numbered exercise drafts. Each example has its own controls and output.
+    document.querySelectorAll('[data-journey-example]').forEach((example) => {
+      if (example.dataset.exampleMounted) return;
+      const input = example.querySelector('[data-example-sql]');
+      const button = example.querySelector('[data-run-example]');
+      const status = example.querySelector('[data-example-status]');
+      const output = example.querySelector('[data-example-result]');
+      if (!input || !button || !status || !output) return;
+      example.dataset.exampleMounted = 'true';
+      button.disabled = false;
+      button.addEventListener('click', () => {
+        const sql = input.value.trim();
+        if (!sql) { status.textContent = 'Write or select a SQL statement first.'; return; }
+        if (sql.length > maxSql) { status.textContent = 'Please use at most 50,000 characters per run.'; return; }
+        button.disabled = true;
+        status.textContent = ready ? 'Running the worked example…' : 'Starting the browser database and running the worked example…';
+        output.replaceChildren();
+        output.setAttribute('aria-busy', 'true');
+        const run = queue.catch(() => {}).then(() => execute(sql));
+        queue = run;
+        run.then((results) => {
+          render(output, results, exampleCell);
+          if (output.querySelector('table')) {
+            output.tabIndex = 0;
+            output.setAttribute('role', 'region');
+            output.setAttribute('aria-label', 'Worked example query results');
+          }
+          status.textContent = 'Query complete. These results were calculated by the browser PostgreSQL database.';
+        }).catch((error) => { status.textContent = `Could not run: ${error.message}`; })
+          .finally(() => { button.disabled = false; output.setAttribute('aria-busy', 'false'); });
+      });
+    });
+  }
+
   function mount() {
+    mountExamples();
     const root = document.querySelector('[data-lab01-practice]');
     if (!root || root.dataset.practiceMounted) return;
     root.dataset.practiceMounted = 'true';

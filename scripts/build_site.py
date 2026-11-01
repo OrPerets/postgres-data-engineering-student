@@ -147,14 +147,16 @@ def filter_docs(directory: Path, enabled: dict[str, bool]) -> None:
         (directory / "start-lab01.md").unlink()
         (directory / "images" / "setup" / "01-github-codespaces.png").unlink()
         shutil.rmtree(directory / "assets" / "lab01-practice")
+        shutil.rmtree(directory / "assets" / "lab01-journey")
         for asset in ("javascripts/lab01-join.js", "javascripts/lab01-quiz.js", "javascripts/lab01-null.js",
                       "javascripts/lab01-window-frame.js", "javascripts/lab01-window-rank-lag.js",
                       "javascripts/lab01-family-aggregate.js", "javascripts/lab01-family-ranking.js",
                       "javascripts/lab01-family-navigation.js", "javascripts/lab01-function-explorer.js",
                       "javascripts/lab01-practice.js", "javascripts/lab01-practice-worker.js",
+                      "javascripts/lab01-order-journey.js",
                       "stylesheets/lab01-join.css", "stylesheets/lab01-quiz.css", "stylesheets/lab01-null.css",
                       "stylesheets/lab01-window-frame.css", "stylesheets/lab01-window-rank-lag.css",
-                      "stylesheets/lab01-practice.css"):
+                      "stylesheets/lab01-practice.css", "stylesheets/lab01-order-journey.css"):
             (directory / asset).unlink()
     if "02" in hidden:
         for page in ("02-exercises.md", "02-interview.md"):
@@ -303,10 +305,12 @@ def filtered_config(text: str, enabled: dict[str, bool]) -> str:
             text = require_replace(text, f"      - {label}: labs/{page}\n", "", f"Lab 01 {label} nav")
         for asset in ("stylesheets/lab01-join.css", "stylesheets/lab01-quiz.css", "stylesheets/lab01-null.css",
                       "stylesheets/lab01-window-frame.css", "stylesheets/lab01-window-rank-lag.css", "stylesheets/lab01-practice.css",
+                      "stylesheets/lab01-order-journey.css",
                       "javascripts/lab01-join.js", "javascripts/lab01-quiz.js", "javascripts/lab01-null.js",
                       "javascripts/lab01-window-frame.js", "javascripts/lab01-window-rank-lag.js",
                       "javascripts/lab01-family-aggregate.js", "javascripts/lab01-family-ranking.js",
-                      "javascripts/lab01-family-navigation.js", "javascripts/lab01-function-explorer.js", "javascripts/lab01-practice.js"):
+                      "javascripts/lab01-family-navigation.js", "javascripts/lab01-function-explorer.js", "javascripts/lab01-practice.js",
+                      "javascripts/lab01-order-journey.js"):
             text = require_replace(text, f"  - {asset}\n", "", f"Lab 01 asset {asset}")
     else:
         # GitHub Pages/CDNs can retain old assets after deployment. Use content
@@ -315,6 +319,8 @@ def filtered_config(text: str, enabled: dict[str, bool]) -> str:
         for asset, inputs in (
             ("stylesheets/lab01-practice.css", ("stylesheets/lab01-practice.css",)),
             ("javascripts/lab01-practice.js", ("javascripts/lab01-practice.js", "javascripts/lab01-practice-worker.js")),
+            ("stylesheets/lab01-order-journey.css", ("stylesheets/lab01-order-journey.css",)),
+            ("javascripts/lab01-order-journey.js", ("javascripts/lab01-order-journey.js",)),
         ):
             digest = hashlib.sha256()
             for filename in inputs:
