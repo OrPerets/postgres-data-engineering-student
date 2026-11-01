@@ -59,6 +59,35 @@
 .md-typeset .lab01-question { margin: 2rem 0; padding: 1.2rem 0 1.6rem; border-top: 2px solid #8b2029; }
 .md-typeset .lab01-question h3 { margin: 0 0 .7rem; }
 .md-typeset .lab01-question pre { overflow-x: auto; }
+.md-typeset .lab01-question details.lab01-answer {
+  width: fit-content;
+  max-width: 100%;
+  margin: .75rem 0 0;
+  padding: 0;
+  border: 1px solid #d7c5c2;
+  border-radius: 3px;
+  background: #fff;
+  box-shadow: none;
+  font-size: .72rem;
+}
+.md-typeset .lab01-question details.lab01-answer[open] { width: 100%; }
+.md-typeset .lab01-answer > summary {
+  display: flex;
+  align-items: center;
+  gap: .6rem;
+  min-height: 2.2rem;
+  margin: 0;
+  padding: .4rem .75rem;
+  background: #faf6f4;
+  color: #751d27;
+  font-weight: 700;
+  cursor: pointer;
+}
+.md-typeset .lab01-answer > summary::before { display: none; }
+.md-typeset .lab01-answer > summary::after { position: static; margin-left: auto; }
+.md-typeset .lab01-answer > summary:hover { background: #f3e9e8; }
+.md-typeset .lab01-answer[open] > summary { border-bottom: 1px solid #e8dbd7; }
+.md-typeset .lab01-answer > :not(summary) { margin-left: .85rem; margin-right: .85rem; }
 .md-typeset .lab01-editor { margin-top: 1rem; padding: 1rem; border: 1px solid #ded7d3; background: #f9f6f3; }
 .md-typeset .lab01-editor label { display: block; margin-bottom: .4rem; color: #342f2f; font-size: .8rem; font-weight: 700; }
 .md-typeset .lab01-editor textarea { display: block; width: 100%; min-height: 8rem; resize: vertical; padding: .75rem; border: 1px solid #aaa09a; border-radius: 2px; background: #fff; color: #232020; font: .75rem/1.55 ui-monospace, SFMono-Regular, Consolas, monospace; tab-size: 2; }

@@ -56,93 +56,11 @@ The running total uses `ORDER BY order_date, order_id` and `ROWS BETWEEN UNBOUND
 <noscript>The tables above explain the three illustrated transformations. Enable JavaScript for the animation and browser SQL runner.</noscript>
 </div>
 
-<details class="lab01-journey-worked" markdown="1">
-<summary>Run the full worked example in PostgreSQL</summary>
-
-<div class="lab01-practice lab01-journey-example" data-journey-example markdown="1">
-
-### Run the worked example
-
-The animation focuses on three completed orders (101–103). This query uses all five of customer 1's completed orders in the synthetic lab data. It runs in the browser's PostgreSQL database, with separate output from your exercise answers. The first run may take a moment to load.
-
-[Download the worked SQL example](../assets/lab01-journey/worked-example.sql){ download="lab01-worked-example.sql" }
-
-<div class="lab01-editor">
-<label for="lab01-journey-sql">Worked SQL: customer 1's completed-order revenue and running total</label>
-<textarea id="lab01-journey-sql" data-example-sql rows="14" spellcheck="false" readonly>-- Worked example: customer 1's completed orders in the synthetic Lab 01 data.
--- One row per completed order, followed by a running total.
--- This SELECT does not change source tables or exercise answers.
-WITH completed_order_revenue AS (
-    SELECT o.order_id, o.customer_id, o.order_date,
-           COALESCE(SUM(i.quantity * i.unit_price *
-                        (1 - COALESCE(i.discount_pct, 0) / 100.0)), 0) AS revenue
-    FROM orders AS o
-    LEFT JOIN order_items AS i ON i.order_id = o.order_id
-    WHERE o.customer_id = 1 AND o.status = 'completed'
-    GROUP BY o.order_id, o.customer_id, o.order_date
-)
-SELECT order_id, customer_id, order_date, revenue,
-       SUM(revenue) OVER (
-           PARTITION BY customer_id
-           ORDER BY order_date, order_id
-           ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW
-       ) AS running_total
-FROM completed_order_revenue
-ORDER BY order_date, order_id;
-</textarea>
-<div class="lab01-editor-actions"><button type="button" data-run-example disabled>Run worked example</button></div>
-<p class="lab01-status" data-example-status role="status" aria-live="polite"></p>
-<div class="lab01-result" data-example-result></div>
-</div>
-
-<noscript>Download the SQL example and run it in your optional Codespace database after Lab 01 setup. The static journey above remains available.</noscript>
-
-</div>
-
-</details>
-
-## 2 · Work through the 15 questions {#4-work-through-the-15-questions}
-
-Write and run your own SQL for each question below. Try each question yourself before opening a hint.
-
-| Questions | Focus | Helpful preparation |
-|---|---|---|
-| 1–5 | Filters, joins, grouping and business metrics | Trace the grain of each join. |
-| 6–7 | Debug aggregation and `NOT IN` / `NULL` | Consider how missing values affect comparisons. |
-| 8–11 | Rankings, previous orders, running totals and months | [Explore window functions](01-window-functions.md). Its SQL worksheet is separate from the guided draft. |
-| 12–15 | Relational logic, product pairs and window frames | Check ties, order and frame choices. |
-
-<details markdown="1">
-<summary>See the question roadmap</summary>
-
-These are short prompts. The complete conditions and supplied queries appear with each editor below and in the optional worksheet.
-
-1. Select January orders that match the stated customer and status conditions.
-2. Calculate completed-order metrics for every customer, including those with no completed orders.
-3. Find customers who bought in both specified categories and have no returned orders.
-4. Compare each completed order's revenue with the customer's other completed orders.
-5. Summarize order statuses and completion percentages by city.
-6. Diagnose and correct the supplied aggregate query, then apply the requested thresholds.
-7. Explain and correct the supplied `NOT IN` query when a city is `NULL`.
-8. Rank customer revenue within each city and return the top two distinct revenue levels, including ties.
-9. Calculate previous-order revenue, change, cumulative revenue and a moving average for each completed order.
-10. Find each customer's highest-revenue category and its share of their total.
-11. Compare monthly revenues across January–March, including months without purchases.
-12. Find customers who purchased from every category sold in completed orders, using two solutions.
-13. Count product pairs purchased together in at least two completed orders.
-14. Find the first order where each qualifying customer's cumulative revenue reaches 500.
-15. Compare `ROWS` and `RANGE` cumulative sums for the same-day orders.
-</details>
-
 <div class="lab01-practice" id="lab01-practice" data-lab01-practice markdown="1">
 
 ### Your SQL practice
 
-Run read-only PostgreSQL queries directly in this browser using a separate copy of the sample data. The first run may take a moment to load; results show up to 100 rows. The browser database starts fresh when you reload the page or a query is interrupted; it is separate from your Codespace database.
-
 <noscript>Enable JavaScript to run queries here. You can also use the optional Codespace routes later on this page.</noscript>
-
-Your SQL drafts are saved in this browser on this device. They do not sync with the guided workspace or worksheet. Download your answers to keep a backup or submit them as instructed. To run only part of an answer, select that SQL before choosing **Run query**.
 
 <div class="lab01-practice-actions"><button type="button" data-practice-export>Download answers</button></div>
 
@@ -168,6 +86,19 @@ Display up to five orders from January 2026 that satisfy either condition: the o
 <div class="lab01-result" data-result></div>
 </div>
 
+
+<details class="lab01-answer" markdown="1">
+<summary>See answer</summary>
+
+```sql
+SELECT o.* FROM orders o JOIN customers c USING(customer_id)
+WHERE o.order_date>=DATE '2026-01-01' AND o.order_date<DATE '2026-02-01'
+ AND ((o.status='completed' AND c.city='Haifa') OR o.status='cancelled')
+ORDER BY o.order_id LIMIT 5;
+```
+
+</details>
+
 </section>
 
 <section class="lab01-question" data-question="2" markdown="1">
@@ -185,6 +116,28 @@ For every customer, display the number of completed orders, total revenue, avera
 <p class="lab01-status" data-status role="status" aria-live="polite"></p>
 <div class="lab01-result" data-result></div>
 </div>
+
+
+<details class="lab01-answer" markdown="1">
+<summary>See answer</summary>
+
+```sql
+WITH instructor_order_revenue AS (
+    SELECT o.order_id, o.customer_id, o.order_date,
+           COALESCE(SUM(i.quantity * i.unit_price *
+               (1 - COALESCE(i.discount_pct, 0) / 100.0)), 0)::numeric AS revenue
+    FROM orders o LEFT JOIN order_items i USING (order_id)
+    WHERE o.status = 'completed'
+    GROUP BY o.order_id, o.customer_id, o.order_date
+)
+SELECT c.customer_id,c.full_name,count(r.order_id) AS completed_orders,
+ coalesce(sum(r.revenue),0) AS total_revenue,avg(r.revenue) AS avg_order_revenue,
+ max(r.order_date) AS last_completed_date
+FROM customers c LEFT JOIN instructor_order_revenue r USING(customer_id)
+GROUP BY c.customer_id,c.full_name ORDER BY c.customer_id;
+```
+
+</details>
 
 </section>
 
@@ -204,6 +157,23 @@ Find customers who purchased from both the books and electronics categories in c
 <div class="lab01-result" data-result></div>
 </div>
 
+
+<details class="lab01-answer" markdown="1">
+<summary>See answer</summary>
+
+```sql
+SELECT c.customer_id,c.full_name
+FROM customers c
+WHERE EXISTS (SELECT 1 FROM orders o JOIN order_items i USING(order_id)
+              WHERE o.customer_id=c.customer_id AND o.status='completed' AND i.category='books')
+ AND EXISTS (SELECT 1 FROM orders o JOIN order_items i USING(order_id)
+              WHERE o.customer_id=c.customer_id AND o.status='completed' AND i.category='electronics')
+ AND NOT EXISTS (SELECT 1 FROM orders o WHERE o.customer_id=c.customer_id AND o.status='returned')
+ORDER BY c.customer_id;
+```
+
+</details>
+
 </section>
 
 <section class="lab01-question" data-question="4" markdown="1">
@@ -222,6 +192,30 @@ For every completed order, calculate its revenue and the average revenue of the 
 <div class="lab01-result" data-result></div>
 </div>
 
+
+<details class="lab01-answer" markdown="1">
+<summary>See answer</summary>
+
+```sql
+WITH instructor_order_revenue AS (
+    SELECT o.order_id, o.customer_id, o.order_date,
+           COALESCE(SUM(i.quantity * i.unit_price *
+               (1 - COALESCE(i.discount_pct, 0) / 100.0)), 0)::numeric AS revenue
+    FROM orders o LEFT JOIN order_items i USING (order_id)
+    WHERE o.status = 'completed'
+    GROUP BY o.order_id, o.customer_id, o.order_date
+),
+w AS (
+SELECT r.*,count(*) OVER(PARTITION BY customer_id) n,
+ sum(revenue) OVER(PARTITION BY customer_id) AS customer_total
+FROM instructor_order_revenue r)
+SELECT order_id,customer_id,revenue,
+ (customer_total-revenue)/(n-1) AS avg_other_orders
+FROM w WHERE n>1 AND revenue>(customer_total-revenue)/(n-1) ORDER BY customer_id,order_id;
+```
+
+</details>
+
 </section>
 
 <section class="lab01-question" data-question="5" markdown="1">
@@ -239,6 +233,24 @@ For each city, display the number of customers, total number of orders, number o
 <p class="lab01-status" data-status role="status" aria-live="polite"></p>
 <div class="lab01-result" data-result></div>
 </div>
+
+
+<details class="lab01-answer" markdown="1">
+<summary>See answer</summary>
+
+```sql
+SELECT coalesce(c.city,'Unknown') city, count(DISTINCT c.customer_id) customers,
+ count(o.order_id) total_orders,
+ count(o.order_id) FILTER (WHERE o.status='completed') completed,
+ count(o.order_id) FILTER (WHERE o.status='cancelled') cancelled,
+ count(o.order_id) FILTER (WHERE o.status='returned') returned,
+ count(o.order_id) FILTER (WHERE o.status='pending') pending,
+ 100.0*count(o.order_id) FILTER (WHERE o.status='completed')/nullif(count(o.order_id),0) completed_pct
+FROM customers c LEFT JOIN orders o USING(customer_id)
+GROUP BY coalesce(c.city,'Unknown') ORDER BY city;
+```
+
+</details>
 
 </section>
 
@@ -270,6 +282,30 @@ You can include your written explanation as SQL comments, using `--`.
 <p class="lab01-status" data-status role="status" aria-live="polite"></p>
 <div class="lab01-result" data-result></div>
 </div>
+
+
+<details class="lab01-answer" markdown="1">
+<summary>See answer</summary>
+
+The `WHERE` condition removes customers without a completed order; `COUNT(*)` counts joined rows rather than orders; and `AVG` averages item lines rather than order totals. The query below aggregates each order first.
+
+```sql
+WITH instructor_order_revenue AS (
+    SELECT o.order_id, o.customer_id, o.order_date,
+           COALESCE(SUM(i.quantity * i.unit_price *
+               (1 - COALESCE(i.discount_pct, 0) / 100.0)), 0)::numeric AS revenue
+    FROM orders o LEFT JOIN order_items i USING (order_id)
+    WHERE o.status = 'completed'
+    GROUP BY o.order_id, o.customer_id, o.order_date
+)
+SELECT c.customer_id,count(r.order_id) completed_orders,
+ coalesce(sum(r.revenue),0) total_revenue,avg(r.revenue) avg_order_revenue
+FROM customers c LEFT JOIN instructor_order_revenue r USING(customer_id)
+GROUP BY c.customer_id
+HAVING count(r.order_id)>=2 AND coalesce(sum(r.revenue),0)>=500 ORDER BY c.customer_id;
+```
+
+</details>
 
 </section>
 
@@ -304,6 +340,22 @@ You can include your written explanation as SQL comments, using `--`.
 <div class="lab01-result" data-result></div>
 </div>
 
+
+<details class="lab01-answer" markdown="1">
+<summary>See answer</summary>
+
+The supplied query returns no rows for the sample data: its subquery includes a NULL city, so `NOT IN` is never true for a known city without a match. `NOT EXISTS` tests matching known cities directly.
+
+```sql
+SELECT c.customer_id,c.full_name,c.city FROM customers c
+WHERE c.city IS NOT NULL AND NOT EXISTS (
+SELECT 1 FROM customers bad JOIN orders o ON o.customer_id=bad.customer_id
+WHERE bad.city=c.city AND o.status='returned')
+ORDER BY c.customer_id;
+```
+
+</details>
+
 </section>
 
 <section class="lab01-question" data-question="8" markdown="1">
@@ -322,6 +374,34 @@ Calculate total revenue for each customer with at least one completed order. Wit
 <div class="lab01-result" data-result></div>
 </div>
 
+
+<details class="lab01-answer" markdown="1">
+<summary>See answer</summary>
+
+```sql
+WITH instructor_order_revenue AS (
+    SELECT o.order_id, o.customer_id, o.order_date,
+           COALESCE(SUM(i.quantity * i.unit_price *
+               (1 - COALESCE(i.discount_pct, 0) / 100.0)), 0)::numeric AS revenue
+    FROM orders o LEFT JOIN order_items i USING (order_id)
+    WHERE o.status = 'completed'
+    GROUP BY o.order_id, o.customer_id, o.order_date
+),
+totals AS (
+ SELECT c.customer_id,c.full_name,coalesce(c.city,'Unknown') city,sum(r.revenue) revenue
+ FROM customers c JOIN instructor_order_revenue r USING(customer_id)
+ GROUP BY c.customer_id,c.full_name,coalesce(c.city,'Unknown')
+), ranks AS (
+ SELECT *,
+ row_number() OVER(PARTITION BY city ORDER BY revenue DESC,customer_id) row_number,
+ rank() OVER(PARTITION BY city ORDER BY revenue DESC) rank,
+ dense_rank() OVER(PARTITION BY city ORDER BY revenue DESC) dense_rank
+ FROM totals)
+SELECT * FROM ranks WHERE dense_rank<=2 ORDER BY city,dense_rank,customer_id;
+```
+
+</details>
+
 </section>
 
 <section class="lab01-question" data-question="9" markdown="1">
@@ -339,6 +419,31 @@ For every completed order, display its revenue, the previous completed order’s
 <p class="lab01-status" data-status role="status" aria-live="polite"></p>
 <div class="lab01-result" data-result></div>
 </div>
+
+
+<details class="lab01-answer" markdown="1">
+<summary>See answer</summary>
+
+```sql
+WITH instructor_order_revenue AS (
+    SELECT o.order_id, o.customer_id, o.order_date,
+           COALESCE(SUM(i.quantity * i.unit_price *
+               (1 - COALESCE(i.discount_pct, 0) / 100.0)), 0)::numeric AS revenue
+    FROM orders o LEFT JOIN order_items i USING (order_id)
+    WHERE o.status = 'completed'
+    GROUP BY o.order_id, o.customer_id, o.order_date
+),
+w AS (
+ SELECT r.*,
+ lag(revenue) OVER(PARTITION BY customer_id ORDER BY order_date,order_id) previous_revenue,
+ sum(revenue) OVER(PARTITION BY customer_id ORDER BY order_date,order_id ROWS UNBOUNDED PRECEDING) running_revenue,
+ avg(revenue) OVER(PARTITION BY customer_id ORDER BY order_date,order_id ROWS BETWEEN 2 PRECEDING AND CURRENT ROW) moving_avg_3
+ FROM instructor_order_revenue r)
+SELECT *,100*(revenue-previous_revenue)/nullif(previous_revenue,0) percent_change
+FROM w ORDER BY customer_id,order_date,order_id;
+```
+
+</details>
 
 </section>
 
@@ -360,6 +465,27 @@ The schema permits completed orders without item lines. If a customer has no cat
 <div class="lab01-result" data-result></div>
 </div>
 
+
+<details class="lab01-answer" markdown="1">
+<summary>See answer</summary>
+
+This example returns customers who have at least one category in a completed order. The question leaves customers with only itemless completed orders unspecified.
+
+```sql
+WITH categories AS (
+SELECT o.customer_id,i.category,
+ sum(i.quantity*i.unit_price*(1-coalesce(i.discount_pct,0)/100.0)) revenue
+FROM orders o JOIN order_items i USING(order_id)
+WHERE o.status='completed' GROUP BY o.customer_id,i.category
+), w AS (
+SELECT *,sum(revenue) OVER(PARTITION BY customer_id) customer_revenue,
+ row_number() OVER(PARTITION BY customer_id ORDER BY revenue DESC,category) rn FROM categories)
+SELECT customer_id,category,revenue,100*revenue/nullif(customer_revenue,0) pct_customer
+FROM w WHERE rn=1 ORDER BY customer_id;
+```
+
+</details>
+
 </section>
 
 <section class="lab01-question" data-question="11" markdown="1">
@@ -377,6 +503,35 @@ Produce exactly three rows for every customer, covering January, February, and M
 <p class="lab01-status" data-status role="status" aria-live="polite"></p>
 <div class="lab01-result" data-result></div>
 </div>
+
+
+<details class="lab01-answer" markdown="1">
+<summary>See answer</summary>
+
+```sql
+WITH instructor_order_revenue AS (
+    SELECT o.order_id, o.customer_id, o.order_date,
+           COALESCE(SUM(i.quantity * i.unit_price *
+               (1 - COALESCE(i.discount_pct, 0) / 100.0)), 0)::numeric AS revenue
+    FROM orders o LEFT JOIN order_items i USING (order_id)
+    WHERE o.status = 'completed'
+    GROUP BY o.order_id, o.customer_id, o.order_date
+),
+months AS (
+SELECT generate_series(DATE '2026-01-01',DATE '2026-03-01',interval '1 month')::date month_start
+), monthly AS (
+SELECT customer_id,date_trunc('month',order_date)::date month_start,sum(revenue) revenue
+FROM instructor_order_revenue GROUP BY 1,2
+), spine AS (
+SELECT c.customer_id,m.month_start,coalesce(r.revenue,0) revenue
+FROM customers c CROSS JOIN months m LEFT JOIN monthly r USING(customer_id,month_start)
+), w AS (
+SELECT *,lag(revenue) OVER(PARTITION BY customer_id ORDER BY month_start) previous_revenue FROM spine)
+SELECT *,100*(revenue-previous_revenue)/nullif(previous_revenue,0) pct_change FROM w
+ORDER BY customer_id,month_start;
+```
+
+</details>
 
 </section>
 
@@ -396,6 +551,38 @@ Find customers who purchased from every category sold in a completed order anywh
 <div class="lab01-result" data-result></div>
 </div>
 
+
+<details class="lab01-answer" markdown="1">
+<summary>See answer</summary>
+
+Two approaches are shown: double `NOT EXISTS`, and counting distinct categories.
+
+**Solution 1**
+
+```sql
+SELECT c.customer_id FROM customers c
+WHERE EXISTS (SELECT 1 FROM orders o JOIN order_items i USING(order_id) WHERE o.status='completed')
+AND NOT EXISTS (
+ SELECT 1 FROM (SELECT DISTINCT i.category FROM orders o JOIN order_items i USING(order_id)
+                WHERE o.status='completed') needed
+ WHERE NOT EXISTS (SELECT 1 FROM orders o JOIN order_items i USING(order_id)
+                   WHERE o.customer_id=c.customer_id AND o.status='completed' AND i.category=needed.category))
+ORDER BY c.customer_id;
+```
+
+**Solution 2**
+
+```sql
+WITH required AS (
+ SELECT count(DISTINCT i.category) n FROM orders o JOIN order_items i USING(order_id) WHERE o.status='completed'
+), purchased AS (
+SELECT o.customer_id,count(DISTINCT i.category) n FROM orders o JOIN order_items i USING(order_id)
+WHERE o.status='completed' GROUP BY o.customer_id)
+SELECT p.customer_id FROM purchased p CROSS JOIN required r WHERE r.n>0 AND p.n=r.n ORDER BY p.customer_id;
+```
+
+</details>
+
 </section>
 
 <section class="lab01-question" data-question="13" markdown="1">
@@ -414,6 +601,21 @@ Find pairs of different products purchased together in at least two completed or
 <div class="lab01-result" data-result></div>
 </div>
 
+
+<details class="lab01-answer" markdown="1">
+<summary>See answer</summary>
+
+```sql
+WITH product_order AS (
+ SELECT DISTINCT o.order_id,i.product_name FROM orders o JOIN order_items i USING(order_id)
+ WHERE o.status='completed')
+SELECT a.product_name product_a,b.product_name product_b,count(*) orders_together
+FROM product_order a JOIN product_order b ON a.order_id=b.order_id AND a.product_name<b.product_name
+GROUP BY 1,2 HAVING count(*)>=2 ORDER BY orders_together DESC,1,2;
+```
+
+</details>
+
 </section>
 
 <section class="lab01-question" data-question="14" markdown="1">
@@ -431,6 +633,31 @@ For each customer whose cumulative revenue from completed orders reached at leas
 <p class="lab01-status" data-status role="status" aria-live="polite"></p>
 <div class="lab01-result" data-result></div>
 </div>
+
+
+<details class="lab01-answer" markdown="1">
+<summary>See answer</summary>
+
+```sql
+WITH instructor_order_revenue AS (
+    SELECT o.order_id, o.customer_id, o.order_date,
+           COALESCE(SUM(i.quantity * i.unit_price *
+               (1 - COALESCE(i.discount_pct, 0) / 100.0)), 0)::numeric AS revenue
+    FROM orders o LEFT JOIN order_items i USING (order_id)
+    WHERE o.status = 'completed'
+    GROUP BY o.order_id, o.customer_id, o.order_date
+),
+w AS (
+ SELECT r.*,sum(revenue) OVER(PARTITION BY customer_id ORDER BY order_date,order_id ROWS UNBOUNDED PRECEDING) cumulative,
+ row_number() OVER(PARTITION BY customer_id ORDER BY order_date,order_id) rn
+ FROM instructor_order_revenue r
+), crossing AS (
+ SELECT *,row_number() OVER(PARTITION BY customer_id ORDER BY rn) first_crossing
+ FROM w WHERE cumulative>=500)
+SELECT customer_id,order_id,order_date,revenue,cumulative FROM crossing WHERE first_crossing=1 ORDER BY customer_id;
+```
+
+</details>
 
 </section>
 
@@ -452,6 +679,29 @@ You can include your written explanation as SQL comments, using `--`.
 <div class="lab01-result" data-result></div>
 </div>
 
+
+<details class="lab01-answer" markdown="1">
+<summary>See answer</summary>
+
+On 2026-02-05, order 102 has ROWS = 500 and RANGE = 700; order 103 has ROWS = 700 and RANGE = 700. RANGE includes both date peers, while ROWS follows the order-ID sequence.
+
+```sql
+WITH instructor_order_revenue AS (
+    SELECT o.order_id, o.customer_id, o.order_date,
+           COALESCE(SUM(i.quantity * i.unit_price *
+               (1 - COALESCE(i.discount_pct, 0) / 100.0)), 0)::numeric AS revenue
+    FROM orders o LEFT JOIN order_items i USING (order_id)
+    WHERE o.status = 'completed'
+    GROUP BY o.order_id, o.customer_id, o.order_date
+)
+SELECT order_id,order_date,revenue,
+ sum(revenue) OVER(ORDER BY order_date,order_id ROWS UNBOUNDED PRECEDING) rows_total,
+ sum(revenue) OVER(ORDER BY order_date RANGE UNBOUNDED PRECEDING) range_total
+FROM instructor_order_revenue WHERE customer_id=1 ORDER BY order_date,order_id;
+```
+
+</details>
+
 </section>
 
 </div>
@@ -462,140 +712,24 @@ You can include your written explanation as SQL comments, using `--`.
 
 **Checkpoint:** Does your join multiply order counts? Are customers without orders kept where required? Are `NULL` values handled? Is the order deterministic when dates or amounts tie?
 
-## 3 · Optional: start the lab in a Codespace {#2-optional-start-the-lab-in-a-codespace}
+## Optional · Work in a Codespace {#2-optional-start-the-lab-in-a-codespace}
 
-The browser editors above have their own copy of the sample data. Follow this section only if you also want to work with the lab database in a Codespace.
+<span id="3-optional-write-answers-in-a-codespace"></span><span id="5-optional-performance-experiment"></span>
 
-Open the [student repository](https://github.com/OrPerets/postgres-data-engineering-student) in GitHub Codespaces. From the **repository root**, run:
+The browser editors work independently; use a Codespace if you also want the lab database or the performance experiment.
 
-```bash
-make lab-sql
-```
+- **Start:** Open the [student repository](https://github.com/OrPerets/postgres-data-engineering-student) in Codespaces and run `make lab-sql` from the repository root. Existing tables are preserved; an incomplete setup is reported. See the [setup walkthrough](../start-lab01.md) or [troubleshooting](../troubleshooting.md).
+- **Write SQL:** Run `make lab-sql-workspace` and open private port **8765** for the guided workspace, or edit `labs/01-relational-sql/sql/student_answers.sql` in the Codespace. [See how to save your work](../start-lab01.md#4-write-and-save-your-answers). The guided workspace, worksheet, and browser editors keep **separate drafts**; they do not sync. Save the guided draft regularly and download a backup.
+- **Check and submit:** `make test LAB=01-relational-sql` checks the sample data and services, but does not grade SQL. Keep your answers and requested explanations, and submit them as instructed; saving or downloading is not submission.
+- **Explore performance:** Compare a correlated subquery with a window function for running totals. From the lab folder, run the commands below and explore the [performance challenge](https://github.com/OrPerets/postgres-data-engineering-student/blob/main/labs/01-relational-sql/benchmarks/STUDENT_CHALLENGE.md). Results depend on the data, indexes, and cache.
 
-On a fresh lab, the initializer creates the classroom tables and loads the synthetic sample data. Existing tables are preserved; an incomplete setup is reported instead of being silently recreated. [Follow the illustrated setup walkthrough](../start-lab01.md) if this is your first Codespace.
+    ```bash
+    cd labs/01-relational-sql
+    docker compose exec -T postgres psql -U student -d query_lab < benchmarks/01_seed_running_total.sql
+    docker compose exec -T postgres psql -U student -d query_lab < benchmarks/03_compact_report.sql
+    ```
 
-<details markdown="1">
-<summary>Check that PostgreSQL and the sample data are available</summary>
-
-From a shell terminal, open PostgreSQL:
-
-```bash
-cd labs/01-relational-sql
-docker compose exec postgres psql -U student -d query_lab
-```
-
-Then try these queries in `psql`:
-
-```sql
-SELECT COUNT(*) FROM customers;
-SELECT * FROM orders LIMIT 5;
-```
-
-You should see records. Enter `\q` to exit. If the service does not start, see [Troubleshooting](../troubleshooting.md). The schema creation script itself drops and recreates the exercise tables; do not use it for routine startup.
-</details>
-
-## 4 · Optional: write answers in a Codespace {#3-optional-write-answers-in-a-codespace}
-
-The two Codespace routes below use the same Codespace lab database, but their drafts are **separate copies** and do not automatically synchronize. Neither route synchronizes with the browser editors.
-
-<details markdown="1">
-<summary>Route A · Guided workspace</summary>
-
-From the repository root, run:
-
-```bash
-make lab-sql-workspace
-```
-
-Keep that terminal running and open private port **8765** from the Codespace **Ports** tab. Choose a question and write your SQL. **Run query** runs the current or selected statement as read-only SQL.
-
-Select **Save answers** regularly; edits are not autosaved. Select **Download SQL** to keep the current draft outside the Codespace. The guided draft is stored in `.workspace-data/`, which Git ignores: committing the original worksheet does not back up this draft. [See how to open and save your work](../start-lab01.md#4-write-and-save-your-answers).
-</details>
-
-<details markdown="1">
-<summary>Route B · Codespace editor and psql</summary>
-
-Edit `labs/01-relational-sql/sql/student_answers.sql` in the Explorer and save it with **Ctrl+S** (Windows/Linux) or **⌘S** (Mac). From the lab folder run:
-
-```bash
-cd labs/01-relational-sql
-docker compose exec -T postgres psql -v ON_ERROR_STOP=1 -U student -d query_lab < sql/student_answers.sql
-```
-
-Download the saved worksheet from Explorer or commit and push it to your own fork to keep a copy outside the Codespace. The [starter worksheet on GitHub](https://github.com/OrPerets/postgres-data-engineering-student/blob/main/labs/01-relational-sql/sql/student_answers.sql) contains all 15 complete question descriptions and blank answer sections.
-</details>
-
-**Check and submit:** If you use a Codespace, `make test LAB=01-relational-sql` from the repository root checks the sample data and services; it does **not** grade your SQL. Whether you use the browser or Codespace, keep your completed answers, short explanations for questions 6, 7 and 15, and any requested plans or worksheet work. Download your browser answers and keep separate explanations or plans as needed. Saving or downloading is not submission: follow your instructor's method and deadline.
-
-## 5 · Optional performance experiment
-
-**Goal:** Calculate each customer's running total without recomputing all previous transactions.
-
-First predict which version will be faster: a correlated subquery or `SUM(...) OVER (...)`. Both should return the same answers.
-
-<details markdown="1">
-<summary>Run the benchmark and inspect the plans</summary>
-
-**Before running setup:** The seed drops and recreates `benchmark_sales`, deleting its existing rows and indexes, including any index you added for the challenge. It does not drop the `customers`, `orders`, or `order_items` classroom tables. If you want to keep an earlier benchmark experiment, back up the table's data and schema (including index definitions) outside the Codespace before reseeding, or keep the existing table and skip the seed. Save any query plans or timing results separately.
-
-From a **shell terminal** at the repository root, enter the lab folder. If you are already in `labs/01-relational-sql`, skip the `cd` command. Run setup only when you are ready to replace the benchmark table:
-
-```bash
-cd labs/01-relational-sql
-docker compose exec -T postgres psql -U student -d query_lab < benchmarks/01_seed_running_total.sql
-```
-
-From the same lab folder, run the **compact comparison**:
-
-```bash
-docker compose exec -T postgres psql -U student -d query_lab < benchmarks/03_compact_report.sql
-```
-
-You'll see:
-
-- Number of sequential scan executions.
-- Aggregate/Window and sort executions.
-- Shared buffer hits.
-- Total runtime for both approaches.
-- Side-by-side sample outputs and a full-data `MATCH` / `MISMATCH` check.
-
-**Understand the result**
-
-The correlated subquery may repeatedly scan the table for each transaction. The window plan can sort and process the ordered rows with incremental running aggregation.
-
-**Important:** A Window Function is not always faster. This benchmark deliberately uses a case where repeated work is expensive. Indexes, table size and caching can change the result.
-
-**Optional challenge**
-
-Read the [performance challenge](https://github.com/OrPerets/postgres-data-engineering-student/blob/main/labs/01-relational-sql/benchmarks/STUDENT_CHALLENGE.md). Add a composite index and compare again.
-
-**Visual checkpoint — One result, two query plans**
-
-The running-total benchmark computes identical per-row results using two approaches.
-
-| Stage | Correlated subquery | Window function |
-|---|---|---|
-| Read sales | Outer scan, then repeated inner scans | One main scan |
-| Order rows | No explicit sort in original plan | Sort by customer, date, sale ID |
-| Calculate cumulative sum | Repeated aggregate per sale | One WindowAgg plan node |
-| Verify | Compare every output row | Compare every output row |
-
-**Five-row illustration (not a timing measurement)**
-
-| Sale ID | Amount | Running total |
-|---|---:|---:|
-| 1 | 10 | 10 |
-| 2 | 20 | 30 |
-| 3 | 30 | 60 |
-| 4 | 40 | 100 |
-| 5 | 50 | 150 |
-
-**Predict:** How many previous values would the naive correlated approach revisit for the fifth row? How many new values does an incremental running sum need to add when moving from row four to row five?
-
-**Try it:** Run `benchmarks/03_compact_report.sql` and compare the real execution counts. The five-row table is only an illustrative example; the benchmark itself uses a larger synthetic dataset.
-
-</details>
-
+    **Before seeding:** The first command drops and recreates `benchmark_sales`, including its rows and indexes. Back up any benchmark work first, or skip the seed to keep the existing table. The classroom tables are not dropped.
 
 ## Finish
 
