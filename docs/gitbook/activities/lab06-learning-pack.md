@@ -2,6 +2,14 @@
 
 Explore ticket-ID boundaries and the small lecture corpus, then try five questions before returning to [Lab 06](../labs/06-tfidf.md). These activities are optional practice and do not grade or submit your assignment.
 
+## Follow the four stages
+
+Before stepping through, predict: if a term occurs twice in one document, does it count as one or two documents in DF? Follow the separate, illustrative corpus through each grouping stage.
+
+<div id="lab06-flow"></div>
+
+<noscript>For A = “tea tea milk”, B = “tea bread”, and C = “bread soup”, MR1 counts each (term, document); MR2 groups by document to attach its length; MR3 groups by term and counts distinct documents; MR4 computes a score. For tea in A, TF = 2/3 and DF = 2 of 3 documents. This is a local illustration, not a distributed job.</noscript>
+
 ## Explore ticket-ID boundaries
 
 Compare an unbounded pattern with a pattern using word boundaries. Predict what each matches before revealing the substrings and offsets. These fixed ASCII examples run in your browser; they do not execute Python.

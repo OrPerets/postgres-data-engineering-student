@@ -95,8 +95,14 @@
 .md-typeset .lab04-trace button:hover:not(:disabled) { background: #641720; }
 .md-typeset .lab04-trace button:disabled { opacity: .55; cursor: not-allowed; }
 .md-typeset .lab04-trace :focus-visible { outline: 3px solid #bf6855; outline-offset: 3px; }
-.md-typeset .lab04-trace__stage { font-weight: 700; }
-.md-typeset .lab04-trace__output { padding: .8rem 1rem; overflow-x: auto; background: #f4f0ec; }
-.md-typeset .lab04-trace__output code { white-space: pre; }
+.md-typeset .lab04-trace__path { display: flex; flex-wrap: wrap; gap: .35rem; padding: 0; margin: 1.2rem 0; list-style: none; }
+.md-typeset .lab04-trace__path li { display: flex; align-items: center; gap: .35rem; margin: 0; padding: .35rem .5rem; border: 1px solid #d8cbc5; background: #fff; font-size: .7rem; font-weight: 700; }
+.md-typeset .lab04-trace__path li:not(:last-child)::after { content: '→'; color: #81242d; }
+.md-typeset .lab04-trace__path li[aria-current="step"] { border: 2px solid #8b2029; background: #f8eeeb; color: #681920; }
+.md-typeset .lab04-trace__stage { color: #70202a; font-weight: 700; }
+.md-typeset .lab04-trace__output { display: grid; gap: .45rem; padding: .8rem; background: #f4f0ec; }
+.md-typeset .lab04-trace__row { display: grid; grid-template-columns: minmax(4.5rem, .3fr) minmax(0, 1fr); align-items: start; gap: .6rem; padding: .55rem; background: #fffefa; border: 1px solid #dfd1ca; }
+.md-typeset .lab04-trace__row code { display: block; min-width: 0; overflow-wrap: anywhere; white-space: pre-wrap; }
+.md-typeset .lab04-trace__metrics { padding: .6rem .8rem; border-left: 3px solid #8b2029; background: #f8f1ed; }
 .md-typeset .lab04-trace__error:not(:empty) { padding: .7rem; border-left: 4px solid #8b2029; background: #f9ece9; }
 .md-typeset .lab04-trace__note { font-size: .8rem; }

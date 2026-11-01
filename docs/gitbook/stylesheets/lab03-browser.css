@@ -1,0 +1,54 @@
+/* Lab 03 local browser workspace and optional real Codespace embed. */
+.md-typeset .lab03-real-workspace,
+.md-typeset [data-lab03-browser-workspace] { margin: 1.3rem 0; }
+.md-typeset .lab03-real-workspace { padding: 1rem; border: 1px solid #ded7d3; border-left: 3px solid #8b2029; background: #faf8f5; }
+.md-typeset .lab03-real-workspace label,
+.md-typeset .lab03-browser__editor label { display: block; margin-bottom: .4rem; color: #342f2f; font-weight: 700; }
+.md-typeset .lab03-real-workspace__actions,
+.md-typeset .lab03-browser__controls,
+.md-typeset .lab03-browser__editor-actions { display: flex; flex-wrap: wrap; align-items: center; gap: .6rem; }
+.md-typeset .lab03-real-workspace input { flex: 1 1 20rem; min-width: 0; padding: .6rem .7rem; border: 1px solid #aaa09a; background: #fff; color: #232020; font: inherit; }
+.md-typeset .lab03-real-workspace button,
+.md-typeset [data-lab03-browser-workspace] button { min-height: 2.3rem; padding: .45rem .85rem; border: 1px solid #8b2029; border-radius: 2px; background: #fff; color: #751d27; font: inherit; font-size: .72rem; font-weight: 700; cursor: pointer; }
+.md-typeset .lab03-real-workspace button:hover,
+.md-typeset [data-lab03-browser-workspace] button:hover:not(:disabled) { background: #66151c; color: #fff; }
+.md-typeset [data-lab03-browser-workspace] button:disabled { opacity: .55; cursor: not-allowed; }
+.md-typeset .lab03-real-workspace iframe { display: block; width: 100%; height: min(75vh, 50rem); min-height: 24rem; border: 1px solid #aaa09a; background: white; }
+.md-typeset .lab03-real-workspace iframe[hidden] { display: none; }
+.md-typeset .lab03-real-workspace [data-embed-status],
+.md-typeset .lab03-browser__reset-status,
+.md-typeset .lab03-browser__status { margin: .5rem 0; color: #514a47; font-size: .73rem; }
+.md-typeset .lab03-browser__reference { margin: 1rem 0; padding: .7rem 1rem; border: 1px solid #ded7d3; background: #faf8f5; }
+.md-typeset .lab03-browser__jump { display: flex; flex-wrap: wrap; gap: .35rem .9rem; margin: 1rem 0; font-size: .75rem; }
+.md-typeset .lab03-browser__jump span { font-weight: 700; }
+.md-typeset .lab03-browser__reference p { margin-bottom: .4rem; }
+.md-typeset .lab03-browser__question { min-width: 0; margin: 2rem 0; padding: 1.2rem 0 1.6rem; border-top: 2px solid #8b2029; }
+.md-typeset .lab03-browser__question h3 { margin: 0 0 .7rem; }
+.md-typeset .lab03-browser__scope { padding: .55rem .8rem; border-left: 3px solid #ad7a4b; background: #faf4e9; color: #44392e; font-size: .73rem; }
+.md-typeset .lab03-browser__hint { margin: 1rem 0; }
+.md-typeset .lab03-browser__editor { min-width: 0; margin-top: 1rem; padding: 1rem; border: 1px solid #ded7d3; background: #f9f6f3; }
+.md-typeset .lab03-browser__editor label { font-size: .8rem; }
+.md-typeset .lab03-browser__editor textarea { display: block; box-sizing: border-box; width: 100%; min-height: 8rem; resize: vertical; padding: .75rem; border: 1px solid #aaa09a; border-radius: 2px; background: #fff; color: #232020; font: .75rem/1.55 ui-monospace, SFMono-Regular, Consolas, monospace; tab-size: 2; }
+.md-typeset .lab03-browser__editor-actions { margin-top: .65rem; }
+.md-typeset [data-lab03-browser-workspace] .lab03-browser__run { background: #8b2029; color: #fff; }
+.md-typeset .lab03-browser__result { overflow: auto; max-width: 100%; max-height: 24rem; }
+.md-typeset .lab03-browser__result:empty { display: none; }
+.md-typeset .lab03-browser__result table { display: table; margin: .75rem 0 0; font-size: .7rem; }
+.md-typeset .lab03-browser__result th,
+.md-typeset .lab03-browser__result td { padding: .4rem .6rem; white-space: nowrap; }
+.md-typeset .lab03-browser__result th { position: sticky; top: 0; z-index: 1; background: #fff; }
+.md-typeset :is(.lab03-real-workspace, [data-lab03-browser-workspace]) :is(button, input, summary, textarea, [role="region"]):focus-visible { outline: 3px solid #2354a4; outline-offset: 3px; }
+@media screen and (max-width: 600px) {
+  .md-typeset .lab03-browser__editor { padding: .75rem; }
+  .md-typeset .lab03-browser__editor textarea { min-height: 9rem; font-size: .8rem; }
+  .md-typeset .lab03-real-workspace iframe { min-height: 20rem; }
+}
+.md-typeset .lab03-browser__editor-actions { position: relative; }
+.md-typeset .lab03-browser__local-reference { margin: 0 0 0 auto; padding: 0; border: 0; background: transparent; box-shadow: none; }
+.md-typeset .lab03-browser__local-reference > summary { min-height: 2.3rem; padding: .45rem .85rem; border: 1px solid #8b2029; border-radius: 2px; background: white; color: #751d27; font-size: .72rem; font-weight: 700; cursor: pointer; }
+.md-typeset .lab03-browser__reference-panel { position: absolute; top: calc(100% + .35rem); right: 0; z-index: 5; box-sizing: border-box; width: min(100%, 28rem); max-height: min(65vh, 30rem); overflow: auto; margin: 0; padding: 1rem; border: 1px solid #ded7d3; background: #faf8f5; box-shadow: 0 .35rem 1rem #342f2f26; }
+.md-typeset .lab03-browser__schema-result { max-width: 100%; max-height: 16rem; overflow: auto; }
+.md-typeset .lab03-browser__schema-result table { display: table; font-size: .65rem; }
+.md-typeset .lab03-browser__schema-result th, .md-typeset .lab03-browser__schema-result td { white-space: nowrap; }
+.md-typeset .lab03-browser__notes { margin-top: .8rem; }
+.md-typeset .lab03-browser__notes textarea { min-height: 5rem; }

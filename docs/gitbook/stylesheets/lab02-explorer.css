@@ -4,6 +4,7 @@
 .md-typeset .lab02-explorer__replication {
   padding: clamp(1rem, 3vw, 1.8rem);
   border: 1px solid #d7cecb;
+  border-top: 3px solid #8b2029;
   background: #fff;
 }
 .md-typeset .lab02-explorer__replication { margin-top: 1rem; }
@@ -35,7 +36,6 @@
   gap: .7rem;
   margin: 1rem 0;
 }
-.md-typeset .lab02-explorer__replication-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 .md-typeset .lab02-explorer__partition,
 .md-typeset .lab02-explorer__replication-grid > div {
   display: flex;
@@ -54,6 +54,15 @@
 .md-typeset .lab02-explorer__partition.is-pruned .lab02-explorer__partition-status { color: #4d4846; }
 .md-typeset .lab02-explorer__summary,
 .md-typeset .lab02-explorer__replication-status { margin: .8rem 0; font-weight: 700; }
+.md-typeset .lab02-explorer__prediction {
+  margin: 1rem 0;
+  padding: 1rem;
+  background: #f9f6f3;
+  border-left: 3px solid #8b2029;
+}
+.md-typeset .lab02-explorer__prediction button { margin-top: .65rem; }
+.md-typeset .lab02-explorer__pending-card { border-left-color: #9c7651; }
+.md-typeset .lab02-explorer__transfer { font-size: .72rem; }
 .md-typeset .lab02-explorer__note { color: #58504e; font-size: .7rem; margin-bottom: 0; }
 .md-typeset .lab02-explorer__actions { display: flex; flex-wrap: wrap; gap: .55rem; }
 .md-typeset .lab02-explorer button {
@@ -69,8 +78,9 @@
 }
 .md-typeset .lab02-explorer button[data-action="reset"] { background: #fff; color: #67151d; }
 .md-typeset .lab02-explorer button:disabled { background: #eee9e6; color: #67605e; border-color: #a89e9a; cursor: not-allowed; }
-.md-typeset .lab02-explorer :is(select, button):focus-visible { outline: 3px solid #bf6855; outline-offset: 3px; }
+.md-typeset .lab02-explorer :is(select, button):focus-visible { outline: 3px solid #2354a4; outline-offset: 3px; }
 @media (max-width: 640px) {
-  .md-typeset .lab02-explorer__partition-list { grid-template-columns: 1fr; }
+  .md-typeset .lab02-explorer__partition-list,
+  .md-typeset .lab02-explorer__replication-grid { grid-template-columns: 1fr; }
   .md-typeset .lab02-explorer__actions button { flex: 1 1 100%; }
 }

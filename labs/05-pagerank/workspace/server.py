@@ -13,7 +13,7 @@ NUMBER = '05' if LAB.name == '05-pagerank' else '06'
 PORT = 8769 if NUMBER == '05' else 8770
 ASSIGNMENT = LAB / 'STUDENT_ASSIGNMENT.md'
 STARTER = LAB / 'student_tasks.py'
-HINTS = LAB.parents[1] / 'docs' / 'gitbook' / 'labs' / ('05-pagerank.md' if NUMBER == '05' else '06-tfidf.md')
+HINTS = LAB.parents[1] / 'docs' / 'gitbook' / 'labs' / ('05-exercises.md' if NUMBER == '05' else '06-tfidf.md')
 DRAFT = LAB / '.workspace-data' / 'answers.json'
 MAX_BODY = 512 * 1024
 MAX_SOURCE = 200_000

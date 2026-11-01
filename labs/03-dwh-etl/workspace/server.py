@@ -19,7 +19,7 @@ from urllib.parse import urlsplit, parse_qs
 WORKSPACE_DIR = Path(__file__).resolve().parent
 LAB_DIR = WORKSPACE_DIR.parent
 ASSIGNMENT = LAB_DIR / "STUDENT_ASSIGNMENT.md"
-HINTS_FILE = LAB_DIR.parents[1] / "docs" / "gitbook" / "labs" / "03-dwh-etl.md"
+HINTS_FILE = LAB_DIR.parents[1] / "docs" / "gitbook" / "labs" / "03-exercises.md"
 ANSWERS_FILE = LAB_DIR / ".workspace-data" / "answers.json"
 MAX_BODY = 512 * 1024
 MAX_SQL = 50_000

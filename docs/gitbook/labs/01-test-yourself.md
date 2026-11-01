@@ -2,8 +2,6 @@
 
 [← Lab 01 chapters](01-relational-sql.md) · [Interview questions](01-interview.md)
 
-**Can you explain what the query will do before running it?** Work through ten short questions about JOINs, NULLs, ranking, `LAG` and window frames. Each answer comes with an explanation, so use a mistake as a clue about what to revisit.
-
 This is **practice**, not a grade: answers stay in this browser session and are not submitted or saved. You can restart as often as you like.
 
 <div id="lab01-practice-quiz"></div>
@@ -15,9 +13,3 @@ This is **practice**, not a grade: answers stay in this browser session and are 
 <p>The window sum keeps <strong>five</strong> order rows. The frame for order 104 contains <strong>102, 103 and 104</strong>. If February is filtered out before LAG, the first March order cannot see it; calculate the window over the full history first if the prior order is needed.</p>
 </details>
 </noscript>
-
-## Choose your next step
-
-- Revisit the [window-functions chapter](01-window-functions.md) to explore the visual examples.
-- Apply your ideas in [Tutorial & practice](01-tutorial-practice.md).
-- Explain your reasoning with the [interview questions](01-interview.md).

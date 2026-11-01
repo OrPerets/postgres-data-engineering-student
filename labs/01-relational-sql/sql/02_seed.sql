@@ -1,5 +1,5 @@
 -- Synthetic teaching dataset, invented for this lab. NOT original source data.
--- Includes null city, no orders, no completed orders, duplicate same-day customer orders,
+-- Includes null city, customers with no completed orders, duplicate same-day customer orders,
 -- 100% discounts, ties, returned orders, missing order lines and repeated product lines.
 BEGIN;
 INSERT INTO customers (customer_id,full_name,city) VALUES

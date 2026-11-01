@@ -6,39 +6,13 @@ Learn the data and business rules, then solve the 15 SQL questions in your brows
 
 [Jump to the 15 questions and SQL editors ↓](#lab01-practice)
 
-## 1 · Meet the data
+<a id="1-meet-the-data"></a><a id="business-rules-for-the-questions"></a>
 
-The lab uses **synthetic data** for a small order system. Each table has its own grain: what one row represents.
+Review [the lab's tables and business rules](01-relational-sql.md#the-labs-data) before starting.
 
-```mermaid
-flowchart LR
-    C["customers<br/>one row per customer"] -->|"one customer → zero or more orders"| O["orders<br/>one row per order"]
-    O -->|"one order → zero or more item lines"| I["order_items<br/>one row per order line"]
-```
+## 1 · Before you begin {#before-you-begin}
 
-| Table | Key columns | One row means |
-|---|---|---|
-| `customers` | `customer_id`, `full_name`, `city` | One customer. A city can be `NULL`. |
-| `orders` | `order_id`, `customer_id`, `order_date`, `status` | One order. Its status is `completed`, `cancelled`, `returned`, or `pending`. |
-| `order_items` | `order_id`, `line_no`, `product_name`, `category`, `quantity`, `unit_price`, `discount_pct` | One item line in an order. The key is `(order_id, line_no)`. |
-
-A customer can have no orders; the schema also permits an order with no item lines. If an order has two lines, joining it to `order_items` produces two rows, but it is still **one order**. [Try the JOIN explorer](../activities/lab01-learning-pack.md#explore-joins).
-
-### Business rules for the questions
-
-- Use only `completed` orders for revenue unless a question says otherwise. A returned order represents a full return.
-- A `NULL` discount means no discount. A completed order with a 100% discount still counts as an order, even though the discounted line contributes zero revenue.
-- The net revenue of an item line is:
-
-```sql
-quantity * unit_price * (1 - COALESCE(discount_pct, 0) / 100.0)
-```
-
-A completed order without item lines has zero revenue when included in an order-level revenue calculation. The exercise schema is in `labs/01-relational-sql/sql/01_schema.sql`.
-
-### Before you begin
-
-Use the schema and sample rows in the reference panel above the questions. For example, run this in any editor to see what an order row looks like:
+Use **Tables & schema** next to each question's **Run query** button to inspect the columns and sample rows. For example, run this in any editor to see what an order row looks like:
 
 ```sql
 SELECT order_id, customer_id, order_date, status
@@ -56,7 +30,7 @@ Write and run your own SQL for each question below. Try each question yourself b
 | Questions | Focus | Helpful preparation |
 |---|---|---|
 | 1–5 | Filters, joins, grouping and business metrics | Trace the grain of each join. |
-| 6–7 | Debug aggregation and `NOT IN` / `NULL` | [Explore NULL comparisons](../activities/lab01-learning-pack.md#explore-not-in-and-null). |
+| 6–7 | Debug aggregation and `NOT IN` / `NULL` | Consider how missing values affect comparisons. |
 | 8–11 | Rankings, previous orders, running totals and months | [Explore window functions](01-window-functions.md). Its SQL worksheet is separate from the guided draft. |
 | 12–15 | Relational logic, product pairs and window frames | Check ties, order and frame choices. |
 
@@ -96,7 +70,7 @@ Your SQL drafts are saved in this browser on this device. They do not sync with 
 
 <div class="lab01-practice-layout" markdown="1">
 
-<aside class="lab01-reference" aria-labelledby="lab01-reference-title"><h3 id="lab01-reference-title">Tables &amp; schema</h3><p>One customer → many orders → many item lines. Expand a table to see its columns, sample rows, or the full table.</p><p class="lab01-reference-legend"><strong>PK</strong> primary key · <strong>FK</strong> foreign key · <strong>Required</strong> cannot be NULL</p><details data-reference-table="customers"><summary><code>customers</code> <span>one row per customer</span></summary><ul><li><code>customer_id</code> <span>integer · PK · required</span></li><li><code>full_name</code> <span>varchar(120) · required</span></li><li><code>city</code> <span>varchar(80) · nullable</span></li></ul><div class="lab01-reference-actions"><button type="button" data-sample="customers">Sample rows</button><button type="button" data-view-all="customers">View all rows</button></div><p data-reference-status role="status" aria-live="polite"></p><div class="lab01-reference-result" data-reference-result></div></details><details data-reference-table="orders"><summary><code>orders</code> <span>one row per order</span></summary><ul><li><code>order_id</code> <span>integer · PK · required</span></li><li><code>customer_id</code> <span>integer · FK → customers.customer_id · required</span></li><li><code>order_date</code> <span>date · required</span></li><li><code>status</code> <span>varchar(20) · required</span></li></ul><div class="lab01-reference-actions"><button type="button" data-sample="orders">Sample rows</button><button type="button" data-view-all="orders">View all rows</button></div><p data-reference-status role="status" aria-live="polite"></p><div class="lab01-reference-result" data-reference-result></div></details><details data-reference-table="order_items"><summary><code>order_items</code> <span>one row per item line</span></summary><ul><li><code>order_id</code> <span>integer · PK, FK → orders.order_id · required</span></li><li><code>line_no</code> <span>integer · PK · required</span></li><li><code>product_name</code> <span>text · required</span></li><li><code>category</code> <span>text · required</span></li><li><code>quantity</code> <span>integer · required</span></li><li><code>unit_price</code> <span>numeric(12,2) · required</span></li><li><code>discount_pct</code> <span>numeric(5,2) · nullable</span></li></ul><p>The primary key is the pair <code>(order_id, line_no)</code>.</p><div class="lab01-reference-actions"><button type="button" data-sample="order_items">Sample rows</button><button type="button" data-view-all="order_items">View all rows</button></div><p data-reference-status role="status" aria-live="polite"></p><div class="lab01-reference-result" data-reference-result></div></details><noscript>Enable JavaScript to load sample rows; the schema above remains available.</noscript></aside>
+<aside class="lab01-reference" aria-labelledby="lab01-reference-title"><p class="lab01-reference-title" id="lab01-reference-title"><strong>Tables &amp; schema</strong></p><p>One customer → many orders → many item lines. Expand a table to see its columns, sample rows, or the full table.</p><p class="lab01-reference-legend"><strong>PK</strong> primary key · <strong>FK</strong> foreign key · <strong>Required</strong> cannot be NULL</p><details data-reference-table="customers"><summary><code>customers</code> <span>one row per customer</span></summary><ul><li><code>customer_id</code> <span>integer · PK · required</span></li><li><code>full_name</code> <span>varchar(120) · required</span></li><li><code>city</code> <span>varchar(80) · nullable</span></li></ul><div class="lab01-reference-actions"><button type="button" data-sample="customers">Sample rows</button><button type="button" data-view-all="customers">View all rows</button></div><p data-reference-status role="status" aria-live="polite"></p><div class="lab01-reference-result" data-reference-result></div></details><details data-reference-table="orders"><summary><code>orders</code> <span>one row per order</span></summary><ul><li><code>order_id</code> <span>integer · PK · required</span></li><li><code>customer_id</code> <span>integer · FK → customers.customer_id · required</span></li><li><code>order_date</code> <span>date · required</span></li><li><code>status</code> <span>varchar(20) · required</span></li></ul><div class="lab01-reference-actions"><button type="button" data-sample="orders">Sample rows</button><button type="button" data-view-all="orders">View all rows</button></div><p data-reference-status role="status" aria-live="polite"></p><div class="lab01-reference-result" data-reference-result></div></details><details data-reference-table="order_items"><summary><code>order_items</code> <span>one row per item line</span></summary><ul><li><code>order_id</code> <span>integer · PK, FK → orders.order_id · required</span></li><li><code>line_no</code> <span>integer · PK · required</span></li><li><code>product_name</code> <span>text · required</span></li><li><code>category</code> <span>text · required</span></li><li><code>quantity</code> <span>integer · required</span></li><li><code>unit_price</code> <span>numeric(12,2) · required</span></li><li><code>discount_pct</code> <span>numeric(5,2) · nullable</span></li></ul><p>The primary key is the pair <code>(order_id, line_no)</code>.</p><div class="lab01-reference-actions"><button type="button" data-sample="order_items">Sample rows</button><button type="button" data-view-all="order_items">View all rows</button></div><p data-reference-status role="status" aria-live="polite"></p><div class="lab01-reference-result" data-reference-result></div></details><noscript>Enable JavaScript to load sample rows; the schema above remains available.</noscript></aside>
 
 <div class="lab01-practice-questions" markdown="1">
 

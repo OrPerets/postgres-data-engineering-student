@@ -8,12 +8,13 @@
       throw new Error('Use 1–12 records with uppercase letters A–Z, at most 30 letters each and 120 total.');
     }
     const mapped = records.map(record => Array.from(record, key => [key, 1]));
-    const pairs = mapped.flatMap(group => {
-      if (!combine) return group;
+    const localGroups = mapped.map(group => {
+      if (!combine) return group.slice();
       const sums = new Map();
       group.forEach(([key, count]) => sums.set(key, (sums.get(key) || 0) + count));
       return Array.from(sums);
     });
+    const pairs = localGroups.flat();
     const grouped = new Map();
     pairs.forEach(([key, count]) => {
       if (!grouped.has(key)) grouped.set(key, []);
@@ -21,7 +22,7 @@
     });
     const keys = Array.from(grouped.keys()).sort();
     const counts = keys.map(key => [key, grouped.get(key).reduce((sum, value) => sum + value, 0)]);
-    return { records, mapped, pairs, grouped, keys, counts };
+    return { records, mapped, localGroups, pairs, grouped, keys, counts, combine };
   }
   if (typeof module !== 'undefined' && module.exports) module.exports = { traceRecords };
   if (typeof document === 'undefined') return;
@@ -35,13 +36,17 @@
       <p class="lab04-trace__eyebrow">BROWSER SIMULATION</p>
       <p>Enter one uppercase-letter record per line. A mapper emits one <code>(letter, 1)</code> for each character.</p>
       <label for="lab04-input">Input records</label>
-      <textarea id="lab04-input" rows="3" spellcheck="false" maxlength="371">ABR\nCCR\nACB</textarea>
+      <textarea id="lab04-input" rows="3" spellcheck="false" maxlength="371">DATA\nDARK\nTASK</textarea>
       <label class="lab04-trace__checkbox"><input type="checkbox" id="lab04-combine"> Use a local sum combiner per record</label>
       <div class="lab04-trace__actions"><button type="button" id="lab04-run">Run trace</button></div>
       <p class="lab04-trace__error" role="alert"></p>
       <div class="lab04-trace__result" hidden>
-        <p class="lab04-trace__stage" aria-live="polite" aria-atomic="true"></p>
-        <pre class="lab04-trace__output" aria-label="Current MapReduce stage"><code></code></pre>
+        <ol class="lab04-trace__path" aria-label="Trace stages">
+          <li>Input</li><li>Map</li><li>Combine</li><li>Shuffle</li><li>Reduce</li>
+        </ol>
+        <div class="lab04-trace__stage" role="status" aria-live="polite" aria-atomic="true"></div>
+        <p class="lab04-trace__explanation"></p>
+        <div class="lab04-trace__output" aria-label="Current MapReduce stage"></div>
         <p class="lab04-trace__metrics"></p>
         <div class="lab04-trace__actions"><button type="button" id="lab04-prev">Previous stage</button><button type="button" id="lab04-next">Next stage</button></div>
       </div>
@@ -51,7 +56,9 @@
     const error = root.querySelector('.lab04-trace__error');
     const result = root.querySelector('.lab04-trace__result');
     const stage = root.querySelector('.lab04-trace__stage');
-    const output = root.querySelector('.lab04-trace__output code');
+    const output = root.querySelector('.lab04-trace__output');
+    const explanation = root.querySelector('.lab04-trace__explanation');
+    const path = [...root.querySelectorAll('.lab04-trace__path li')];
     const metrics = root.querySelector('.lab04-trace__metrics');
     const prev = root.querySelector('#lab04-prev');
     const next = root.querySelector('#lab04-next');
@@ -59,13 +66,30 @@
     let trace;
     const pair = ([key, value]) => `(${key}, ${value})`;
     function render() {
-      const names = ['Input', 'Map', 'Shuffle', 'Reduce'];
-      stage.textContent = `Stage ${current + 1} of 4: ${names[current]}`;
-      if (current === 0) output.textContent = trace.records.map((record, i) => `Record ${i + 1}: ${record}`).join('\n');
-      if (current === 1) output.textContent = trace.mapped.map((pairs, i) => `Record ${i + 1}: ${pairs.map(pair).join(' ')}`).join('\n');
-      if (current === 2) output.textContent = trace.keys.map(key => `${key} → [${trace.grouped.get(key).join(', ')}]`).join('\n');
-      if (current === 3) output.textContent = trace.counts.map(([key, count]) => `${key} → ${count}`).join('\n');
-      metrics.textContent = `Mapper emitted ${trace.mapped.flat().length} pairs; ${trace.pairs.length} pairs entered the logical shuffle${combine.checked ? ' after local combination.' : ' without a combiner.'}`;
+      const names = ['Input', 'Map', 'Combine', 'Shuffle', 'Reduce'];
+      const descriptions = [
+        'Each record is one local group in this example.',
+        'Emit one (letter, 1) pair for every character, including repeated characters.',
+        trace.combine ? 'Add values for each letter within each local group before the shuffle.' : 'The combiner is off, so every emitted pair goes to the shuffle unchanged.',
+        'Gather values for the same letter. The lists below are the values presented to each key’s reducer.',
+        'Add the values for each letter to get the final counts.'
+      ];
+      stage.textContent = `Stage ${current + 1} of ${names.length}: ${names[current]}`;
+      explanation.textContent = descriptions[current];
+      path.forEach((item, i) => { if (i === current) item.setAttribute('aria-current', 'step'); else item.removeAttribute('aria-current'); });
+      output.replaceChildren();
+      const row = (label, value) => {
+        const item = document.createElement('div'); item.className = 'lab04-trace__row';
+        const title = document.createElement('strong'); title.textContent = label;
+        const data = document.createElement('code'); data.textContent = value;
+        item.append(title, data); output.append(item);
+      };
+      if (current === 0) trace.records.forEach((record, i) => row(`Record ${i + 1}`, record));
+      if (current === 1) trace.mapped.forEach((pairs, i) => row(`Record ${i + 1}`, pairs.map(pair).join(' ')));
+      if (current === 2) trace.localGroups.forEach((pairs, i) => row(`Record ${i + 1}`, pairs.map(pair).join(' ')));
+      if (current === 3) trace.keys.forEach(key => row(`Key ${key}`, `[${trace.grouped.get(key).join(', ')}]`));
+      if (current === 4) trace.counts.forEach(([key, count]) => row(`Key ${key}`, String(count)));
+      metrics.textContent = `Mapper emitted ${trace.mapped.flat().length} pairs; ${trace.pairs.length} pairs entered the logical shuffle${trace.combine ? ' after local combination.' : ' without a combiner.'}`;
       prev.disabled = current === 0;
       next.disabled = current === names.length - 1;
     }
@@ -84,7 +108,7 @@
     }
     root.querySelector('#lab04-run').addEventListener('click', run);
     prev.addEventListener('click', () => { if (current > 0) { current -= 1; render(); } });
-    next.addEventListener('click', () => { if (current < 3) { current += 1; render(); } });
+    next.addEventListener('click', () => { if (current < 4) { current += 1; render(); } });
     // Applying edited input or a changed combiner always requires an explicit run.
     input.addEventListener('input', () => { result.hidden = true; });
     combine.addEventListener('change', () => { result.hidden = true; });

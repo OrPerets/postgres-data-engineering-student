@@ -79,7 +79,13 @@
   background: #f6f1ed;
 }
 .md-typeset .lab05-explorer h3 { margin-top: 0; }
-.md-typeset .lab05-explorer__graph { font-weight: 500; }
+.md-typeset .lab05-explorer__graph { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: .5rem; padding: 0; margin: 1rem 0; list-style: none; }
+.md-typeset .lab05-explorer__graph li { display: flex; flex-direction: column; gap: .25rem; min-width: 0; margin: 0; padding: .75rem; background: #fffefa; border: 1px solid #d8c8c1; border-top: 3px solid #81242b; overflow-wrap: anywhere; }
+.md-typeset .lab05-explorer__graph li span { font-size: .75rem; }
+.md-typeset .lab05-explorer__breakdown { margin: .8rem 0; padding: .7rem; border: 1px solid #d8c8c1; background: #fffefa; }
+.md-typeset .lab05-explorer__breakdown summary { cursor: pointer; font-weight: 700; }
+.md-typeset .lab05-explorer__incoming { overflow-wrap: anywhere; }
+@media (max-width: 700px) { .md-typeset .lab05-explorer__graph { grid-template-columns: repeat(2, minmax(0,1fr)); } }
 .md-typeset .lab05-explorer__label { display: block; font-weight: 700; }
 .md-typeset .lab05-explorer select { display: block; width: min(100%, 12rem); min-height: 2.5rem; margin-top: .35rem; padding: .4rem .6rem; border: 1px solid #8b7771; background: white; color: #26211f; font: inherit; }
 .md-typeset .lab05-explorer__table-wrap { overflow-x: auto; }

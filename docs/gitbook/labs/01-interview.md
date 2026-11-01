@@ -19,8 +19,3 @@ Use the examples from the lab. Answer each question aloud first, then open its s
 <details><summary>7. How do ROW_NUMBER and RANK handle ties?</summary><p><code>ROW_NUMBER()</code> assigns a different number to every row; add a stable tie-breaker for reproducible selection. <code>RANK()</code> gives equal ranks to peers and leaves gaps after ties. If ties must share a rank, do not add a unique identifier to that ranking window's ordering.</p></details>
 
 <details><summary>8. How can you filter to the three highest-ranked orders per customer?</summary><p>Compute <code>ROW_NUMBER()</code> in a subquery or CTE, partitioned by customer and ordered by the intended measure and a stable tie-breaker. Filter the resulting number in the outer query. Window results are computed after the same query level's <code>WHERE</code>, so they cannot be filtered there directly.</p></details>
-
-
-## Put it into practice
-
-Choose one answer and explain it with a specific order or customer from the [tutorial](01-tutorial-practice.md). Then take the [self-check](01-test-yourself.md); it is practice and does not submit a grade.

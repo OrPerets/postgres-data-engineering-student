@@ -1,0 +1,20 @@
+.md-typeset .python-draft { margin: 1.5rem 0; padding: 1.4rem; border: 1px solid #ded3ce; border-top: 4px solid #8b2029; background: #fffefa; }
+.md-typeset .python-draft__status { margin: 0 0 .8rem; color: #51484a; font-size: .75rem; }
+.md-typeset .python-draft__intro { margin: .7rem 0 1rem; }
+.md-typeset .python-draft__actions { display: flex; flex-wrap: wrap; gap: .6rem; margin-bottom: 1.2rem; }
+.md-typeset .python-draft__actions button { padding: .55rem .8rem; border: 1px solid #8b2029; color: #812029; background: #fff; font: inherit; font-weight: 700; cursor: pointer; }
+.md-typeset .python-draft__actions button:hover { background: #f8efed; }
+.md-typeset .python-draft__label { display: block; margin: .8rem 0 .35rem; font-weight: 700; }
+.md-typeset .python-draft__code, .md-typeset .python-draft__sql, .md-typeset .python-draft__note { display: block; box-sizing: border-box; width: 100%; max-width: 100%; resize: vertical; padding: .8rem; border: 1px solid #aa9993; border-radius: 0; color: #242021; background: #fff; font: inherit; }
+.md-typeset .python-draft__code { min-height: 28rem; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: .72rem; line-height: 1.5; white-space: pre; overflow: auto; }
+.md-typeset .python-draft__note { min-height: 6rem; }
+.md-typeset .python-draft__notes { margin-top: 1.2rem; padding: .8rem; border: 1px solid #d7c9c4; background: #f9f5f2; }
+.md-typeset .python-draft__notes > summary, .md-typeset .python-draft__hint > summary { cursor: pointer; font-weight: 700; }
+.md-typeset .python-draft__task { padding: .5rem 0 1.2rem; border-bottom: 1px solid #ded3ce; }
+.md-typeset .python-draft__task:last-child { border-bottom: 0; }
+.md-typeset .python-draft__task h3 { margin-bottom: .4rem; }
+.md-typeset .python-draft__hint { margin: .7rem 0; padding: .55rem .7rem; border: 1px solid #d7c9c4; background: #fff; }
+.md-typeset .python-draft :focus-visible { outline: 3px solid #2354a4; outline-offset: 3px; }
+@media (max-width: 700px) { .md-typeset .python-draft { padding: 1rem; } .md-typeset .python-draft__code { min-height: 20rem; } }
+
+.md-typeset .python-draft__sql { min-height: 10rem; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }

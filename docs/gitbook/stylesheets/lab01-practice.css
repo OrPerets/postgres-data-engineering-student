@@ -3,7 +3,7 @@
 .md-typeset .lab01-practice-layout { display: grid; grid-template-columns: minmax(0, 1fr); gap: 1.1rem; margin-top: 1.5rem; align-items: start; }
 .md-typeset .lab01-practice-questions { min-width: 0; }
 .md-typeset .lab01-reference { min-width: 0; padding: 1rem; border: 1px solid #ded7d3; border-top: 3px solid #8b2029; background: #faf8f5; font-size: .7rem; line-height: 1.45; }
-.md-typeset .lab01-reference h3 { margin: 0 0 .4rem; font-size: .95rem; }
+.md-typeset .lab01-reference .lab01-reference-title { margin: 0 0 .4rem; font-size: .95rem; }
 .md-typeset .lab01-reference p { margin: .5rem 0; }
 .md-typeset .lab01-reference .lab01-reference-legend { color: #514a47; font-size: .62rem; }
 .md-typeset .lab01-reference details { margin: .55rem 0; box-shadow: none; border: 1px solid #ded7d3; background: #fff; font-size: .7rem; }
@@ -19,10 +19,43 @@
 .md-typeset .lab01-reference-result { max-width: calc(100% - 1.3rem); max-height: 15rem; overflow: auto; }
 .md-typeset .lab01-reference-result table { display: table; margin: .5rem 0; font-size: .62rem; }
 .md-typeset .lab01-reference-result th, .md-typeset .lab01-reference-result td { padding: .35rem .5rem; white-space: nowrap; }
-/* Material's maximum article width is limited even on wide screens. Keep the
-   reference above the questions so it never squeezes the editor into a rail. */
 .md-typeset .lab01-practice-actions,
 .md-typeset .lab01-editor-actions { display: flex; flex-wrap: wrap; align-items: center; gap: .6rem; }
+.md-typeset .lab01-editor-actions { position: relative; }
+.md-typeset .lab01-editor-actions details.lab01-local-schema {
+  margin: 0 0 0 auto;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  box-shadow: none;
+  font-size: .72rem;
+}
+.md-typeset .lab01-local-schema > summary {
+  display: flex;
+  align-items: center;
+  min-height: 2.3rem;
+  margin: 0;
+  padding: .45rem .85rem;
+  border: 1px solid #8b2029;
+  border-radius: 2px;
+  background: #fff;
+  color: #751d27;
+  cursor: pointer;
+  font-weight: 700;
+}
+.md-typeset .lab01-local-schema > summary::before { display: none; }
+.md-typeset .lab01-local-schema > summary::after { position: static; margin-left: .6rem; }
+.md-typeset .lab01-local-schema[open] > summary { background: #f3e9e8; }
+.md-typeset .lab01-local-schema > .lab01-reference {
+  position: absolute;
+  top: calc(100% + .4rem);
+  right: 0;
+  z-index: 10;
+  width: min(100%, 30rem);
+  max-height: min(65vh, 30rem);
+  overflow: auto;
+  box-shadow: 0 .35rem 1rem #342f2f26;
+}
 .md-typeset .lab01-question { margin: 2rem 0; padding: 1.2rem 0 1.6rem; border-top: 2px solid #8b2029; }
 .md-typeset .lab01-question h3 { margin: 0 0 .7rem; }
 .md-typeset .lab01-question pre { overflow-x: auto; }

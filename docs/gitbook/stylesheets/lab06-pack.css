@@ -29,3 +29,17 @@
 #lab06-regex .lab06-regex__matches, #lab06-regex .lab06-regex__explain { padding: .75rem; background: white; overflow-wrap: anywhere; }
 #lab06-regex mark { background: #f8dca0; color: #211a10; text-decoration: underline; }
 #lab06-regex .lab06-regex__note { font-size: .72rem; }
+#lab06-flow .lab06-flow { border: 1px solid #dfd1ca; border-top: 4px solid #8b2029; background: #fffefa; padding: 1.3rem; margin: 1.2rem 0; }
+#lab06-flow .lab06-flow__eyebrow { font-size: .65rem; font-weight: 800; letter-spacing: .08em; color: #792129; }
+#lab06-flow .lab06-flow h3 { margin: .3rem 0 .7rem; }
+#lab06-flow .lab06-flow__path { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: .35rem; list-style: none; margin: 1rem 0; padding: 0; }
+#lab06-flow .lab06-flow__path li { border: 1px solid #d8c6bf; background: #f8f3f0; padding: .55rem; font-size: .7rem; font-weight: 700; margin: 0; }
+#lab06-flow .lab06-flow__path li[aria-current="step"] { color: #fff; background: #81242d; border-color: #81242d; }
+#lab06-flow .lab06-flow__state { padding: 1rem; background: #f7f3f0; border-left: 3px solid #8b2029; overflow-wrap: anywhere; }
+#lab06-flow .lab06-flow__state h4 { margin: 0 0 .5rem; }
+#lab06-flow .lab06-flow__example { padding: .7rem; background: white; font-weight: 700; }
+#lab06-flow button { background: #8b2029; color: white; border: 1px solid #8b2029; padding: .6rem .9rem; margin: .65rem .4rem 0 0; cursor: pointer; font: inherit; }
+#lab06-flow button:disabled { opacity: .55; cursor: not-allowed; }
+#lab06-flow :focus-visible { outline: 3px solid #2354a4; outline-offset: 3px; }
+#lab06-flow .lab06-flow__note { font-size: .72rem; }
+@media (max-width: 700px) { #lab06-flow .lab06-flow__path { grid-template-columns: repeat(2, minmax(0, 1fr)); } }

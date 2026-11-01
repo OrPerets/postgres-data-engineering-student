@@ -2,7 +2,9 @@
 
 <p class="course-kicker">DATA ENGINEERING &nbsp; / &nbsp; HANDS-ON LABORATORY</p>
 
-# Data engineering, in practice.
+<a id="data-engineering-in-practice"></a>
+
+# Data engineering course
 
 From relational databases to distributed data processing. Learn by building, testing, and explaining each step.
 {: .course-hero__lead }
@@ -15,8 +17,6 @@ From relational databases to distributed data processing. Learn by building, tes
 </div>
 
 ## Explore the course
-
-Six workshops follow a path from SQL fundamentals to distributed algorithms. Choose a lab or use the [course map](course-map.md) to see how they connect to the lectures.
 
 <div class="course-sections" markdown="1">
 <div class="course-section" markdown="1">
@@ -38,19 +38,6 @@ Six workshops follow a path from SQL fundamentals to distributed algorithms. Cho
 
 </div>
 </div>
-
-## One workflow, six labs
-
-Understand → Predict → Implement → Validate → Explain
-{: .course-flow }
-
-Start with a concrete question, try the example, and use the checks to explain what happened. Each lab includes a student assignment and its own instructions.
-
-### Ready to begin?
-
-Begin with [Lab 01](labs/01-relational-sql.md): review SQL foundations, explore window functions, and work through the questions in your browser. No setup is needed for browser practice.
-
-Prefer a Codespace? The [first SQL lab walkthrough](start-lab01.md) explains how to start PostgreSQL and save work there. The browser and Codespace databases and drafts are separate.
 
 For help, see [Environment Setup](getting-started.md), [Troubleshooting](troubleshooting.md), or the [Glossary](glossary.md).
 

@@ -92,7 +92,45 @@
     example.addEventListener('change', () => { shown = false; render(); });
     reveal.addEventListener('click', () => { shown = !shown; render(); }); render();
   }
+  function initFlow() {
+    const root = document.getElementById('lab06-flow');
+    if (!root || root.dataset.ready) return;
+    root.dataset.ready = 'true';
+    root.innerHTML = `<section class="lab06-flow" aria-labelledby="lab06-flow-title">
+      <p class="lab06-flow__eyebrow">INTERACTIVE · FOUR MAPREDUCE STAGES</p>
+      <h3 id="lab06-flow-title">Follow “tea” through the pipeline</h3>
+      <p>Illustrative documents: A: <code>tea tea milk</code> · B: <code>tea bread</code> · C: <code>bread soup</code></p>
+      <ol class="lab06-flow__path" aria-label="Processing stages"><li>MR1 · Count</li><li>MR2 · Length</li><li>MR3 · DF</li><li>MR4 · Score</li></ol>
+      <div class="lab06-flow__state" aria-live="polite" aria-atomic="true"></div>
+      <div class="lab06-flow__buttons"><button type="button" data-prev>Previous</button><button type="button" data-next>Next stage</button><button type="button" data-reset>Start over</button></div>
+      <p class="lab06-flow__note">Fixed browser illustration with normalized tokens; no Python, database or distributed job is run. DF counts each document once even if its term repeats.</p>
+    </section>`;
+    const panels = [
+      ['MR1 · Count term occurrences', 'Group by (term, document). Each occurrence contributes one.', '(tea, A) → 2 · (tea, B) → 1'],
+      ['MR2 · Attach document length', 'Group counts by document to find its total number of tokens, then attach that length to each term count.', '(tea, A) → count 2, length 3'],
+      ['MR3 · Find document frequency', 'Group by term and count distinct document IDs. The two occurrences in A count as one document.', 'tea → {A, B} → DF = 2'],
+      ['MR4 · Calculate the score', 'Use normalized TF and the lab’s smoothed natural-log IDF. N = 3 and DF = 2.', 'TF = 2/3 · IDF = ln(4/3) · TF-IDF ≈ 0.1918']
+    ];
+    const state = root.querySelector('.lab06-flow__state'), path = [...root.querySelectorAll('.lab06-flow__path li')];
+    const prev = root.querySelector('[data-prev]'), next = root.querySelector('[data-next]');
+    let current = 0;
+    function render() {
+      const [title, description, example] = panels[current];
+      state.replaceChildren();
+      const heading = document.createElement('h4'); heading.textContent = `Stage ${current + 1} of 4: ${title}`;
+      const text = document.createElement('p'); text.textContent = description;
+      const result = document.createElement('p'); result.className = 'lab06-flow__example'; result.textContent = example;
+      state.append(heading, text, result);
+      path.forEach((item, i) => { if (i === current) item.setAttribute('aria-current', 'step'); else item.removeAttribute('aria-current'); });
+      prev.disabled = current === 0; next.disabled = current === panels.length - 1;
+    }
+    prev.addEventListener('click', () => { if (current > 0) { current--; render(); } });
+    next.addEventListener('click', () => { if (current < panels.length - 1) { current++; render(); } });
+    root.querySelector('[data-reset]').addEventListener('click', () => { current = 0; render(); });
+    render();
+  }
   function init() {
+    initFlow();
     initRegex();
     const root = document.getElementById('lab06-practice');
     if (!root || root.dataset.ready) return;

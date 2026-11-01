@@ -70,8 +70,67 @@
   function correctSelectedSource(state) {
     return { ...state, source: { ...state.source, cost: '0.010000' } };
   }
-  if (typeof module !== 'undefined' && module.exports) module.exports = { newLoadState, loadSelectedRow, correctSelectedSource };
+  function expectedStagedCost(key) {
+    if (!Object.prototype.hasOwnProperty.call(observations, key)) throw new Error('Unknown observation');
+    return observations[key].typedCost === 'NULL' ? 'null' : 'number';
+  }
+  // UNION ALL appends observations; it does not remove matching rows.
+  function appendedObservations(snowflake, dataiku) {
+    return snowflake.concat(dataiku);
+  }
+  if (typeof module !== 'undefined' && module.exports) module.exports = { newLoadState, loadSelectedRow, correctSelectedSource, expectedStagedCost, appendedObservations };
   if (typeof document === 'undefined') return;
+
+  function setupPipelineExplorer() {
+    const root = document.getElementById('lab03-pipeline-explorer');
+    if (!root || root.dataset.ready === 'true') return;
+    root.dataset.ready = 'true'; root.classList.add('lab03-pipeline');
+    const sampleCount = appendedObservations([1, 2, 3, 4, 5], [1, 2, 3, 4, 5]).length;
+    root.innerHTML = `<p class="lab03-pipeline__eyebrow">INTERACTIVE · THE BIG PICTURE</p>
+      <h3>From two feeds to a warehouse</h3>
+      <p>Choose each layer to follow the path. These counts describe the supplied sample, not a live database.</p>
+      <div class="lab03-pipeline__map" aria-label="Pipeline layers">
+        <button type="button" data-layer="0" aria-pressed="true"><span>01</span><strong>Sources</strong><small>Two raw feeds</small></button>
+        <button type="button" data-layer="1" aria-pressed="false"><span>02</span><strong>Stage</strong><small>Clean and append</small></button>
+        <button type="button" data-layer="2" aria-pressed="false"><span>03</span><strong>Warehouse</strong><small>Dimensions and facts</small></button>
+      </div>
+      <div class="lab03-pipeline__panel" aria-live="polite" aria-atomic="true">
+        <section data-panel="0"><h4>Two sources, two perspectives</h4>
+          <div class="lab03-pipeline__feeds"><div><strong>Snowflake</strong><code>snowflake_raw</code><span>5 observations</span><small>Reported <code>cost_usd</code>: row 1 has text '9.785'.</small></div><div><strong>Dataiku</strong><code>dataiku_raw</code><span>5 observations</span><small>Estimated <code>estimated_cost_usd</code>: row 4 is blank.</small></div></div>
+          <p>Each feed keeps its own fields and meanings. A reported cost and an estimated cost are not interchangeable.</p></section>
+        <section data-panel="1" hidden><h4>Clean each feed, then append</h4>
+          <div class="lab03-pipeline__feeds"><div><strong>Snowflake</strong><code>snowflake_clean</code><small><code>start_time</code> → <code>started_at</code>; text '9.785' → numeric 9.785.</small></div><div><strong>Dataiku</strong><code>dataiku_clean</code><small><code>event_time</code> → <code>started_at</code>; blank estimated cost → <code>NULL</code>.</small></div></div>
+          <div class="lab03-pipeline__merge"><strong>UNION ALL → usage</strong><span>5 + 5 = ${sampleCount} observations</span><small>Append rows; do not join users or remove duplicates.</small></div>
+          <p>These are views over the raw tables. A blank cost becomes <code>NULL</code> (unknown), not zero. A nonblank malformed number is flagged; quality flags preserve context.</p></section>
+        <section data-panel="2" hidden><h4>Give each observation context</h4>
+          <p>Five dimensions describe each fact:</p>
+          <div class="lab03-pipeline__dimensions"><span>Source</span><span>Date</span><span>User</span><span>Entity</span><span>Model</span></div>
+          <div class="lab03-pipeline__merge"><strong>fact_usage</strong><span>10 facts after a successful initial sample load</span><small>One supplied observation per <code>(batch_id, row_no)</code>.</small></div>
+          <p>Dimension keys link the fact to its context. User, entity and model identifiers are scoped to their source; matching text does not prove shared identity. The sample does not establish complete coverage or execution status.</p></section>
+      </div>
+      <details class="lab03-pipeline__predict"><summary>Predict: what does UNION ALL do?</summary>
+        <p>Both feeds have five observations. What happens when the views are combined?</p>
+        <label for="lab03-pipeline-answer">Choose an answer</label>
+        <select id="lab03-pipeline-answer"><option value="">Choose…</option><option value="10">It appends 10 rows</option><option value="5">It matches the feeds into 5 rows</option><option value="unique">It removes duplicate rows</option></select>
+        <button type="button" data-check>Check answer</button><p class="lab03-pipeline__feedback" role="status" aria-live="polite"></p>
+      </details>
+      <p class="lab03-pipeline__note">This is a fixed browser illustration; it does not execute SQL. <a href="#trace-an-observation">Trace one observation through the layers →</a></p>`;
+    const buttons = [...root.querySelectorAll('[data-layer]')];
+    const panels = [...root.querySelectorAll('[data-panel]')];
+    buttons.forEach(button => button.addEventListener('click', () => {
+      const active = button.dataset.layer;
+      buttons.forEach(item => item.setAttribute('aria-pressed', String(item === button)));
+      panels.forEach(panel => { panel.hidden = panel.dataset.panel !== active; });
+    }));
+    const answer = root.querySelector('#lab03-pipeline-answer');
+    const feedback = root.querySelector('.lab03-pipeline__feedback');
+    answer.addEventListener('change', () => { feedback.textContent = ''; });
+    root.querySelector('[data-check]').addEventListener('click', () => {
+      if (!answer.value) feedback.textContent = 'Choose an answer first.';
+      else if (answer.value === '10') feedback.textContent = 'Correct: UNION ALL appends the five rows from each feed, keeping all ten.';
+      else feedback.textContent = 'Try again: UNION ALL appends rows from both feeds without matching or deduplicating them.';
+    });
+  }
 
   function setupLoadExplorer() {
     const root = document.getElementById('lab03-load-explorer');
@@ -118,23 +177,58 @@
     const root = document.getElementById('lab03-observation-explorer');
     if (!root || root.dataset.ready === 'true') return;
     root.dataset.ready = 'true'; root.classList.add('lab03-trace');
-    root.innerHTML = `<label for="lab03-observation">Sample observation</label>
+    root.innerHTML = `<p class="lab03-trace__eyebrow">BROWSER SIMULATION · SOURCE TO FACT</p>
+      <h3>Follow one observation</h3>
+      <p>Choose a record, predict how its cost will be stored, then reveal each step.</p>
+      <label for="lab03-observation">Sample observation</label>
       <select id="lab03-observation"><option value="sf">Snowflake · sf-sample-v1 / row 1</option><option value="dk">Dataiku · dk-sample-v1 / row 1</option><option value="missing">Dataiku · dk-sample-v1 / row 4 (missing cost)</option></select>
       <div class="lab03-trace__stages" aria-label="Observation across the three layers">
         <section><h3>1 / Source</h3><p class="lab03-trace__raw"></p></section>
-        <section><h3>2 / Staging view</h3><p class="lab03-trace__stage"></p></section>
-        <section><h3>3 / Warehouse fact</h3><p class="lab03-trace__fact"></p></section>
-      </div><p class="lab03-trace__summary" role="status" aria-live="polite" aria-atomic="true"></p>
-      <p class="lab03-trace__note">A known <strong>0</strong> is a measured zero; <strong>NULL</strong> is unknown. Dimension keys are generated by the database and are not assigned fixed numbers in this illustration. Snowflake reported costs and Dataiku estimated costs have different meanings.</p>`;
+        <section hidden><h3>2 / Staging view</h3><p class="lab03-trace__stage"></p></section>
+        <section hidden><h3>3 / Warehouse fact</h3><p class="lab03-trace__fact"></p></section>
+      </div>
+      <div class="lab03-trace__prediction"><label for="lab03-cost-prediction">Predict: how will staging store this cost?</label>
+        <select id="lab03-cost-prediction"><option value="">Choose an answer</option><option value="number">As a number</option><option value="null">As NULL (unknown)</option><option value="zero">As a confirmed zero</option><option value="text">As text</option></select>
+        <button type="button" data-trace-check disabled>Check prediction</button>
+        <p class="lab03-trace__feedback" role="status" aria-live="polite" aria-atomic="true"></p>
+      </div>
+      <div class="lab03-trace__actions"><button type="button" data-trace-previous disabled>Previous step</button><button type="button" data-trace-next>Reveal staging</button><button type="button" data-trace-reset>Start over</button></div>
+      <p class="lab03-trace__progress" role="status" aria-live="polite" aria-atomic="true"></p>
+      <p class="lab03-trace__summary"></p>
+      <p class="lab03-trace__note">This illustration does not query PostgreSQL. A known <strong>0</strong> is a measured zero; <strong>NULL</strong> is unknown. Dimension keys are generated by the database and are not assigned fixed numbers here. Snowflake reported costs and Dataiku estimated costs have different meanings.</p>`;
     const select = root.querySelector('select');
+    const prediction = root.querySelector('#lab03-cost-prediction');
+    const check = root.querySelector('[data-trace-check]');
+    const feedback = root.querySelector('.lab03-trace__feedback');
+    const previous = root.querySelector('[data-trace-previous]');
+    const next = root.querySelector('[data-trace-next]');
+    const cards = [...root.querySelectorAll('.lab03-trace__stages section')];
+    const progress = root.querySelector('.lab03-trace__progress');
+    let step = 0;
     function render() {
       const row = observations[select.value];
       root.querySelector('.lab03-trace__raw').textContent = `Source: ${row.source}. Raw cost: ${row.rawCost}; raw total tokens: ${row.rawTokens}. Source user: ${row.user}.`;
       root.querySelector('.lab03-trace__stage').textContent = `cost_usd: ${row.typedCost}; total_tokens: ${row.typedTokens}. Quality flags: ${row.quality}.`;
       root.querySelector('.lab03-trace__fact').textContent = `The source observation retains cost_usd ${row.typedCost} and total_tokens ${row.typedTokens}; dimension references are resolved for its source, date, user, entity and model.`;
-      root.querySelector('.lab03-trace__summary').textContent = `${row.label}. ${row.semantics}`;
+      cards.forEach((card, index) => { card.hidden = index > step; });
+      previous.disabled = step === 0;
+      next.disabled = step === cards.length - 1;
+      next.textContent = step === 0 ? 'Reveal staging' : step === 1 ? 'Reveal warehouse fact' : 'All steps shown';
+      progress.textContent = `Step ${step + 1} of 3: ${['source', 'staging view', 'warehouse fact'][step]}.`;
+      root.querySelector('.lab03-trace__summary').textContent = step === 2 ? `${row.label}. ${row.semantics}` : '';
     }
-    select.addEventListener('change', render); render();
+    function reset() { step = 0; prediction.value = ''; check.disabled = true; feedback.textContent = ''; render(); }
+    select.addEventListener('change', reset);
+    prediction.addEventListener('change', () => { check.disabled = !prediction.value; feedback.textContent = ''; });
+    check.addEventListener('click', () => {
+      const expected = expectedStagedCost(select.value);
+      const explanation = expected === 'null' ? 'The blank cost becomes NULL, meaning unknown—not zero.' : 'The populated numeric text is converted to a number.';
+      feedback.textContent = `${prediction.value === expected ? 'Correct.' : 'Not quite.'} ${explanation}`;
+    });
+    previous.addEventListener('click', () => { step = Math.max(0, step - 1); render(); });
+    next.addEventListener('click', () => { step = Math.min(cards.length - 1, step + 1); render(); });
+    root.querySelector('[data-trace-reset]').addEventListener('click', reset);
+    render();
   }
   function setupQuiz() {
     const root = document.getElementById('lab03-practice-quiz');
@@ -179,6 +273,6 @@
     }
     render(false);
   }
-  function init() { setupExplorer(); setupLoadExplorer(); setupQuiz(); }
+  function init() { setupPipelineExplorer(); setupExplorer(); setupLoadExplorer(); setupQuiz(); }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init, { once: true }); else init();
 }());

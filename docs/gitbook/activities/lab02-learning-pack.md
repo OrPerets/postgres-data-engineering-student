@@ -4,11 +4,11 @@ Use these activities before or during [Lab 02](../labs/02-partitions-replicas.md
 
 ## Explore partitions and replication
 
-Choose a date range to see which yearly partitions could be scanned, then explore how a change moves from a primary to a standby. These examples run in your browser; they are simulations and do not connect to PostgreSQL or measure a real query plan or replication delay.
+Predict how many yearly partitions overlap a date range, then check your answer. Next, step through a committed write reaching a replica. These browser simulations do not connect to PostgreSQL or measure a real query plan or replication delay.
 
 <div id="lab02-partition-explorer"></div>
 
-<noscript>The explorer needs JavaScript enabled. You can still read the [Lab 02 guide](../labs/02-partitions-replicas.md) and complete the workshop in Codespaces.</noscript>
+<noscript>Without JavaScript, consider the range from 1 January to 1 April 2025: it overlaps the 2025 partition, whose end is 1 January 2026. A replica may temporarily show older data while a committed primary change is waiting to be replayed. Read the [Lab 02 guide](../labs/02-partitions-replicas.md) to check these ideas in PostgreSQL.</noscript>
 
 ## Explore missing months and windows
 

@@ -1,0 +1,18 @@
+.md-typeset .lab04-browser { margin: 1.5rem 0; padding: 1.4rem; border: 1px solid #ded3ce; border-top: 4px solid #8b2029; background: #fffefa; }
+.md-typeset .lab04-browser__status { margin: 0 0 .8rem; color: #51484a; font-size: .75rem; }
+.md-typeset .lab04-browser__intro { margin: .7rem 0 1rem; }
+.md-typeset .lab04-browser__actions { display: flex; flex-wrap: wrap; gap: .6rem; margin-bottom: 1.2rem; }
+.md-typeset .lab04-browser__actions button { padding: .55rem .8rem; border: 1px solid #8b2029; color: #812029; background: #fff; font: inherit; font-weight: 700; cursor: pointer; }
+.md-typeset .lab04-browser__actions button:hover { background: #f8efed; }
+.md-typeset .lab04-browser__label { display: block; margin: .8rem 0 .35rem; font-weight: 700; }
+.md-typeset .lab04-browser__code, .md-typeset .lab04-browser__note { display: block; box-sizing: border-box; width: 100%; max-width: 100%; resize: vertical; padding: .8rem; border: 1px solid #aa9993; border-radius: 0; color: #242021; background: #fff; font: inherit; }
+.md-typeset .lab04-browser__code { min-height: 28rem; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: .72rem; line-height: 1.5; white-space: pre; overflow: auto; }
+.md-typeset .lab04-browser__note { min-height: 6rem; }
+.md-typeset .lab04-browser__notes { margin-top: 1.2rem; padding: .8rem; border: 1px solid #d7c9c4; background: #f9f5f2; }
+.md-typeset .lab04-browser__notes > summary, .md-typeset .lab04-browser__hint > summary { cursor: pointer; font-weight: 700; }
+.md-typeset .lab04-browser__task { padding: .5rem 0 1.2rem; border-bottom: 1px solid #ded3ce; }
+.md-typeset .lab04-browser__task:last-child { border-bottom: 0; }
+.md-typeset .lab04-browser__task h3 { margin-bottom: .4rem; }
+.md-typeset .lab04-browser__hint { margin: .7rem 0; padding: .55rem .7rem; border: 1px solid #d7c9c4; background: #fff; }
+.md-typeset .lab04-browser :focus-visible { outline: 3px solid #2354a4; outline-offset: 3px; }
+@media (max-width: 700px) { .md-typeset .lab04-browser { padding: 1rem; } .md-typeset .lab04-browser__code { min-height: 20rem; } }

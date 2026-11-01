@@ -2,13 +2,23 @@
 
 Explore how source observations become typed records and warehouse facts before or during [Lab 03](../labs/03-dwh-etl.md). These activities are optional practice and do not replace the graded SQL assignment.
 
+## Explore the complete pipeline
+
+Follow both feeds through the lab's ETL pipeline. Choose a layer to see what changes and what stays traceable. This browser illustration does not connect to PostgreSQL or execute SQL.
+
+<div id="lab03-pipeline-explorer"></div>
+
+<noscript>
+The supplied sample starts with five Snowflake observations and five Dataiku observations. Two typed staging views clean the source fields; the usage view appends the two feeds with UNION ALL, preserving all ten observations. In the sample load, five dimensions (source, date, user, entity and model) provide context for ten fact rows. A fact represents one supplied source observation identified by batch and row number. A blank cost becomes NULL, not zero; Snowflake costs are reported and Dataiku costs are estimated. Staging views are not stored copies, and matching identifiers across sources do not establish the same identity.
+</noscript>
+
 ## Trace an observation
 
-Choose a sample record to follow its source, staging and warehouse representations. The sample and transformation are illustrative: the browser does not connect to the PostgreSQL database.
+Choose a sample record, predict how staging will store its cost, then step through its source, staging and warehouse representations. The illustration does not connect to PostgreSQL.
 
 <div id="lab03-observation-explorer"></div>
 
-<noscript>The observation explorer needs JavaScript. You can still follow the [Lab 03 guide](../labs/03-dwh-etl.md) and use PostgreSQL in Codespaces.</noscript>
+<noscript>In Dataiku sample row 4, the source cost is blank. The staging view converts the blank to NULL (unknown), and the warehouse fact retains that NULL. For a populated numeric field, staging converts the text to a number. Follow the Lab 03 guide in the navigation to inspect the rows in PostgreSQL.</noscript>
 
 ## Explore repeated fact loads
 

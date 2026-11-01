@@ -122,6 +122,41 @@
     if (!root || root.dataset.practiceMounted) return;
     root.dataset.practiceMounted = 'true';
     const sections = [...root.querySelectorAll('[data-question]')];
+    const referenceTemplate = root.querySelector('.lab01-reference');
+    if (referenceTemplate) {
+      sections.forEach((section) => {
+        const actions = section.querySelector('.lab01-editor-actions');
+        if (!actions) return;
+        const disclosure = document.createElement('details');
+        disclosure.className = 'lab01-local-schema';
+        disclosure.setAttribute('data-local-schema', '');
+        const summary = document.createElement('summary');
+        summary.textContent = 'Tables & schema';
+        summary.setAttribute('aria-label', `Tables and schema for question ${section.dataset.question}`);
+        const reference = referenceTemplate.cloneNode(true);
+        reference.removeAttribute('aria-labelledby');
+        reference.setAttribute('aria-label', `Tables and schema for question ${section.dataset.question}`);
+        reference.querySelectorAll('[id]').forEach((element) => element.removeAttribute('id'));
+        reference.querySelectorAll('[data-reference-table]').forEach((table) => {
+          const name = table.dataset.referenceTable;
+          table.querySelector('summary').setAttribute('aria-label', `${name} table`);
+          table.querySelector('[data-sample]').setAttribute('aria-label', `Sample rows from ${name}`);
+          table.querySelector('[data-view-all]').setAttribute('aria-label', `View all rows from ${name}`);
+        });
+        disclosure.append(summary, reference);
+        actions.appendChild(disclosure);
+      });
+      // Preserve existing links to the old reference at the first disclosure.
+      const oldTitle = referenceTemplate.querySelector('#lab01-reference-title');
+      const firstSummary = root.querySelector('[data-local-schema] > summary');
+      if (oldTitle && firstSummary) {
+        oldTitle.removeAttribute('id');
+        firstSummary.id = 'lab01-reference-title';
+      }
+      // Keep the static copy as a no-JavaScript fallback. The per-question
+      // references are created before hiding it, so the schema remains usable.
+      referenceTemplate.hidden = true;
+    }
     let storageAvailable = true;
     sections.forEach((section) => {
       const number = section.dataset.question;

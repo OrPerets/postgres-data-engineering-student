@@ -2,6 +2,7 @@
 import importlib.util
 import html
 import hashlib
+import json
 from html.parser import HTMLParser
 from pathlib import Path
 import re
@@ -39,6 +40,8 @@ class PracticeStructure(HTMLParser):
         self.tables = []
         self.questions = []
         self.controls = {}
+        self.question_actions = {}
+        self.ids = []
 
     def handle_starttag(self, tag, attributes):
         attrs = dict(attributes)
@@ -48,6 +51,8 @@ class PracticeStructure(HTMLParser):
                 return
             self.active = True
         ancestors = [item[1] for item in self.stack]
+        if 'id' in attrs:
+            self.ids.append(attrs['id'])
         if 'data-reference-table' in attrs:
             table = attrs['data-reference-table']
             self.tables.append(table)
@@ -56,8 +61,17 @@ class PracticeStructure(HTMLParser):
             self.controls[table] = set()
         if 'data-question' in attrs:
             self.questions.append(attrs['data-question'])
+            self.question_actions[attrs['data-question']] = {'actions': 0, 'runs': 0}
             if not any('lab01-practice-questions' in item.get('class', '').split() for item in ancestors):
                 self.errors.append(f"Question {attrs['data-question']} is outside the practice layout")
+        question = next((item['data-question'] for item in reversed(ancestors) if 'data-question' in item), None)
+        if question and 'lab01-editor-actions' in classes:
+            self.question_actions[question]['actions'] += 1
+        if question and 'data-run' in attrs:
+            if any('lab01-editor-actions' in item.get('class', '').split() for item in ancestors):
+                self.question_actions[question]['runs'] += 1
+            else:
+                self.errors.append(f'Question {question} run button is outside its action container')
         if any(key in attrs for key in ('data-sample', 'data-view-all', 'data-reference-status', 'data-reference-result')):
             table = next((item['data-reference-table'] for item in reversed(ancestors) if 'data-reference-table' in item), None)
             if table is None:
@@ -129,6 +143,9 @@ class SiteVisibilityTests(unittest.TestCase):
                 self.assertEqual(structure.errors, [])
                 self.assertEqual(structure.tables, ['customers', 'orders', 'order_items'])
                 self.assertEqual(structure.questions, [str(n) for n in range(1, 16)])
+                self.assertEqual(len(structure.ids), len(set(structure.ids)), 'Duplicate IDs in the practice layout')
+                for number in structure.questions:
+                    self.assertEqual(structure.question_actions[number], {'actions': 1, 'runs': 1}, number)
                 for table in structure.tables:
                     self.assertEqual(structure.controls[table], {'data-sample', 'data-view-all', 'data-reference-status', 'data-reference-result'}, table)
                 # Students can find each table's schema and explicitly choose
@@ -179,18 +196,53 @@ class SiteVisibilityTests(unittest.TestCase):
                 self.assertNotIn("labs/01-window-functions/", all_pages)
                 self.assertFalse((out / "images" / "setup" / "01-github-codespaces.png").exists())
             practice_page = out / "activities" / "lab01-learning-pack" / "index.html"
-            self.assertEqual(practice_page.exists(), "01" in active)
+            self.assertFalse(practice_page.exists())
             for asset in ("javascripts/lab01-null.js", "stylesheets/lab01-null.css"):
                 self.assertEqual((out / asset).exists(), "01" in active, asset)
                 if "01" not in active:
                     self.assertNotIn(asset, all_pages)
-            if "01" in active:
-                self.assertIn('id="lab01-null-explorer"', practice_page.read_text())
             if "01" not in active:
                 self.assertNotIn("activities/lab01-learning-pack/", all_pages)
                 self.assertFalse((out / "javascripts" / "lab01-quiz.js").exists())
             second_pack = out / "activities" / "lab02-learning-pack" / "index.html"
             self.assertEqual(second_pack.exists(), "02" in active)
+            for chapter in ("02-exercises", "02-interview"):
+                self.assertEqual((out / "labs" / chapter / "index.html").exists(), "02" in active, chapter)
+                if "02" not in active:
+                    self.assertNotIn(f"labs/{chapter}/", all_pages)
+            browser02 = out / "assets" / "lab02-browser"
+            for asset in ("questions.json", "seed.sql", "pglite/index.js", "pglite/pglite.wasm"):
+                self.assertEqual((browser02 / asset).is_file(), "02" in active, asset)
+            for asset in ("javascripts/lab02-browser.js", "javascripts/lab02-browser-worker.js",
+                          "stylesheets/lab02-browser.css"):
+                self.assertEqual((out / asset).is_file(), "02" in active, asset)
+                if "02" not in active:
+                    self.assertNotIn(asset, all_pages)
+            if "02" in active:
+                # Compare the generated student-facing manifest to the authoritative
+                # assignment, rather than a second hand-maintained list of prompts.
+                source = (ROOT / "labs/02-partitioning-replication/assignments/STUDENT_ASSIGNMENT.md").read_text()
+                expected = [(number, int(points), text.replace("**", "").replace("`", "").strip())
+                            for number, points, text in re.findall(r"^([ABCD][1-9])\s+\((\d+)\)\s+(.+)$", source, re.M)]
+                questions = json.loads((browser02 / "questions.json").read_text())
+                self.assertEqual([(q["id"], q["points"], q["question"]) for q in questions], expected)
+                self.assertEqual(len(questions), 20)
+                hints_source = (ROOT / "docs/gitbook/labs/02-exercises.md").read_text()
+                hint_pattern = r"<details>\s*<summary>([ABCD][1-9])\b.*?</summary>\s*<p>(.*?)</p>\s*</details>"
+                expected_hints = {number: html.unescape(re.sub(r"<[^>]*>", "", content)).strip()
+                                  for number, content in re.findall(hint_pattern, hints_source, re.S)}
+                self.assertEqual({q["id"]: q["hint"] for q in questions}, expected_hints)
+                self.assertEqual(len(expected_hints), 20)
+                exercise_html = (out / "labs/02-exercises/index.html").read_text()
+                self.assertIn("data-lab02-browser-workspace", exercise_html)
+                self.assertIn("data-lab02-real-workspace", exercise_html)
+                self.assertIn("data-lab02-static-hints", exercise_html)
+                # The assignment's general instructions are outside its per-task
+                # lines, so check they remain visible alongside the workspace.
+                self.assertIn("SUM(amount)", html.unescape(exercise_html))
+                self.assertIn("all requested columns", html.unescape(exercise_html))
+                self.assertIn("pg_is_in_recovery()", html.unescape(exercise_html))
+                self.assertIn("ROLLBACK", html.unescape(exercise_html))
             for asset in ("javascripts/lab02-months.js", "stylesheets/lab02-months.css"):
                 self.assertEqual((out / asset).exists(), "02" in active, asset)
                 if "02" not in active:
@@ -200,6 +252,43 @@ class SiteVisibilityTests(unittest.TestCase):
             if "02" not in active:
                 self.assertNotIn("activities/lab02-learning-pack/", all_pages)
                 self.assertFalse((out / "javascripts" / "lab02-quiz.js").exists())
+            for chapter in ("03-exercises", "03-interview"):
+                self.assertEqual((out / "labs" / chapter / "index.html").exists(), "03" in active, chapter)
+                if "03" not in active:
+                    self.assertNotIn(f"labs/{chapter}/", all_pages)
+            browser03 = out / "assets" / "lab03-browser"
+            for asset in ("questions.json", "01_stage.sql", "02_dwh.sql", "pglite/index.js", "pglite/pglite.wasm"):
+                self.assertEqual((browser03 / asset).is_file(), "03" in active, asset)
+            for asset in ("javascripts/lab03-browser.js", "javascripts/lab03-browser-worker.js",
+                          "stylesheets/lab03-browser.css"):
+                self.assertEqual((out / asset).is_file(), "03" in active, asset)
+                if "03" not in active:
+                    self.assertNotIn(asset, all_pages)
+            if "03" in active:
+                # Source SQL and assignment are authoritative; avoid a second
+                # hand-maintained copy of task wording, hints or setup.
+                lab03 = ROOT / "labs/03-dwh-etl"
+                for name in ("01_stage.sql", "02_dwh.sql"):
+                    self.assertEqual((browser03 / name).read_bytes(), (lab03 / "sql" / name).read_bytes(), name)
+                source = (lab03 / "STUDENT_ASSIGNMENT.md").read_text()
+                expected = [(number, text.replace("**", "").replace("`", "").strip())
+                            for number, text in re.findall(r"^(\d{1,2})\.\s+(.+)$", source, re.M)]
+                questions = json.loads((browser03 / "questions.json").read_text())
+                self.assertEqual([(q["id"], q["question"]) for q in questions], expected)
+                self.assertEqual(len(questions), 18)
+                hints_source = (ROOT / "docs/gitbook/labs/03-exercises.md").read_text()
+                hint_pattern = r"<details>\s*<summary>Question\s+(\d{1,2})\b.*?</summary>\s*<p>(.*?)</p>\s*</details>"
+                expected_hints = {number: html.unescape(re.sub(r"<[^>]*>", "", content)).strip()
+                                  for number, content in re.findall(hint_pattern, hints_source, re.S)}
+                self.assertEqual({q["id"]: q["hint"] for q in questions}, expected_hints)
+                self.assertEqual(len(expected_hints), 18)
+                exercise_html = (out / "labs/03-exercises/index.html").read_text()
+                for marker in ("data-lab03-browser-workspace", "data-lab03-real-workspace",
+                               "data-lab03-static-hints", "<noscript>"):
+                    self.assertIn(marker, exercise_html)
+                for distinction in ("PostgreSQL 18", "PostgreSQL 16", "source completeness",
+                                    "Reported Snowflake costs", "estimated Dataiku costs"):
+                    self.assertIn(distinction, html.unescape(exercise_html))
             for number in ("03", "04", "05", "06"):
                 practice = out / "activities" / f"lab{number}-learning-pack" / "index.html"
                 self.assertEqual(practice.exists(), number in active)
@@ -211,8 +300,53 @@ class SiteVisibilityTests(unittest.TestCase):
                 self.assertEqual((out / asset).exists(), "04" in active, asset)
                 if "04" not in active:
                     self.assertNotIn(asset, all_pages)
+            for chapter in ("04-exercises", "04-interview"):
+                self.assertEqual((out / "labs" / chapter / "index.html").exists(), "04" in active, chapter)
+                if "04" not in active:
+                    self.assertNotIn(f"labs/{chapter}/", all_pages)
             if "04" in active:
-                self.assertIn('id="lab04-variance-explorer"', (out / "labs" / "04-mapreduce" / "index.html").read_text())
+                practice04 = (out / "activities" / "lab04-learning-pack" / "index.html").read_text()
+                for mount in ("lab04-mapreduce-explorer", "lab04-mean-explorer", "lab04-variance-explorer"):
+                    self.assertIn(f'id="{mount}"', practice04)
+                materials = json.loads((out / "assets/lab04-browser/materials.json").read_text())
+                source = (ROOT / "labs/04-mapreduce/STUDENT_ASSIGNMENT.md").read_text()
+                expected = [(int(number), text.replace("**", "").replace("`", "").strip())
+                            for number, text in re.findall(r"^(\d+)\.\s+(.+)$", source, re.M)]
+                self.assertEqual([(q["id"], q["question"]) for q in materials["questions"]], expected)
+                self.assertEqual(len(expected), 11)
+                self.assertTrue(all(q["hint"] for q in materials["questions"]))
+                self.assertEqual(materials["starter"], (ROOT / "labs/04-mapreduce/student_tasks.py").read_text())
+                exercise04 = (out / "labs/04-exercises/index.html").read_text()
+                self.assertIn('id="lab04-browser-workspace"', exercise04)
+            else:
+                self.assertFalse((out / "assets/lab04-browser").exists())
+            for asset in ("javascripts/lab04-browser.js", "stylesheets/lab04-browser.css"):
+                self.assertEqual((out / asset).is_file(), "04" in active, asset)
+            for number, count in (("05", 14), ("06", 13)):
+                for suffix in ("exercises", "interview"):
+                    slug = f"{number}-{suffix}"
+                    self.assertEqual((out / "labs" / slug / "index.html").exists(), number in active, slug)
+                    if number not in active:
+                        self.assertNotIn(f"labs/{slug}/", all_pages)
+                materials_path = out / "assets" / f"lab{number}-browser" / "materials.json"
+                self.assertEqual(materials_path.is_file(), number in active)
+                if number in active:
+                    materials = json.loads(materials_path.read_text())
+                    self.assertEqual([q["id"] for q in materials["questions"]], list(range(1, count + 1)))
+                    self.assertTrue(all(q["question"] and q["hint"] for q in materials["questions"]))
+                    lab = ROOT / "labs" / SOURCE_PATHS[number]
+                    source = (lab / "STUDENT_ASSIGNMENT.md").read_text()
+                    assigned = [(int(i), text.replace("**", "").replace("`", "").strip())
+                                for i, text in re.findall(r"^(\d+)\.\s+(.+)$", source, re.M)]
+                    self.assertEqual(len(assigned), count)
+                    for question, (task_id, text) in zip(materials["questions"], assigned):
+                        self.assertEqual(question["id"], task_id)
+                        self.assertTrue(question["question"].startswith(text), task_id)
+                    self.assertEqual(materials["starter"], (lab / "student_tasks.py").read_text())
+                    exercise = (out / "labs" / f"{number}-exercises" / "index.html").read_text()
+                    self.assertIn(f'id="lab{number}-browser-workspace"', exercise)
+            for asset in ("javascripts/python-draft.js", "stylesheets/python-draft.css"):
+                self.assertEqual((out / asset).exists(), bool({"05", "06"} & active), asset)
             for number, slug in PAGES.items():
                 with self.subTest(number=number, active=active):
                     self.assertEqual((out / "labs" / slug / "index.html").exists(), number in active)

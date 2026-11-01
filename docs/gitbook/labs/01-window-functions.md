@@ -4,15 +4,14 @@
 
 [← Lab 01 chapters](01-relational-sql.md) · [Go to tutorial & practice →](01-tutorial-practice.md)
 
-Review [SQL foundations](01-relational-sql.md#sql-foundations) first if joins, grouping or `NULL` are new to you.
-
 How can you show an order **and** its customer’s total on the same row? A window function looks across related rows without collapsing the rows you started with. Follow the visuals, make a prediction, and then check it in PostgreSQL.
 
-```mermaid
-flowchart LR
-    A["1 · Grain<br/>What is one row?"] --> B["2 · Partition<br/>Which customer?"]
-    B --> C["3 · Order<br/>Which row comes first?"] --> D["4 · Frame<br/>Which rows contribute?"]
-```
+<ol class="window-path" aria-label="Four decisions for a window calculation">
+  <li><strong>Grain</strong><span>What is one row?</span></li>
+  <li><strong>Partition</strong><span>Which customer?</span></li>
+  <li><strong>Order</strong><span>Which row comes first?</span></li>
+  <li><strong>Frame</strong><span>Which rows contribute?</span></li>
+</ol>
 
 The interactive examples are **browser simulations** using synthetic data, not live PostgreSQL queries. The [worksheet](https://github.com/OrPerets/postgres-data-engineering-student/blob/main/labs/01-relational-sql/windows/worksheet.sql) lets you try the same ideas on the lab database. The [full lesson and optional challenges](https://github.com/OrPerets/postgres-data-engineering-student/blob/main/labs/01-relational-sql/windows/README.md) provide more detail.
 
@@ -67,23 +66,20 @@ GROUP BY o.order_id, o.customer_id, o.order_date;
 Keep the `psql` session open for each `SELECT`. The view disappears when the session ends; running the worksheet as a separate command does not preserve it for another session. The guided workspace runs each query in a separate read-only connection, so the temporary view will not persist there between runs. For these examples, use the same `psql` session, or put the order-revenue calculation in a CTE within a single workspace query. The view does not modify source tables. It treats a `NULL` discount as zero and keeps completed orders without item lines with zero revenue.
 </details>
 
-The PostgreSQL references cover [window functions](https://www.postgresql.org/docs/16/functions-window.html), [aggregate functions](https://www.postgresql.org/docs/16/functions-aggregate.html), and [window syntax and frames](https://www.postgresql.org/docs/16/sql-expressions.html#SYNTAX-WINDOW-FUNCTIONS).
-
 ## Foundation · Start with one row per order
 
-An order may contain multiple item lines. Joining them can repeat the order; aggregate first when the calculation needs **one row per order**.
+An **item line** is one product entry in an order, like a line on a receipt. An order can have several item lines. For example, order 101 contains two products:
 
-```mermaid
-flowchart LR
-    O["Order 101"] --> A["Line 1 · 100"]
-    O --> B["Line 2 · 200"]
-    A --> C["One order · 300"]
-    B --> C
-```
+| Order | Item line | Product | Line revenue |
+|---|---|---|---:|
+| 101 | 1 | Novel | 100 |
+| 101 | 2 | Mouse | 200 |
 
-**Predict:** How many rows represent this order before and after aggregation? What happens if you count orders directly from the joined lines?
+Joining `orders` to `order_items` gives **two rows** for order 101—one for each product. But it is still **one order**. To calculate its total revenue, add the two line amounts: **100 + 200 = 300**. Grouping the lines by order gives one row for that order, which is the starting point for the window examples below.
 
-The worksheet includes completed orders, subtracts discounts, treats a `NULL` discount as zero, and keeps completed orders without item lines with zero revenue. Cancelled, returned and pending orders do not contribute.
+**Think about it:** If you count the two joined rows as orders, how many orders would you report? How many were actually placed?
+
+The worksheet counts revenue from completed orders after discounts. It treats a `NULL` discount as no discount and includes completed orders without item lines with zero revenue. Cancelled, returned, and pending orders do not contribute to revenue.
 
 ## 1 · Aggregate windows
 
@@ -418,12 +414,14 @@ For customer 1, the descending revenues are **400, 300, 200, 200, 120**. Both 20
 
 A window result cannot be filtered in `WHERE` at the same query level in PostgreSQL. Calculate it in a CTE or subquery, then filter outside.
 
-```mermaid
-flowchart LR
-    A["Order revenues"] --> B["CTE<br/>calculate rank"] --> C["Outer query<br/>keep ranks 1 and 2"]
-```
-
-**Try it:** Find the two highest **distinct order-revenue levels** for each customer, including ties. Calculate the rank before filtering it.
+<div class="window-apply">
+  <ol class="window-path window-path--apply" aria-label="Calculate a rank, then filter it">
+    <li><strong>Order revenues</strong><span>Start with one row per completed order.</span></li>
+    <li><strong>CTE</strong><span>Calculate the rank for each customer's orders.</span></li>
+    <li><strong>Outer query</strong><span>Keep ranks 1 and 2.</span></li>
+  </ol>
+  <p class="window-try"><strong>Try it:</strong> Find the two highest <strong>distinct order-revenue levels</strong> for each customer, including ties. Calculate the rank before filtering it.</p>
+</div>
 
 <details markdown="1">
 <summary>Example · Filter a ranking after it is calculated</summary>

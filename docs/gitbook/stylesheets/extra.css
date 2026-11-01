@@ -202,3 +202,126 @@ body {
 @media (prefers-reduced-motion: reduce) {
   .md-typeset .course-actions a { transition: none; }
 }
+
+/* A simple ordered path keeps the learning sequence clear at every width. */
+.md-typeset ol.lab01-timeline {
+  counter-reset: lab01-step;
+  list-style: none;
+  margin: 1.4rem 0 2.4rem;
+  padding: 0;
+}
+.md-typeset .lab01-timeline > li {
+  counter-increment: lab01-step;
+  position: relative;
+  margin: 0 0 0 .9rem;
+  padding: 0 0 1.65rem 2.1rem;
+  border-left: 2px solid #d9c9c7;
+}
+.md-typeset .lab01-timeline > li:last-child {
+  border-left-color: transparent;
+  padding-bottom: 0;
+}
+.md-typeset .lab01-timeline > li::before {
+  content: counter(lab01-step);
+  position: absolute;
+  top: 0;
+  left: -.9rem;
+  display: grid;
+  place-items: center;
+  width: 1.7rem;
+  height: 1.7rem;
+  border-radius: 50%;
+  background: #8b2029;
+  color: #fff;
+  font-size: .68rem;
+  font-weight: 700;
+}
+.md-typeset .lab01-timeline h3 { margin: 0 0 .3rem; font-size: 1rem; }
+.md-typeset .lab01-timeline p { margin: 0; }
+.md-typeset .lab01-timeline a:focus-visible { outline: 3px solid #2354a4; outline-offset: 3px; }
+
+/* Physical partitioning and replication are distinct parts of the same lab. */
+.md-typeset .lab02-data-compare { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .8rem; margin: 1.2rem 0; }
+.md-typeset .lab02-data-card { padding: 1rem 1.1rem; border: 1px solid #e2d8d5; border-top: 3px solid #8b2029; border-radius: .25rem; background: #faf8f6; }
+.md-typeset .lab02-data-card h3 { margin: .25rem 0 .4rem; font-size: .9rem; overflow-wrap: anywhere; }
+.md-typeset .lab02-data-card p { margin: .3rem 0; }
+.md-typeset .lab02-data-card .lab02-data-card__label { margin: 0; color: #751d27; font-size: .68rem; font-weight: 700; letter-spacing: .05em; text-transform: uppercase; }
+.md-typeset .lab02-data-years { display: flex; flex-wrap: wrap; gap: .35rem; margin-top: .7rem; }
+.md-typeset .lab02-data-years span { padding: .2rem .55rem; border: 1px solid #cda7a7; background: #fff; color: #65202a; font-size: .7rem; font-weight: 700; }
+.md-typeset .lab02-data-columns { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .5rem; margin: .7rem 0 1rem; }
+.md-typeset .lab02-data-columns > div { min-width: 0; padding: .6rem .75rem; border-left: 2px solid #d9c9c7; background: #f9f6f3; }
+.md-typeset .lab02-data-columns dt { margin: 0; font-weight: 700; overflow-wrap: anywhere; }
+.md-typeset .lab02-data-columns dd { margin: .15rem 0 0; color: #514a47; font-size: .72rem; }
+@media screen and (max-width: 600px) {
+  .md-typeset .lab02-data-compare { grid-template-columns: 1fr; }
+}
+.md-typeset .lab02-system { margin: 1.3rem 0; }
+.md-typeset .lab02-system__server { padding: 1rem 1.2rem; border: 1px solid #e2d8d5; border-left: 3px solid #8b2029; background: #faf8f6; border-radius: .25rem; }
+.md-typeset .lab02-system__server p { margin: .35rem 0 0; }
+.md-typeset .lab02-system__server .lab02-system__label { margin: 0 0 .3rem; color: #751d27; font-size: .68rem; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; }
+.md-typeset .lab02-system__partitions { display: flex; flex-wrap: wrap; gap: .45rem; margin-top: .8rem; }
+.md-typeset .lab02-system__partitions span { min-width: 4rem; padding: .3rem .6rem; border: 1px solid #cda7a7; background: #fff; color: #65202a; text-align: center; font-weight: 700; }
+.md-typeset .lab02-system__server .lab02-system__caption { color: #514a47; font-size: .68rem; }
+.md-typeset .lab02-system .lab02-system__connector { margin: .6rem 0 .6rem 1.2rem; color: #514a47; font-size: .72rem; font-weight: 700; }
+
+/* Lab 03 compares source meaning before tracing the warehouse pipeline. */
+.md-typeset .lab03-sources { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .8rem; margin: 1.2rem 0; }
+.md-typeset .lab03-source { min-width: 0; padding: 1rem 1.15rem; border: 1px solid #e2d8d5; border-top: 3px solid #8b2029; background: #faf8f6; }
+.md-typeset .lab03-source h3 { margin: .2rem 0 .4rem; font-size: .95rem; }
+.md-typeset .lab03-source p { margin: .4rem 0; }
+.md-typeset .lab03-source .lab03-source__label { color: #751d27; font-size: .65rem; font-weight: 700; letter-spacing: .05em; text-transform: uppercase; }
+.md-typeset .lab03-source .lab03-source__cost { padding-top: .55rem; border-top: 1px solid #e2d8d5; font-size: .72rem; }
+@media screen and (max-width: 600px) { .md-typeset .lab03-sources { grid-template-columns: 1fr; } }
+
+/* Window-function decisions use the same numbered, top-to-bottom path. */
+.md-typeset ol.window-path {
+  counter-reset: window-step;
+  list-style: none;
+  margin: 1.4rem 0 1.6rem;
+  padding: 0;
+}
+.md-typeset .window-path > li {
+  counter-increment: window-step;
+  position: relative;
+  margin: 0 0 0 .8rem;
+  padding: 0 0 1.1rem 1.9rem;
+  border-left: 2px solid #d9c9c7;
+}
+.md-typeset .window-path > li:last-child {
+  border-left-color: transparent;
+  padding-bottom: 0;
+}
+.md-typeset .window-path > li::before {
+  content: counter(window-step);
+  position: absolute;
+  top: 0;
+  left: -.8rem;
+  display: grid;
+  place-items: center;
+  width: 1.5rem;
+  height: 1.5rem;
+  border-radius: 50%;
+  background: #8b2029;
+  color: #fff;
+  font-size: .65rem;
+  font-weight: 700;
+}
+.md-typeset .window-path strong { display: block; color: #72202a; font-size: .8rem; }
+.md-typeset .window-path span { display: block; color: #403b39; font-size: .72rem; }
+.md-typeset .window-apply {
+  margin: 1.2rem 0;
+  padding: 1.1rem 1.3rem;
+  border: 1px solid #e2d8d5;
+  border-radius: .35rem;
+  background: #faf8f6;
+}
+.md-typeset .window-apply .window-path { margin: 0 0 1.2rem; }
+.md-typeset .window-try {
+  margin: 0;
+  padding: .8rem 1rem;
+  border-left: 3px solid #8b2029;
+  background: #f2ebe8;
+}
+@media screen and (max-width: 600px) {
+  .md-typeset .window-apply { padding: 1rem; }
+}
