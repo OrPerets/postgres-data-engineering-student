@@ -5,18 +5,21 @@ description: Design, build, or refine focused educational animations that make m
 
 # Animated Learning Flows
 
-Make the mechanism visible through motion. A learner should be able to follow an identifiable input through one transformation and explain where the result came from.
+Make the mechanism visible through motion. A learner should be able to follow an identifiable input, explain what the computation keeps in working memory, and describe how that state produces a result.
 
 ## Choose what to show
 
 - Inspect the lesson, authoritative data or rules, audience, and target surface before choosing a visual. Reuse the host’s components and language. An existing page does not imply a new app, framework, backend, or deployment.
 - Focus the main canvas on one concept at a time. Choose the smallest source-backed example that exposes the mechanism; three to five records is often useful, not a fixed limit. Label a subset or invented simplification and preserve ordering, units, ties, missing values, and relevant exceptions.
+- Choose and name the mechanism being illustrated before drawing its final result. Where relevant, distinguish input, mutable working state, and emitted output: discovering a key, allocating a group, assigning a member, updating an accumulator, and emitting a row are different events. Show those events in the order of the chosen algorithm. A useful teaching sequence may differ from a production implementation; label that choice.
 - Use stable input identities and spatial origins. Show matching with connections, splitting with distinct destinations, grouping with arrivals and partial totals, or a frame with a moving boundary. Preserve the visible relationship between the input and its output.
 - Keep one short changing caption beside the scene. Put SQL/code, long explanations, quizzes, and full tables in optional disclosures unless the requested experience calls for them. Avoid turning the animation into a dense worksheet.
 
 ## Build the interaction
 
 - Separate a deterministic calculation/snapshot model from rendering. Verify that model independently against the source or actual execution. Label a simulation clearly; a conceptual flow does not establish a system’s physical execution behavior.
+- Begin with the working state and output appropriate to the algorithm, usually empty. Reserve space without precreating groups or revealing result identities the computation has not discovered. Animate allocation, lookup, mutation, and emission separately when those distinctions explain the mechanism; reveal each state change on its own arrival, and emit output only when the model reaches emission.
+- When memory or efficiency is part of the lesson, derive a few visible work/state counters from model events, such as records read, groups allocated, or member references retained. Define what they count and keep the canvas sparse. Distinguish accumulated work from currently retained state; animation duration is playback pacing, not execution time. Compare algorithms on the same input and result, and explain any extra teaching pass. Claim bytes, timings, or database execution behavior only from relevant measurements.
 - Start paused. Provide a few native controls, normally Play/Pause, Next, and Replay. Next animates one transformation and stops; during an active transition it may complete that transition and stop. Replay returns to the initial state. Keep control elements stable so focus survives rendering.
 - Animate the computation itself, rather than merely changing highlights between finished tables. Keep movement visible long enough to follow. Reveal a matched output or updated total when the moving input arrives, with one unambiguous commit per transition.
 - Pause must freeze the current position and progress. Resume from that position. Pause when the document is hidden or the activity leaves view. Cancel scheduled work on replay, concept changes, and unmount so old callbacks cannot change the new scene. Read [the animation contract](references/animation-contract.md) when implementing these mechanics.
@@ -25,7 +28,7 @@ Make the mechanism visible through motion. A learner should be able to follow an
 
 ## Verify the experience
 
-- Check intermediate calculations, final results, identity preservation, and fresh replay state. Use an independent oracle where available; do not derive every expected value from the renderer’s own model.
+- Check intermediate working states, allocation and emission order, counter changes, final results, identity preservation, and fresh replay state. Verify that outputs remain absent until their emission event and that retained objects match the selected mechanism. Use an independent oracle where available; do not derive every expected value from the renderer’s own model.
 - In a rendered browser, sample a moving object’s coordinates at two times, pause mid-transition and confirm coordinates remain fixed, then resume. Also check arrival-time output commits, single-step stopping, rapid replay/concept switches, final stopping, hidden/offscreen pause, and reduced motion. Final row counts alone do not verify animation.
 - Inspect normal and narrow layouts, text size, clipping, keyboard focus, and the semantic fallback. Report which checks ran and distinguish local verification from publication.
 

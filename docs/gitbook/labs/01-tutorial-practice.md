@@ -25,7 +25,7 @@ As you work, `WHERE` filters rows, while `GROUP BY` combines them into groups. A
 
 ## Follow one customer's order journey {#order-journey}
 
-Choose **JOIN**, **GROUP BY** or **Window**, then press **Play** to watch the rows change.
+Choose **JOIN**, **GROUP BY** or **Window**, then press **Play**. In **GROUP BY**, watch empty working memory fill before any output appears.
 
 <div id="lab01-order-journey" data-lab01-order-journey markdown="1">
 <div data-journey-fallback markdown="1">
@@ -39,6 +39,10 @@ This small example uses customer 1's completed orders **101, 102 and 103**, with
 | Window running total | 3 | One order, with cumulative revenue beside it |
 
 Order **101** combines **100 + 200 = 300**; order **102** combines **150 + 50 = 200**; order **103** has one line worth **200**. Grouping combines lines into orders. The window keeps those three order rows.
+
+The default grouping demonstration first reads the five lines to create an empty group for each distinct order ID. It reads the lines again to assign each member and update its group's sum. Only then does it emit the three output rows. The alternative **One-pass SUM** creates groups as needed and updates their sums during a single scan, without retaining member references. Both produce the same totals.
+
+These teaching models count illustrated work and retained state: the first makes **10 input reads** and retains **5 member references**; the second makes **5 input reads** and retains **0 member references**. Both hold **3 group sums**. These counts exclude the displayed source and output tables; they are not measurements of PostgreSQL memory or execution time. Inspect an actual query with [PostgreSQL EXPLAIN](https://www.postgresql.org/docs/16/sql-explain.html) to see its chosen execution plan.
 
 | Order | Date | Order revenue | Running total |
 |---|---|---:|---:|

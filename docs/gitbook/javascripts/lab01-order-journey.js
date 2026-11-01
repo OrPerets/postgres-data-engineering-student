@@ -164,7 +164,63 @@ ORDER BY customer_id, order_date, order_id;
     ];
   }
 
-  function buildAnimationLesson() {
+  // Resource counters describe the operations and retained state in these
+  // teaching algorithms. They are not PostgreSQL timings or memory bytes.
+  function buildGroupMemoryLesson(method = 'two_pass') {
+    if (!['two_pass', 'one_pass'].includes(method)) throw new RangeError(`Unknown GROUP BY model: ${method}`);
+    const orderIds = [101, 102, 103];
+    const lines = buildJourney().find(stage => stage.key === 'revenue').after.rows
+      .filter(row => orderIds.includes(row.order_id));
+    const groups = [], outputs = [], steps = [];
+    const stats = { rowsRead: 0, lookups: 0, groupsCreated: 0, storedMembers: 0, updates: 0 };
+    function save(phase, active, status, equation = '') {
+      steps.push({ index: steps.length, phase, active: active ? { ...active } : null, status, equation,
+        groups: groups.map(group => ({ ...group, members: group.members.map(member => ({ ...member })) })),
+        outputs: outputs.map(row => ({ ...row })), stats: { ...stats } });
+    }
+    const identity = (row, index) => ({ line_id: `${row.order_id}-${row.line_no}`, order_id: row.order_id,
+      line_no: row.line_no, line_revenue: row.line_revenue, output_index: index });
+    save('ready', null, method === 'two_pass'
+      ? 'Memory and output start empty. First discover the order keys; then assign the lines.'
+      : 'Memory and output start empty. Read each line once and keep a sum for its order.');
+    function locate(row, index, phase) {
+      stats.rowsRead++; stats.lookups++;
+      let group = groups.find(item => item.order_id === row.order_id);
+      const newGroup = !group;
+      if (newGroup) { group = { order_id: row.order_id, revenue: 0, members: [] }; groups.push(group); stats.groupsCreated++; }
+      const active = { ...identity(row, index), kind: phase, newGroup, group_index: groups.indexOf(group) };
+      save(phase, active, newGroup
+        ? `Read line ${active.line_id}: create a memory entry for order ${row.order_id}. No result row yet.`
+        : `Read line ${active.line_id}: order ${row.order_id} already has a memory entry. Reuse it.`,
+      newGroup ? `Key ${row.order_id} → create group` : `Key ${row.order_id} → existing group`);
+    }
+    function assign(row, index) {
+      if (method === 'two_pass') { stats.rowsRead++; stats.lookups++; }
+      const group = groups.find(item => item.order_id === row.order_id);
+      const previousTotal = group.revenue;
+      group.revenue += row.line_revenue; stats.updates++;
+      if (method === 'two_pass') { group.members.push({ line_id: `${row.order_id}-${row.line_no}`, line_revenue: row.line_revenue }); stats.storedMembers++; }
+      save('assign', { ...identity(row, index), kind: 'assign', group_index: groups.indexOf(group), previousTotal, nextTotal: group.revenue },
+        method === 'two_pass'
+          ? `Assign line ${row.order_id}-${row.line_no} to its group. Retain its member reference and update the sum to ${group.revenue}.`
+          : `Add ${row.line_revenue} to order ${row.order_id}: keep sum ${group.revenue}, without retaining this line as a member.`,
+        `Order ${row.order_id}: ${previousTotal} + ${row.line_revenue} = ${group.revenue}`);
+    }
+    if (method === 'two_pass') {
+      lines.forEach((row, index) => locate(row, index, 'discover'));
+      lines.forEach(assign);
+    } else lines.forEach((row, index) => { locate(row, index, 'lookup'); assign(row, index); });
+    groups.forEach((group, index) => {
+      outputs.push({ order_id: group.order_id, revenue: group.revenue });
+      save('emit', { kind: 'emit', order_id: group.order_id, output_index: index, group_index: index, revenue: group.revenue },
+        `All lines are processed. Emit order ${group.order_id} with revenue ${group.revenue} from memory to the output.`,
+        `Order ${group.order_id} → output ${group.revenue}`);
+    });
+    return { key: 'group', title: 'GROUP BY', method,
+      subset: { orderIds: [...orderIds], lineIds: lines.map(row => `${row.order_id}-${row.line_no}`) }, steps };
+  }
+
+  function buildAnimationLesson(options = {}) {
     const all = buildJourney();
     const orderIds = [101, 102, 103];
     const lines = all.find(stage => stage.key === 'revenue').after.rows
@@ -174,18 +230,9 @@ ORDER BY customer_id, order_date, order_id;
     const activeLine = (row, index) => ({ order_id: row.order_id, line_no: row.line_no, line_id: `${row.order_id}-${row.line_no}`, output_index: index });
     const initial = status => ({ index: 0, status, active: null, outputs: [], equation: '' });
     const join = [initial('Three orders meet five item lines. Follow one matching pair into the result.')];
-    const group = [initial('Five line revenues will become three order totals. Each arrival adds to its own order.')];
     lines.forEach((row, index) => {
       join.push({ index: index + 1, status: `Order ${row.order_id} matches line ${row.line_no}: ${row.product_name}. ${index + 1} joined ${index === 0 ? 'row has' : 'rows have'} arrived.`, active: activeLine(row, index), outputs: lines.slice(0, index + 1).map(line => ({ ...line })), equation: `Order ${row.order_id} + line ${row.line_no} → joined row ${index + 1}` });
-      const totals = [];
-      lines.slice(0, index + 1).forEach(line => {
-        let total = totals.find(item => item.order_id === line.order_id);
-        if (!total) { total = { order_id: line.order_id, revenue: 0 }; totals.push(total); }
-        total.revenue += line.line_revenue;
-      });
-      const contributions = lines.slice(0, index + 1).filter(line => line.order_id === row.order_id).map(line => line.line_revenue);
-      const sum = totals.find(total => total.order_id === row.order_id).revenue;
-      group.push({ index: index + 1, status: `Line ${row.line_no} adds ${row.line_revenue} to order ${row.order_id}. Its total is now ${sum}.`, active: activeLine(row, index), outputs: totals.map(total => ({ ...total })), equation: `Order ${row.order_id}: ${contributions.join(' + ')} = ${sum}` });
+
     });
     const orders = all.find(stage => stage.key === 'window').after.rows.filter(row => orderIds.includes(row.order_id));
     const windowSteps = [initial('Keep all three orders. Grow the frame to add their revenues one at a time.')];
@@ -195,7 +242,7 @@ ORDER BY customer_id, order_date, order_id;
     });
     return [
       { key: 'join', title: 'JOIN', subset: subset(), steps: join },
-      { key: 'group', title: 'GROUP BY', subset: subset(), steps: group },
+      buildGroupMemoryLesson(options.groupMethod ?? 'two_pass'),
       { key: 'window', title: 'Window', subset: subset(), steps: windowSteps }
     ];
   }
@@ -205,6 +252,7 @@ ORDER BY customer_id, order_date, order_id;
       const host = doc.getElementById('lab01-order-journey');
       if (!host || host.dataset.ready === 'true') return;
       const lessons = buildAnimationLesson();
+      let groupMethod = 'two_pass';
       const lines = lessons[0].steps[5].outputs;
       const orderRows = [
         { order_id: 101, date: 'Jan 5', revenue: 300 },
@@ -219,6 +267,7 @@ ORDER BY customer_id, order_date, order_id;
       host.setAttribute('role', 'region'); host.setAttribute('aria-label', 'Watch SQL transform rows');
       host.innerHTML = `
         <div class="order-journey__tabs" role="tablist" aria-label="SQL animation"></div>
+        <div class="order-journey__group-tools" data-group-tools hidden><label for="lab01-group-method">GROUP BY model</label><select id="lab01-group-method" data-group-method><option value="two_pass">Create groups, then assign</option><option value="one_pass">One-pass SUM</option></select><div class="order-journey__memory-stats" aria-label="Illustrated work and retained state"><span>Reads <b data-group-stat="rowsRead">0</b></span><span>Groups <b data-group-stat="groupsCreated">0</b></span><span>Member refs <b data-group-stat="storedMembers">0</b></span></div></div>
         <div class="order-journey__scene" role="tabpanel" id="lab01-animation-scene"></div>
         <p class="order-journey__caption" id="lab01-animation-caption" aria-live="polite" aria-atomic="true"></p>
         <div class="order-journey__controls"><div role="group" aria-label="Animation controls"><button type="button" data-animation-action="replay" title="Return to the beginning">↺ Replay</button><button type="button" data-animation-action="play" aria-pressed="false">▶ Play</button><button type="button" data-animation-action="next">Next →</button></div><span data-animation-progress></span></div>
@@ -277,7 +326,7 @@ ORDER BY customer_id, order_date, order_id;
       const snapshot = () => currentLesson().steps[step];
       function layout() {
         const w = Math.max(280, Math.round(scene.getBoundingClientRect().width || 760));
-        return { w, mobile: w < 600, h: w < 600 ? 480 : 424 };
+        return { w, mobile: w < 600, h: w < 600 ? (currentLesson().key === 'group' ? 520 : 480) : 424 };
       }
       function renderScene() {
         const geometry = layout(), { w, mobile, h } = geometry;
@@ -326,28 +375,73 @@ ORDER BY customer_id, order_date, order_id;
         }
       }
       function drawGroup({ w, mobile, h }, active) {
-        const sources = lines.map((row, i) => ({ ...row, x: mobile ? 12 : 35, y: mobile ? 52+i*63 : 54+i*60, w: mobile ? w*.43-12 : w*.29, h: 44 }));
-        const groups = orderRows.map((row, i) => ({ ...row, x: mobile ? w*.61 : w*.66, y: mobile ? 80+i*112 : 81+i*105, w: mobile ? w*.39-12 : w*.34-35, h: 68 }));
-        const routes = sources.map(source => {
-          const destination = groups.find(group => group.order_id === source.order_id);
-          const route = curve({ x: source.x+source.w, y: source.y+source.h/2 }, { x: destination.x, y: destination.y+destination.h/2 });
-          add('path', { d: path(route), class: 'journey-ribbon' }); return route;
-        });
-        text(sources[0].x, 27, 'Line revenue · 5 rows', 'journey-heading');
-        text(groups[0].x, 27, 'Order totals · 3', 'journey-heading');
-        sources.forEach((source, i) => card(source.x, source.y, source.w, source.h, `${source.order_id} · line ${source.line_no}`, String(source.line_revenue), i < step ? 'is-consumed' : active && active.output_index === i ? 'is-active' : ''));
-        let destinationNode = null, destinationGeometry = null;
-        groups.forEach(group => {
-          const total = snapshot().outputs.find(row => row.order_id === group.order_id);
-          const node = card(group.x, group.y, group.w, group.h, `Order ${group.order_id}`, `Total ${total ? total.revenue : 0}`, `is-group${active && active.order_id === group.order_id ? ' is-active' : ''}`);
-          if (active && active.order_id === group.order_id) { destinationNode = node; destinationGeometry = group; }
-        });
-        text(w/2, mobile ? 419 : h-31, snapshot().equation || 'Each line adds to its own order.', 'journey-equation', svg, 'middle');
-        if (active) {
-          const route = routes[active.output_index];
-          const ribbon = add('path', { d: path(route), class: 'journey-ribbon journey-ribbon--active', 'data-animation-ribbon': '' });
-          motion = { type: 'group', route, ribbon, token: token(lines[active.output_index].line_revenue, 58), destinationNode, destinationGeometry };
+        const state = snapshot();
+        const sourceW = mobile ? w*.38-12 : w*.24-22;
+        const sourceX = mobile ? 12 : 22, memoryX = mobile ? w*.47 : w*.34;
+        const memoryW = mobile ? w*.53-12 : w*.35;
+        const outputX = mobile ? 12 : w*.78, outputW = mobile ? (w-44)/3 : w*.22-18;
+        const sources = lines.map((row, i) => ({ ...row, x: sourceX, y: 78+i*(mobile ? 48 : 53), w: sourceW, h: 41 }));
+        const groupGeometry = index => ({ x: memoryX, y: 82+index*(mobile ? 88 : 91), w: memoryW, h: mobile ? 76 : 78 });
+        const outputGeometry = index => ({ x: mobile ? 12+index*(outputW+10) : outputX, y: mobile ? 413 : 98+index*85, w: outputW, h: mobile ? 58 : 62 });
+        const phaseNames = { ready: 'Ready · memory is empty', discover: '1 · Discover groups', lookup: 'Read key · find or create', assign: groupMethod === 'two_pass' ? '2 · Assign members' : 'Update the sum', emit: groupMethod === 'two_pass' ? '3 · Emit output' : 'Emit output' };
+        const nextState = active ? currentLesson().steps[step+1] : state;
+        text(12, 23, phaseNames[nextState.phase], 'journey-phase');
+        text(sourceX, 55, 'Input · 5 lines', 'journey-heading');
+        text(memoryX, 55, 'Working memory', 'journey-heading');
+        text(mobile ? 12 : outputX, mobile ? 394 : 55, 'Output', 'journey-heading');
+        add('rect', { x: memoryX-5, y: 68, width: memoryW+10, height: mobile ? 280 : 299, rx: 9, class: 'journey-memory-zone' });
+        if (!state.groups.length) {
+          text(memoryX+memoryW/2, 185, 'No groups yet', 'journey-empty-note', svg, 'middle');
+          text(memoryX+memoryW/2, 206, 'Created on key arrival', 'journey-empty-note', svg, 'middle');
         }
+        if (!state.outputs.length) {
+          const x = mobile ? 12 : outputX, y = mobile ? 409 : 74;
+          add('rect', { x, y, width: mobile ? w-24 : outputW, height: mobile ? 66 : 286, rx: 8, class: 'journey-output-zone' });
+          text(mobile ? w/2 : outputX+outputW/2, mobile ? 434 : 190, 'No output yet', 'journey-empty-note', svg, 'middle');
+          if (!mobile) text(outputX+outputW/2, 211, 'Emit after all lines', 'journey-empty-note', svg, 'middle');
+        }
+        sources.forEach((source, index) => {
+          const id = `${source.order_id}-${source.line_no}`;
+          const assigned = state.stats.updates > index;
+          const cls = active && active.line_id === id ? 'is-active' : assigned ? 'is-read' : '';
+          const node = card(source.x, source.y, source.w, source.h, id, String(source.line_revenue), cls);
+          node.dataset.groupInput = id;
+        });
+        const groupNodes = [];
+        state.groups.forEach((group, index) => {
+          const box = groupGeometry(index);
+          const node = add('g', { class: `journey-memory-group${active && active.order_id === group.order_id ? ' is-active' : ''}`, 'data-memory-group': group.order_id });
+          add('rect', { x: box.x, y: box.y, width: box.w, height: box.h, rx: 7 }, undefined, node);
+          text(box.x+10, box.y+19, `Key ${group.order_id}`, 'journey-memory-key', node);
+          const discoveredOnly = groupMethod === 'two_pass' && state.stats.updates === 0;
+          text(box.x+10, box.y+41, discoveredOnly ? 'No members yet' : `SUM ${group.revenue}`, 'journey-memory-sum', node);
+          const members = group.members.map(member => member.line_revenue).join(' · ');
+          text(box.x+10, box.y+box.h-10, groupMethod === 'one_pass' ? 'Key + sum only' : members ? `Members: ${members}` : 'Members: —', 'journey-memory-members', node);
+          groupNodes[index] = node;
+        });
+        state.outputs.forEach((row, index) => {
+          const box = outputGeometry(index);
+          const node = card(box.x, box.y, box.w, box.h, `Order ${row.order_id}`, `SUM ${row.revenue}`, 'is-result');
+          node.dataset.groupOutput = row.order_id;
+        });
+        text(w/2, h-16, state.equation || 'Keys and sums live in memory before output.', 'journey-memory-equation', svg, 'middle');
+        if (!active) return;
+        const box = groupGeometry(active.group_index);
+        let route, label, destinationNode = groupNodes[active.group_index] || null, destinationGeometry = box;
+        if (active.kind === 'emit') {
+          const output = outputGeometry(active.output_index);
+          route = curve({ x: box.x+box.w, y: box.y+box.h/2 }, mobile
+            ? { x: output.x+output.w/2, y: output.y } : { x: output.x, y: output.y+output.h/2 });
+          label = String(active.revenue); destinationNode = null; destinationGeometry = output;
+        } else {
+          const source = sources[active.output_index];
+          route = curve({ x: source.x+source.w, y: source.y+source.h/2 }, { x: box.x, y: box.y+box.h/2 });
+          label = active.kind === 'assign' ? String(active.line_revenue) : String(active.order_id);
+        }
+        let allocation = null;
+        if (active.newGroup) allocation = add('rect', { x: box.x, y: box.y, width: box.w, height: box.h, rx: 7, class: 'journey-allocation', opacity: 0, 'data-allocation-preview': '' });
+        const ribbon = add('path', { d: path(route), class: 'journey-ribbon journey-ribbon--active', 'data-animation-ribbon': '' });
+        motion = { type: 'group', route, ribbon, token: token(label, 52), destinationNode, destinationGeometry, allocation };
       }
       function drawWindow({ w, mobile, h }, active) {
         const left = mobile ? 12 : 34, top = mobile ? 88 : 81, rowHeight = mobile ? 90 : 77;
@@ -385,7 +479,8 @@ ORDER BY customer_id, order_date, order_id;
           motion.ribbon.setAttribute('stroke-dashoffset', String(-t*120));
           const d = motion.destinationGeometry, scale = t > .76 ? 1 + Math.sin((t-.76)/.24*Math.PI)*.045 : 1;
           const cx = d.x+d.w/2, cy = d.y+d.h/2;
-          motion.destinationNode.setAttribute('transform', `translate(${cx} ${cy}) scale(${scale}) translate(${-cx} ${-cy})`);
+          if (motion.destinationNode) motion.destinationNode.setAttribute('transform', `translate(${cx} ${cy}) scale(${scale}) translate(${-cx} ${-cy})`);
+          if (motion.allocation) motion.allocation.setAttribute('opacity', String(Math.max(0, (t-.65)/.35)));
         } else {
           const { top, rowHeight } = motion;
           motion.frame.setAttribute('opacity', '1');
@@ -400,7 +495,12 @@ ORDER BY customer_id, order_date, order_id;
         const end = step === currentLesson().steps.length-1 && !inFlight;
         play.textContent = running || auto ? 'Ⅱ Pause' : '▶ Play'; play.setAttribute('aria-pressed', String(running || auto));
         play.disabled = end; next.disabled = end;
-        find('[data-animation-progress]').textContent = `${step} / ${currentLesson().steps.length-1} ${currentLesson().key === 'window' ? 'orders calculated' : 'lines arrived'}`;
+        find('[data-animation-progress]').textContent = `${step} / ${currentLesson().steps.length-1} ${currentLesson().key === 'window' ? 'orders calculated' : currentLesson().key === 'group' ? 'actions' : 'lines arrived'}`;
+        find('[data-group-tools]').hidden = currentLesson().key !== 'group';
+        if (currentLesson().key === 'group') {
+          host.dataset.groupMethod = groupMethod; host.dataset.groupPhase = snapshot().phase;
+          host.querySelectorAll('[data-group-stat]').forEach(node => { node.textContent = snapshot().stats[node.dataset.groupStat]; });
+        }
         host.dataset.animationState = running ? 'playing' : inFlight ? 'paused' : end ? 'complete' : 'ready';
         host.dataset.animationStep = String(step); host.dataset.animationConcept = currentLesson().key;
         tabs.querySelectorAll('button').forEach((button, i) => { button.setAttribute('aria-selected', String(i===concept)); button.tabIndex = i===concept ? 0 : -1; });
@@ -409,7 +509,7 @@ ORDER BY customer_id, order_date, order_id;
       function refreshCaption() {
         if (inFlight) {
           const active = currentLesson().steps[step+1].active;
-          caption.textContent = currentLesson().key === 'join' ? `Match order ${active.order_id} to line ${active.line_no}, then carry that pair into the result.` : currentLesson().key === 'group' ? `Move line ${active.line_no}’s ${lines[active.output_index].line_revenue} into order ${active.order_id}’s total.` : `Grow the frame through order ${active.order_id}; its running total appears when the frame arrives.`;
+          caption.textContent = currentLesson().key === 'join' ? `Match order ${active.order_id} to line ${active.line_no}, then carry that pair into the result.` : currentLesson().key === 'group' ? active.kind === 'emit' ? `Carry order ${active.order_id}’s completed sum to the output.` : active.kind === 'assign' ? `Carry line ${active.line_id}’s ${active.line_revenue} into the memory entry for order ${active.order_id}.` : active.newGroup ? `Read key ${active.order_id}. Allocate a new group when the key arrives.` : `Read key ${active.order_id}. Find and reuse the group already in memory.` : `Grow the frame through order ${active.order_id}; its running total appears when the frame arrives.`;
         } else caption.textContent = snapshot().status;
       }
       function cancelTiming() {
@@ -419,10 +519,11 @@ ORDER BY customer_id, order_date, order_id;
       function pause() { cancelTiming(); running = false; auto = false; syncControls(); }
       function finish() {
         running = false; inFlight = false; progress = 0; lastTime = null; step++;
+        if (currentLesson().key === 'group') details();
         renderScene(); refreshCaption(); syncControls();
         if (auto && step < currentLesson().steps.length-1) {
           const generation = epoch;
-          delay = setTimeout(() => { delay = null; if (generation === epoch && auto) start(true); }, reduced.matches ? 1600 : 650);
+          delay = setTimeout(() => { delay = null; if (generation === epoch && auto) start(true); }, reduced.matches ? 1600 : currentLesson().key === 'group' ? 300 : 650);
         } else { auto = false; syncControls(); }
       }
       function start(continuePlaying) {
@@ -431,7 +532,7 @@ ORDER BY customer_id, order_date, order_id;
         if (!inFlight) { inFlight = true; progress = 0; renderScene(); }
         running = true; refreshCaption(); syncControls();
         if (reduced.matches) { finish(); return; }
-        const generation = epoch, duration = currentLesson().key === 'window' ? 2400 : 2200;
+        const generation = epoch, duration = currentLesson().key === 'group' ? (currentLesson().steps[step+1].phase === 'assign' ? 1800 : 1100) : currentLesson().key === 'window' ? 2400 : 2200;
         function tick(time) {
           if (!running || generation !== epoch) return;
           if (lastTime !== null) progress = Math.min(1, progress+(time-lastTime)/duration);
@@ -448,17 +549,34 @@ ORDER BY customer_id, order_date, order_id;
         const kind = currentLesson().key;
         const descriptions = {
           join: 'Each match keeps the order ID and line number. Orders 101 and 102 appear twice because each has two lines. LEFT JOIN would also retain an order without lines; this selected subset has a match for every order.',
-          group: 'Line revenue already includes quantity and discount under the lab rule. SUM groups the five lines by order: 100 + 200 = 300; 150 + 50 = 200; 200 = 200. Five item-line rows become three order rows.',
+          group: (groupMethod === 'two_pass' ? 'This two-pass teaching model first reads five keys to create groups, then reads the five lines again to retain member references and update sums. It keeps three key/sum entries plus five member references.' : 'This one-pass SUM model reads each of five lines once. It finds or creates a key, updates its sum, then discards the member reference. It retains three key/sum entries and no member list.') + ' Both models emit output only after processing all lines. Reads count input visits; Groups counts allocated key/sum entries; Member refs counts retained references, not copies of full rows. The illustrated counts and animation speed are not PostgreSQL memory bytes or measured runtime. SQL specifies the grouped result; PostgreSQL may choose a different physical algorithm. Line revenue already includes quantity and discount. The table below follows emitted output at the current step.',
           window: 'The ordered ROWS frame grows from the first order through the current row. SUM OVER adds a column and keeps three order rows. Orders 102 and 103 share a date; order_id breaks the tie. This is a logical illustration, not PostgreSQL’s physical execution plan.'
         };
         find('[data-animation-detail]').textContent = descriptions[kind];
         const container = find('.order-journey__accessible-data'); container.replaceChildren();
-        const grid = doc.createElement('table'), cap = doc.createElement('caption'); cap.textContent = `${currentLesson().title} · complete subset result`;
+        const grid = doc.createElement('table'), cap = doc.createElement('caption'); cap.textContent = `${currentLesson().title} · ${kind === 'group' ? 'output emitted so far' : 'complete subset result'}`;
         const columns = kind === 'join' ? [['order_id','Order'],['line_no','Line'],['product_name','Product']] : kind === 'group' ? [['order_id','Order'],['revenue','Order revenue']] : [['order_id','Order'],['revenue','Revenue'],['running_total','Running total']];
         const head = doc.createElement('thead'), tr = doc.createElement('tr');
         columns.forEach(([,label]) => { const th = doc.createElement('th'); th.scope='col'; th.textContent=label; tr.append(th); }); head.append(tr);
-        const body = doc.createElement('tbody'); currentLesson().steps.at(-1).outputs.forEach(row => { const tr = doc.createElement('tr'); columns.forEach(([key],i) => { const cell=doc.createElement(i===0?'th':'td'); if (i===0) cell.scope='row'; cell.textContent=String(row[key]); tr.append(cell); }); body.append(tr); });
-        grid.append(cap,head,body); container.append(grid);
+        const body = doc.createElement('tbody'); (kind === 'group' ? snapshot().outputs : currentLesson().steps.at(-1).outputs).forEach(row => { const tr = doc.createElement('tr'); columns.forEach(([key],i) => { const cell=doc.createElement(i===0?'th':'td'); if (i===0) cell.scope='row'; cell.textContent=String(row[key]); tr.append(cell); }); body.append(tr); });
+        grid.append(cap,head,body);
+        if (kind === 'group') {
+          const memoryTable = doc.createElement('table'), memoryCaption = doc.createElement('caption');
+          memoryCaption.textContent = 'Working memory at this step · teaching model';
+          const memoryHead = doc.createElement('thead'), memoryHeader = doc.createElement('tr');
+          ['Order key', 'Current sum', 'Retained members'].forEach(label => { const th = doc.createElement('th'); th.scope='col'; th.textContent=label; memoryHeader.append(th); });
+          memoryHead.append(memoryHeader);
+          const memoryBody = doc.createElement('tbody');
+          snapshot().groups.forEach(group => {
+            const row = doc.createElement('tr');
+            [group.order_id, group.revenue, group.members.map(member => `${member.line_id}: ${member.line_revenue}`).join(', ') || 'None'].forEach((value, index) => {
+              const cell = doc.createElement(index ? 'td' : 'th'); if (!index) cell.scope='row'; cell.textContent=String(value); row.append(cell);
+            });
+            memoryBody.append(row);
+          });
+          memoryTable.append(memoryCaption,memoryHead,memoryBody); container.append(memoryTable);
+        }
+        container.append(grid);
         const sql = kind === 'join' ? `SELECT o.order_id, i.line_no, i.product_name
 FROM orders AS o
 LEFT JOIN order_items AS i ON i.order_id = o.order_id
@@ -473,8 +591,12 @@ GROUP BY o.order_id
 ORDER BY o.order_id;` : workedExampleSql.replace('WHERE c.customer_id = 1', 'WHERE c.customer_id = 1 AND o.order_id IN (101, 102, 103)');
         find('[data-animation-sql]').textContent = sql;
       }
-      function reset() { pause(); epoch++; step=0; progress=0; inFlight=false; renderScene(); refreshCaption(); syncControls(); }
+      function reset() { pause(); epoch++; step=0; progress=0; inFlight=false; details(); renderScene(); refreshCaption(); syncControls(); }
       function changeConcept(i) { pause(); epoch++; concept=i; step=0; progress=0; inFlight=false; details(); renderScene(); refreshCaption(); syncControls(); }
+      find('[data-group-method]').addEventListener('change', event => {
+        pause(); epoch++; groupMethod = event.target.value; lessons[1] = buildGroupMemoryLesson(groupMethod);
+        step=0; progress=0; inFlight=false; details(); renderScene(); refreshCaption(); syncControls();
+      });
       play.addEventListener('click', () => { if (running || auto) pause(); else start(true); });
       next.addEventListener('click', advance); replay.addEventListener('click', reset);
       doc.addEventListener('visibilitychange', () => { if (doc.hidden) pause(); });
@@ -486,5 +608,5 @@ ORDER BY o.order_id;` : workedExampleSql.replace('WHERE c.customer_id = 1', 'WHE
     if (doc.readyState === 'loading') doc.addEventListener('DOMContentLoaded', init, { once: true }); else init();
     if (typeof document$ !== 'undefined') document$.subscribe(init);
   }
-  return { buildJourney, sourceData, workedExampleSql, buildAnimationLesson, mount };
+  return { buildJourney, sourceData, workedExampleSql, buildAnimationLesson, buildGroupMemoryLesson, mount };
 });

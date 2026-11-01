@@ -16,6 +16,27 @@ Each transition has an initial snapshot, a target snapshot, and interpolation ge
 
 Keep model snapshots independent: changing a later state must not mutate an earlier state, the source inputs, or a fresh replay. Layout changes may recalculate coordinates while retaining the same normalized progress.
 
+## Working state, output, and resources
+
+Model the selected computation, not just successive presentations of the answer. Where the distinction matters, each snapshot records:
+
+```text
+snapshot = phase + active operation + working state + emitted outputs + counters
+operation = read / discover / allocate / look up / assign / accumulate / emit
+```
+
+Choose events appropriate to the mechanism; these are not a mandatory sequence for every algorithm. For grouping, a group entry held in working memory is distinct from an output row, even if both later display the same total. A member reference retained by one method is distinct from the accumulator retained by another. Show a new key creating state, an existing key reusing it, and a result leaving that state only at the chosen emission event. Empty spatial slots may reserve layout, but must not reveal undiscovered keys or final values.
+
+Derive resource counters from those operations. A read counter measures cumulative visits; a retained-reference counter measures current state and may decrease when objects are released. Label units and scope: illustrated records, group entries, or references are not memory bytes. Do not count a separate arithmetic animation as another input read when the algorithm has retained that input. Keep most metrics and algorithm qualifications in optional details. Real time or memory claims need an actual measurement and its execution context; a simplified model cannot identify a database's physical plan.
+
+Verify these invariants independently of screen geometry:
+
+- Initial state contains only what the selected method has already received or initialized. Replay and method switching recreate it.
+- Each allocation corresponds to a newly discovered identity; repeated keys reuse the existing entry. Membership and accumulator changes correspond to exactly one contribution.
+- Temporary travelling objects do not prematurely change committed working state, counters, or output. Each arrival commits its specified operation once.
+- Output remains absent until emission. A method that streams results may emit earlier than a blocking method; test the chosen rule rather than requiring every algorithm to wait for all inputs.
+- Compare methods using identical input values and equivalent final results. Check intermediate states and counter deltas as well as the final totals, including any extra pass introduced for teaching.
+
 ## A minimal requestAnimationFrame pattern
 
 This is lifecycle pseudocode to adapt to the host, not a required framework or complete player. `renderTransition` draws temporary movement at normalized progress; `commitTargetOnce` applies the next model snapshot.
@@ -96,12 +117,12 @@ function startTransition(continuePlaying) {
   updateStableControls();
 }
 
-function replaceScene(nextConcept) {
+function replaceScene(nextConceptOrMethod) {
   pause();
   generation += 1;
   inFlight = false;
   progress = 0;
-  resetToInitialSnapshot(nextConcept);
+  resetToInitialSnapshot(nextConceptOrMethod);
 }
 ```
 
@@ -112,8 +133,8 @@ Use equivalent cancellation and completion handling with Web Animations or host 
 ## Lifecycle and browser checks
 
 - On `visibilitychange` to hidden or nonintersection, pause rather than silently reset. Explicit user action can resume.
-- On replay, concept change, or unmount, cancel frame/timer/animation handles and invalidate their generation. Clean up observers and listeners according to the host lifecycle.
+- On replay, concept or method change, or unmount, cancel frame/timer/animation handles and invalidate their generation. Clean up observers and listeners according to the host lifecycle.
 - Keep all movement controlled by the player. A CSS loop, independent tween, or animated ribbon must pause too. With reduced motion, remove travel while keeping the same model commits and manual controls.
 - Give a moving object or frame a stable selector for inspection. Sample its transform/coordinates before and during travel. During pause, sample again after a meaningful interval and check no movement within a small rendering tolerance. Resume and check progress continues from the paused position.
-- Before arrival, completed outputs and totals must still equal the committed snapshot. After arrival, exactly one transition should be committed. Try replay and concept switching mid-flight, during an autoplay dwell, and at the last state.
+- Before arrival, working state, counters, completed outputs, and totals must still equal the committed snapshot. After arrival, exactly one transition should be committed. Try replay and concept/method switching mid-flight, during an autoplay dwell, and at the last state.
 - Resize during a paused transition and verify the same logical progress is preserved with readable labels. A screenshot of the final state does not establish these behaviors.

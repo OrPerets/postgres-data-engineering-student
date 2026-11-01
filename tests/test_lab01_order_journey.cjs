@@ -4,7 +4,7 @@ const assert = require('node:assert/strict');
 const fs = require('node:fs/promises');
 const path = require('node:path');
 const { pathToFileURL } = require('node:url');
-const { buildJourney, buildAnimationLesson, sourceData, workedExampleSql } = require('../docs/gitbook/javascripts/lab01-order-journey.js');
+const { buildJourney, buildAnimationLesson, buildGroupMemoryLesson, sourceData, workedExampleSql } = require('../docs/gitbook/javascripts/lab01-order-journey.js');
 
 const root = path.resolve(__dirname, '..');
 const practiceAssets = path.join(root, 'docs/gitbook/assets/lab01-practice');
@@ -70,20 +70,155 @@ test('the focused JOIN animation matches each of five lines exactly once', () =>
   assert.deepEqual(steps.at(-1).outputs.map(row => row.line_revenue), [100, 200, 150, 50, 200]);
 });
 
-test('GROUP BY animation shows every contribution before collapsing to three orders', () => {
-  const group = buildAnimationLesson().find(lesson => lesson.key === 'group');
-  assert.deepEqual(group.steps.map(step => step.index), [0, 1, 2, 3, 4, 5]);
-  assert.deepEqual(group.steps.slice(1).map(step => step.active.line_id), ['101-1', '101-2', '102-1', '102-2', '103-1']);
-  const expected = [
-    [],
-    [{ order_id: 101, revenue: 100 }],
-    [{ order_id: 101, revenue: 300 }],
-    [{ order_id: 101, revenue: 300 }, { order_id: 102, revenue: 150 }],
-    [{ order_id: 101, revenue: 300 }, { order_id: 102, revenue: 200 }],
-    [{ order_id: 101, revenue: 300 }, { order_id: 102, revenue: 200 }, { order_id: 103, revenue: 200 }],
-  ];
-  assert.deepEqual(group.steps.map(step => project(step.outputs, ['order_id', 'revenue'])), expected);
-  assert.deepEqual(group.steps.map(step => step.outputs.reduce((sum, row) => sum + row.revenue, 0)), [0, 100, 300, 450, 500, 700]);
+const groupLineIds = ['101-1', '101-2', '102-1', '102-2', '103-1'];
+const groupOrderIds = [101, 101, 102, 102, 103];
+const groupAmounts = [100, 200, 150, 50, 200];
+const groupTotals = [{ order_id: 101, revenue: 300 }, { order_id: 102, revenue: 200 }, { order_id: 103, revenue: 200 }];
+const resourceKeys = ['rowsRead', 'lookups', 'groupsCreated', 'storedMembers', 'updates'];
+
+function resources(step) {
+  return resourceKeys.map(key => step.stats[key]);
+}
+
+function assertEmission(lesson) {
+  const emits = lesson.steps.filter(step => step.phase === 'emit');
+  assert.equal(emits.length, 3);
+  const finishedAssignment = lesson.steps.at(-4);
+  assert.deepEqual(finishedAssignment.outputs, [], 'working sums are not output rows');
+  assert.deepEqual(project(finishedAssignment.groups, ['order_id', 'revenue']), groupTotals);
+  for (const [index, step] of emits.entries()) {
+    assert.equal(step.active.kind, 'emit');
+    assert.equal(step.active.order_id, groupTotals[index].order_id);
+    assert.equal(step.active.output_index, index);
+    assert.deepEqual(project(step.outputs, ['order_id', 'revenue']), groupTotals.slice(0, index + 1));
+    assert.deepEqual(step.groups, finishedAssignment.groups, 'emitting output does not re-add contributions');
+    assert.deepEqual(step.stats, finishedAssignment.stats, 'emitting output does not re-read source rows');
+  }
+  for (const step of lesson.steps.filter(step => step.phase !== 'emit')) {
+    assert.deepEqual(step.outputs, [], `${step.phase}: final output stays withheld`);
+  }
+}
+
+test('two-pass GROUP BY discovers empty groups before assigning members and emitting output', () => {
+  const lesson = buildGroupMemoryLesson();
+  assert.equal(lesson.key, 'group');
+  assert.equal(lesson.method, 'two_pass');
+  assert.deepEqual(buildAnimationLesson().find(item => item.key === 'group'), lesson);
+  assert.deepEqual(lesson.steps.map(step => step.index), Array.from({ length: 14 }, (_, index) => index));
+  assert.deepEqual(lesson.steps.map(step => step.phase), [
+    'ready', ...Array(5).fill('discover'), ...Array(5).fill('assign'), ...Array(3).fill('emit'),
+  ]);
+  assert.deepEqual(lesson.steps[0].groups, []);
+  assert.deepEqual(lesson.steps[0].outputs, []);
+  assert.equal(lesson.steps[0].active, null);
+  const discovery = lesson.steps.slice(1, 6);
+  assert.deepEqual(discovery.map(step => step.active.line_id), groupLineIds);
+  assert.deepEqual(discovery.map(step => step.active.newGroup), [true, false, true, false, true]);
+  assert.deepEqual(discovery.map(step => step.groups.map(group => group.order_id)), [
+    [101], [101], [101, 102], [101, 102], [101, 102, 103],
+  ]);
+  for (const step of discovery) {
+    assert.equal(step.active.kind, 'discover');
+    for (const group of step.groups) {
+      assert.equal(group.revenue, 0, 'discovery allocates a group without precomputing its sum');
+      assert.deepEqual(group.members, [], 'discovery does not retain contributions yet');
+    }
+  }
+  const assignment = lesson.steps.slice(6, 11);
+  assert.deepEqual(assignment.map(step => step.active.line_id), groupLineIds);
+  assert.deepEqual(assignment.map(step => step.active.order_id), groupOrderIds);
+  assert.deepEqual(assignment.map(step => step.active.previousTotal), [0, 100, 0, 150, 0]);
+  assert.deepEqual(assignment.map(step => step.active.nextTotal), [100, 300, 150, 200, 200]);
+  assert.deepEqual(assignment.map(step => step.groups.map(group => group.revenue)), [
+    [100, 0, 0], [300, 0, 0], [300, 150, 0], [300, 200, 0], [300, 200, 200],
+  ]);
+  for (const [index, step] of assignment.entries()) {
+    assert.equal(step.active.kind, 'assign');
+    assert.deepEqual(step.groups.map(group => group.order_id), [101, 102, 103]);
+    const members = step.groups.flatMap(group => group.members);
+    assert.deepEqual(members.map(member => member.line_id), groupLineIds.slice(0, index + 1));
+    assert.deepEqual(members.map(member => member.line_revenue), groupAmounts.slice(0, index + 1));
+    assert.equal(new Set(members.map(member => member.line_id)).size, index + 1);
+    for (const group of step.groups) {
+      assert.ok(group.members.every(member => Number(member.line_id.split('-')[0]) === group.order_id));
+      assert.equal(group.revenue, group.members.reduce((sum, member) => sum + member.line_revenue, 0));
+    }
+  }
+  assert.deepEqual(lesson.steps.map(resources), [
+    [0, 0, 0, 0, 0],
+    [1, 1, 1, 0, 0], [2, 2, 1, 0, 0], [3, 3, 2, 0, 0], [4, 4, 2, 0, 0], [5, 5, 3, 0, 0],
+    [6, 6, 3, 1, 1], [7, 7, 3, 2, 2], [8, 8, 3, 3, 3], [9, 9, 3, 4, 4], [10, 10, 3, 5, 5],
+    [10, 10, 3, 5, 5], [10, 10, 3, 5, 5], [10, 10, 3, 5, 5],
+  ]);
+  assertEmission(lesson);
+});
+
+test('one-pass SUM looks up each source once and retains sums without member references', () => {
+  const lesson = buildGroupMemoryLesson('one_pass');
+  assert.equal(lesson.method, 'one_pass');
+  assert.deepEqual(buildAnimationLesson({ groupMethod: 'one_pass' }).find(item => item.key === 'group'), lesson);
+  assert.deepEqual(lesson.steps.map(step => step.index), Array.from({ length: 14 }, (_, index) => index));
+  assert.deepEqual(lesson.steps.map(step => step.phase), [
+    'ready', 'lookup', 'assign', 'lookup', 'assign', 'lookup', 'assign', 'lookup', 'assign', 'lookup', 'assign', 'emit', 'emit', 'emit',
+  ]);
+  assert.deepEqual(lesson.steps[0].groups, []);
+  const lookups = lesson.steps.filter(step => step.phase === 'lookup');
+  const assignments = lesson.steps.filter(step => step.phase === 'assign');
+  assert.deepEqual(lookups.map(step => step.active.line_id), groupLineIds);
+  assert.deepEqual(assignments.map(step => step.active.line_id), groupLineIds);
+  assert.deepEqual(lookups.map(step => step.active.newGroup), [true, false, true, false, true]);
+  assert.deepEqual(lookups.map(step => step.groups.map(group => group.order_id)), [
+    [101], [101], [101, 102], [101, 102], [101, 102, 103],
+  ]);
+  assert.deepEqual(lookups.map(step => step.groups.map(group => group.revenue)), [
+    [0], [100], [300, 0], [300, 150], [300, 200, 0],
+  ]);
+  assert.deepEqual(assignments.map(step => step.groups.map(group => group.revenue)), [
+    [100], [300], [300, 150], [300, 200], [300, 200, 200],
+  ]);
+  for (const step of lesson.steps) {
+    assert.ok(step.groups.every(group => group.members.length === 0), 'SUM state does not retain the original members');
+  }
+  for (const step of assignments) {
+    assert.equal(step.active.nextTotal - step.active.previousTotal, step.active.line_revenue);
+  }
+  assert.deepEqual(lesson.steps.map(resources), [
+    [0, 0, 0, 0, 0],
+    [1, 1, 1, 0, 0], [1, 1, 1, 0, 1], [2, 2, 1, 0, 1], [2, 2, 1, 0, 2], [3, 3, 2, 0, 2],
+    [3, 3, 2, 0, 3], [4, 4, 2, 0, 3], [4, 4, 2, 0, 4], [5, 5, 3, 0, 4], [5, 5, 3, 0, 5],
+    [5, 5, 3, 0, 5], [5, 5, 3, 0, 5], [5, 5, 3, 0, 5],
+  ]);
+  assertEmission(lesson);
+  assert.deepEqual(lesson.steps.at(-1).outputs, buildGroupMemoryLesson('two_pass').steps.at(-1).outputs);
+});
+
+test('GROUP BY replays isolate working memory, member references, counters, and method selection', () => {
+  const originalSource = structuredClone(sourceData);
+  for (const method of ['two_pass', 'one_pass']) {
+    const lesson = buildGroupMemoryLesson(method);
+    const original = structuredClone(lesson);
+    const fresh = buildGroupMemoryLesson(method);
+    assert.notEqual(lesson.steps[6].groups, lesson.steps[7].groups);
+    assert.notEqual(lesson.steps[6].stats, lesson.steps[7].stats);
+    const mutations = [
+      () => { lesson.steps[6].groups[0].revenue = -999; },
+      () => { lesson.steps[6].stats.rowsRead = -999; },
+      () => { lesson.steps[6].groups[0].members.push({ line_id: 'bad', line_revenue: -999 }); },
+      () => { lesson.steps.at(-1).outputs[0].revenue = -999; },
+    ];
+    for (const mutate of mutations) {
+      try { mutate(); } catch (error) { assert.ok(error instanceof TypeError); }
+    }
+    assert.deepEqual(lesson.steps[7], original.steps[7]);
+    assert.deepEqual(fresh, original);
+    assert.deepEqual(buildGroupMemoryLesson(method), original);
+    assert.deepEqual(sourceData, originalSource);
+    assert.deepEqual(fresh.steps[0].groups, []);
+    assert.deepEqual(fresh.steps[0].outputs, []);
+    assert.deepEqual(resources(fresh.steps[0]), [0, 0, 0, 0, 0]);
+  }
+  assert.throws(() => buildGroupMemoryLesson('unsupported'), RangeError);
+  assert.throws(() => buildAnimationLesson({ groupMethod: 'unsupported' }), RangeError);
 });
 
 test('running-window animation grows its frame one order at a time and retains all orders', () => {
@@ -244,7 +379,9 @@ test('Lab 01 journey agrees with PostgreSQL at every transformation', async t =>
             ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW) AS running_total
         FROM order_totals WHERE order_id IN (101, 102, 103) ORDER BY order_date, order_id`);
       assert.deepEqual(project(lessons.join.steps.at(-1).outputs, ['order_id', 'line_no', 'product_name', 'line_revenue']), project(matched, ['order_id', 'line_no', 'product_name', 'line_revenue']));
-      assert.deepEqual(project(lessons.group.steps.at(-1).outputs, ['order_id', 'revenue']), project(grouped, ['order_id', 'revenue']));
+      for (const method of ['two_pass', 'one_pass']) {
+        assert.deepEqual(project(buildGroupMemoryLesson(method).steps.at(-1).outputs, ['order_id', 'revenue']), project(grouped, ['order_id', 'revenue']), `${method}: SQL-equivalent final output`);
+      }
       assert.deepEqual(project(lessons.window.steps.at(-1).outputs, ['order_id', 'revenue', 'running_total']), project(running, ['order_id', 'revenue', 'running_total']));
     });
   } finally {

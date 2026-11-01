@@ -9,9 +9,21 @@ These references illustrate design choices. They are not required dependencies, 
 - [Scoped scene styling](https://github.com/OrPerets/postgres-data-engineering-student/blob/main/docs/gitbook/stylesheets/lab01-order-journey.css)
 - [Independent model and PostgreSQL checks](https://github.com/OrPerets/postgres-data-engineering-student/blob/main/tests/test_lab01_order_journey.cjs)
 
-The main scene presents one of three concepts: matching rows, accumulating groups, or a growing window. It uses a representative three-order/five-line subset, with short captions, a few controls, and details behind a disclosure. A separate example runs the fuller dataset in PostgreSQL. The simulation and actual query execution are labelled separately.
+The main scene presents one of three concepts: matching rows, building groups in working memory, or a growing window. It uses a representative three-order/five-line subset, with short captions, a few controls, and details behind a disclosure. A separate example runs the fuller dataset in PostgreSQL. The simulation and actual query execution are labelled separately.
 
-Useful mechanics to study: pure snapshots, token arrival followed by output commit, partial sums, a growing frame, normalized animation progress, callback generation checks, and distinct narrow-screen coordinates. Its specific SQL schema, platform, colors, record count, and timing are examples rather than requirements for other lessons. Confirm the source revision and live publication separately before making deployment claims.
+The GROUP BY example separates input, working groups, and output. Both working groups and output begin empty. Its default teaching method discovers keys over five input visits, creates three groups as those keys arrive, then visits the five records again to assign members and update sums. Only after assignment does it emit the three result rows. A one-pass SUM method instead alternates lookup/create with accumulator updates, retaining sums without member references. Both finish with order totals `101 → 300`, `102 → 200`, and `103 → 200`.
+
+| Illustrated work or state | Create groups, then assign | One-pass SUM |
+|---|---:|---:|
+| Input records read, cumulative | 10 | 5 |
+| Group lookups, cumulative | 10 | 5 |
+| Group entries created | 3 | 3 |
+| Member references retained at completion | 5 | 0 |
+| Sum updates, cumulative | 5 | 5 |
+
+These counts describe two explicit models on the same five records. Retained member references are additional to group entries and their sums; zero references does not mean zero memory. The extra discovery pass makes group creation observable and is not a claim about PostgreSQL's chosen algorithm. For real execution evidence, inspect the actual query with [PostgreSQL EXPLAIN](https://www.postgresql.org/docs/16/sql-explain.html); do not substitute illustrated counters or animation duration for measured execution statistics.
+
+Useful mechanics to study: pure snapshots, allocation and mutation on arrival, separate emission commits, model-derived counters, partial sums, a growing frame, normalized animation progress, callback generation checks, and distinct narrow-screen coordinates. Its specific SQL schema, platform, colors, record count, timing, and two-pass teaching sequence are examples rather than requirements for other lessons. Confirm the source revision and live publication separately before making deployment claims.
 
 ## Optional visual references
 

@@ -71,3 +71,28 @@
   .md-typeset .order-journey__scene .journey-card.is-group .journey-card__sub { font-size: 16px; }
   .md-typeset .order-journey__scene .journey-equation { font-size: 16px; }
 }
+/* GROUP BY keeps working state separate from emitted rows. */
+.md-typeset .order-journey__group-tools { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: .35rem .5rem; margin: -.2rem 0 .45rem; font-size: .65rem; }
+.md-typeset .order-journey__group-tools label { color: #755b52; font-weight: 700; }
+.md-typeset .order-journey__group-tools select { max-width: 100%; padding: .3rem .5rem; border: 1px solid #c6b8b0; border-radius: .25rem; background: #fff; color: #6b292e; font: inherit; cursor: pointer; min-height: 2rem; }
+.md-typeset .order-journey__memory-stats { display: flex; justify-content: center; gap: .7rem; width: 100%; color: #867165; font-variant-numeric: tabular-nums; }
+.md-typeset .order-journey__memory-stats b { color: #543c35; margin-left: .15rem; }
+.md-typeset .order-journey__scene .journey-phase { fill: #81242d; font-size: 13px; font-weight: 700; }
+.md-typeset .order-journey__scene .journey-memory-zone { fill: #fbf4e8; stroke: #d8c3a8; stroke-dasharray: 5 5; }
+.md-typeset .order-journey__scene .journey-output-zone { fill: #fcfaf7; stroke: #e4dacf; stroke-dasharray: 4 4; }
+.md-typeset .order-journey__scene .journey-memory-group rect { fill: #fffaf1; stroke: #b9966f; stroke-width: 1.5; }
+.md-typeset .order-journey__scene .journey-memory-group.is-active rect { fill: #fff0d8; stroke: #a76522; stroke-width: 2; }
+.md-typeset .order-journey__scene .journey-memory-key { fill: #725236; font-size: 13px; font-weight: 700; }
+.md-typeset .order-journey__scene .journey-memory-sum { fill: #653c28; font-size: 16px; font-weight: 700; }
+.md-typeset .order-journey__scene .journey-memory-members { fill: #806e5c; font-size: 12px; }
+.md-typeset .order-journey__scene .journey-empty-note { fill: #a38d7b; font-size: 12px; }
+.md-typeset .order-journey__scene .journey-memory-equation { fill: #6d252d; font-size: 13px; font-weight: 700; }
+.md-typeset .order-journey__scene .journey-allocation { fill: #edd8b6; stroke: #a76522; stroke-width: 2; stroke-dasharray: 4 3; }
+.md-typeset .order-journey__scene .journey-card.is-read rect { fill: #f5f0ea; stroke: #d7c9bf; }
+.md-typeset .order-journey select:focus-visible { outline: 3px solid #bf6855; outline-offset: 3px; }
+@media (max-width: 600px) {
+  .md-typeset .order-journey__group-tools { margin-top: 0; }
+  .md-typeset .order-journey__scene .journey-memory-key { font-size: 12px; }
+  .md-typeset .order-journey__scene .journey-memory-sum { font-size: 14px; }
+  .md-typeset .order-journey__scene .journey-memory-equation { font-size: 12px; }
+}
