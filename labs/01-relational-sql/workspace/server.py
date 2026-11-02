@@ -38,8 +38,9 @@ def questions_from_worksheet(path: Path = WORKSHEET, hints_path: Path = HINTS_FI
     hints = {}
     try:
         hint_source = hints_path.read_text(encoding="utf-8")
-        pattern_hint = re.compile(r"<details>\s*<summary>Question\s+(\d+)\b.*?</summary>\s*<p>(.*?)</p>\s*</details>", re.S)
+        pattern_hint = re.compile(r"<details>\s*<summary>Question\s+(\d+)\b.*?</summary>\s*(.*?)</details>", re.S)
         for number, content in pattern_hint.findall(hint_source):
+            content = re.sub(r"</(?:li|p)\s*>", "\n", content)
             hints[int(number)] = html.unescape(re.sub(r"<[^>]*>", "", content)).strip()
     except OSError:
         # Hints are optional; the worksheet remains the source of truth.
