@@ -4,13 +4,13 @@
 
 * [Data Engineering](README.md)
 * [Environment Setup / GitHub Codespaces](getting-started.md)
-* [How to Work Through a Lab](how-to-learn.md)
 * [Course Map — Lectures and Workshops](course-map.md)
 
 ## Part I — Relational Data Engineering
 
 * [Lab 01 — Relational SQL & Query Optimization](labs/01-relational-sql.md)
 * [Window functions](labs/01-window-functions.md)
+* [SQL Views](labs/01-sql-views.md)
 * [Useful SQL patterns](labs/01-useful-sql.md)
 * [Tutorial & practice](labs/01-tutorial-practice.md)
 * [Job interview questions](labs/01-interview.md)

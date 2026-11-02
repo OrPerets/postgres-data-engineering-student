@@ -141,3 +141,41 @@
 .md-typeset .useful-runner p { margin: .5rem 0; font-size: .7rem; }
 .md-typeset .useful-results { overflow: auto; max-height: 24rem; }
 .md-typeset .useful-results table { display: table; font-size: .7rem; }
+
+/* SQL views: stored data, a saved filter and an on-demand result. */
+
+#sql-view-flow { --view-ink: var(--foreground); --view-muted: color-mix(in srgb, var(--foreground) 74%, var(--background)); --view-line: color-mix(in srgb, var(--foreground) 36%, var(--background)); --view-paper: var(--background); --view-soft: var(--muted); --view-accent: var(--viz-series-1); }
+#sql-view-flow .view-heading { display: grid; gap: calc(var(--font-size-base) * .25); margin-bottom: var(--font-size-base); }
+#sql-view-flow .view-controls { display: flex; flex-wrap: wrap; align-items: center; gap: var(--font-size-base); }
+#sql-view-flow .view-scene { display: block; width: 100%; height: 532px; margin-top: var(--font-size-base); overflow: visible; }
+#sql-view-flow .view-scene text { fill: var(--view-ink); font-family: inherit; font-size: 12px; font-weight: 400; }
+#sql-view-flow .view-scene .view-label { font-weight: 500; }
+#sql-view-flow .view-scene .view-secondary { fill: var(--view-muted); }
+#sql-view-flow .view-scene .view-shape { fill: var(--view-paper); stroke: var(--view-line); stroke-width: 1.5; }
+#sql-view-flow .view-scene .view-path { fill: none; stroke: var(--view-line); stroke-width: 1.5; }
+#sql-view-flow .view-scene .view-row { fill: color-mix(in srgb, var(--view-accent) 12%, var(--view-paper)); }
+#sql-view-flow .view-scene .view-pending { fill: var(--view-soft); }
+#sql-view-flow .view-scene .view-particle rect { fill: var(--view-accent); }
+#sql-view-flow .view-scene .view-particle text { fill: var(--view-paper); font-weight: 500; }
+#sql-view-flow .view-feedback { margin: 0; color: var(--view-ink); min-height: calc(var(--font-size-base) * 3); }
+
+.md-typeset #sql-view-flow {
+  --font-size-base: 14px;
+  --foreground: var(--md-default-fg-color);
+  --muted-foreground: var(--md-default-fg-color--light);
+  --border: color-mix(in srgb, var(--md-default-fg-color) 25%, var(--md-default-bg-color));
+  --background: var(--md-default-bg-color);
+  --muted: var(--md-code-bg-color);
+  --viz-series-1: var(--md-primary-fg-color);
+  margin: 1.5rem 0 .4rem;
+  max-width: 32rem;
+}
+.md-typeset #sql-view-flow h3 { margin: 0; font-size: .85rem; font-weight: 600; }
+.md-typeset #sql-view-flow .text-small { font-size: .65rem; }
+.md-typeset #sql-view-flow .view-heading > span { color: var(--view-muted); }
+.md-typeset #sql-view-flow .form-check { display: flex; align-items: center; gap: .45rem; font-size: .7rem; cursor: pointer; }
+.md-typeset #sql-view-flow input { width: 16px; height: 16px; accent-color: var(--md-primary-fg-color); }
+.md-typeset #sql-view-flow .btn { min-height: 38px; padding: .4rem .75rem; border-radius: 4px; background: var(--md-primary-fg-color); color: var(--md-primary-bg-color); font: inherit; font-size: .7rem; font-weight: 600; cursor: pointer; }
+.md-typeset #sql-view-flow .btn:disabled { opacity: .6; cursor: wait; }
+.md-typeset #sql-view-flow :is(button, input):focus-visible { outline: 3px solid var(--md-accent-fg-color); outline-offset: 3px; }
+@media (pointer: coarse) { .md-typeset #sql-view-flow :is(.form-check, .btn) { min-height: 44px; } }
