@@ -105,6 +105,24 @@
 .md-typeset .lab01-practice [data-run] { background: #8b2029; color: white; }
 .md-typeset .lab01-practice button:hover:not(:disabled) { background: #66151c; color: #fff; }
 .md-typeset .lab01-practice button:disabled { opacity: .55; cursor: not-allowed; }
+.md-typeset .lab01-practice .md-code__nav button.md-code__button {
+  display: grid;
+  place-items: center;
+  width: 1.8rem;
+  height: 1.8rem;
+  min-height: 0;
+  padding: .35rem;
+  border: 1px solid #ded1cd;
+  border-radius: 5px;
+  background: #fff;
+  color: #751d27;
+  box-shadow: 0 1px 3px #342f2f14;
+}
+.md-typeset .lab01-practice .md-code__nav button.md-code__button:hover {
+  border-color: #8b2029;
+  background: #f8eeec;
+  color: #66151c;
+}
 .md-typeset .lab01-editor-actions { margin-top: .65rem; }
 .md-typeset .lab01-status { margin: .5rem 0 0; font-size: .73rem; color: #514a47; }
 .md-typeset .lab01-result { overflow: auto; max-width: 100%; max-height: 24rem; }
