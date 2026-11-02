@@ -11,6 +11,7 @@
 
 * [Lab 01 — Relational SQL & Query Optimization](labs/01-relational-sql.md)
 * [Window functions](labs/01-window-functions.md)
+* [Useful SQL patterns](labs/01-useful-sql.md)
 * [Tutorial & practice](labs/01-tutorial-practice.md)
 * [Job interview questions](labs/01-interview.md)
 * [Test yourself](labs/01-test-yourself.md)

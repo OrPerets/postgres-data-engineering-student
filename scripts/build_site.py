@@ -141,7 +141,7 @@ def filter_docs(directory: Path, enabled: dict[str, bool]) -> None:
         (directory / "labs" / LABS[number][0]).unlink()
     if "01" in hidden:
         (directory / "labs" / "01-window-functions.md").unlink()
-        for page in ("01-tutorial-practice.md", "01-interview.md", "01-test-yourself.md"):
+        for page in ("01-useful-sql.md", "01-tutorial-practice.md", "01-interview.md", "01-test-yourself.md"):
             (directory / "labs" / page).unlink()
         (directory / "assets" / "h5p" / "lab01-window-partitions.h5p").unlink()
         (directory / "start-lab01.md").unlink()
@@ -153,6 +153,7 @@ def filter_docs(directory: Path, enabled: dict[str, bool]) -> None:
                       "javascripts/lab01-family-aggregate.js", "javascripts/lab01-family-ranking.js",
                       "javascripts/lab01-family-navigation.js", "javascripts/lab01-function-explorer.js",
                       "javascripts/lab01-practice.js", "javascripts/lab01-practice-worker.js",
+                      "javascripts/lab01-performance.js", "javascripts/lab01-performance-worker.js", "javascripts/lab01-useful-sql.js",
                       "javascripts/lab01-order-journey.js",
                       "stylesheets/lab01-join.css", "stylesheets/lab01-quiz.css", "stylesheets/lab01-null.css",
                       "stylesheets/lab01-window-frame.css", "stylesheets/lab01-window-rank-lag.css",
@@ -208,7 +209,7 @@ def filter_docs(directory: Path, enabled: dict[str, bool]) -> None:
     hidden_patterns = [re.compile(re.escape(LABS[n][0])) for n in hidden]
     if "01" in hidden:
         hidden_patterns.append(re.compile(re.escape("01-window-functions.md")))
-        hidden_patterns.extend(re.compile(re.escape(page)) for page in ("01-tutorial-practice.md", "01-interview.md", "01-test-yourself.md"))
+        hidden_patterns.extend(re.compile(re.escape(page)) for page in ("01-useful-sql.md", "01-tutorial-practice.md", "01-interview.md", "01-test-yourself.md"))
     if "02" in hidden:
         hidden_patterns.extend(re.compile(re.escape(page)) for page in ("02-exercises.md", "02-interview.md"))
     if "03" in hidden:
@@ -299,7 +300,7 @@ def filtered_config(text: str, enabled: dict[str, bool]) -> str:
     if not enabled["01"]:
         text = require_replace(text, "      - First SQL lab: start-lab01.md\n", "", "Lab 01 walkthrough nav")
         text = require_replace(text, "      - Window functions: labs/01-window-functions.md\n", "", "Lab 01 window lesson nav")
-        for label, page in (("Tutorial & practice", "01-tutorial-practice.md"),
+        for label, page in (("Useful SQL patterns", "01-useful-sql.md"), ("Tutorial & practice", "01-tutorial-practice.md"),
                             ("Job interview questions", "01-interview.md"),
                             ("Test yourself", "01-test-yourself.md")):
             text = require_replace(text, f"      - {label}: labs/{page}\n", "", f"Lab 01 {label} nav")
@@ -310,6 +311,7 @@ def filtered_config(text: str, enabled: dict[str, bool]) -> str:
                       "javascripts/lab01-window-frame.js", "javascripts/lab01-window-rank-lag.js",
                       "javascripts/lab01-family-aggregate.js", "javascripts/lab01-family-ranking.js",
                       "javascripts/lab01-family-navigation.js", "javascripts/lab01-function-explorer.js", "javascripts/lab01-practice.js",
+                      "javascripts/lab01-performance.js", "javascripts/lab01-useful-sql.js",
                       "javascripts/lab01-order-journey.js"):
             text = require_replace(text, f"  - {asset}\n", "", f"Lab 01 asset {asset}")
     else:
@@ -319,6 +321,9 @@ def filtered_config(text: str, enabled: dict[str, bool]) -> str:
         for asset, inputs in (
             ("stylesheets/lab01-practice.css", ("stylesheets/lab01-practice.css",)),
             ("javascripts/lab01-practice.js", ("javascripts/lab01-practice.js", "javascripts/lab01-practice-worker.js")),
+            ("javascripts/lab01-performance.js", ("javascripts/lab01-performance.js", "javascripts/lab01-performance-worker.js")),
+            ("javascripts/lab01-useful-sql.js", ("javascripts/lab01-useful-sql.js", "javascripts/lab01-practice-worker.js")),
+            ("stylesheets/lab01-window-frame.css", ("stylesheets/lab01-window-frame.css",)),
             ("stylesheets/lab01-order-journey.css", ("stylesheets/lab01-order-journey.css",)),
             ("javascripts/lab01-order-journey.js", ("javascripts/lab01-order-journey.js",)),
         ):

@@ -1,27 +1,10 @@
 # Tutorial & practice — Lab 01
 
-**Chapter 2 of 4 · PostgreSQL and customer orders**
-
-Learn the data and business rules, then solve the 15 SQL questions in your browser. Start with the earlier [window functions chapter](01-window-functions.md) if you have not yet explored it. A Codespace is optional and has a separate database and drafts. [← All Lab 01 chapters](01-relational-sql.md)
-
 [Jump to the 15 questions and SQL editors ↓](#lab01-practice)
 
 <a id="1-meet-the-data"></a><a id="business-rules-for-the-questions"></a>
 
 Review [the lab's tables and business rules](01-relational-sql.md#the-labs-data) before starting.
-
-## 1 · Before you begin {#before-you-begin}
-
-Use **Tables & schema** next to each question's **Run query** button to inspect the columns and sample rows. For example, run this in any editor to see what an order row looks like:
-
-```sql
-SELECT order_id, customer_id, order_date, status
-FROM orders
-ORDER BY order_id
-LIMIT 5;
-```
-
-As you work, `WHERE` filters rows, while `GROUP BY` combines them into groups. A `LEFT JOIN` can retain customers without matching orders; check whether a later `WHERE` condition removes those rows. Use `IS NULL` to test missing values and `COALESCE` when a rule defines a replacement. For multi-step questions, a common table expression (`WITH`) can give an intermediate result a name. Window functions then calculate across related rows without collapsing them; review [partitions, ordering and frames](01-window-functions.md) before questions 8–15.
 
 ## Follow one customer's order journey {#order-journey}
 
@@ -103,7 +86,12 @@ ORDER BY o.order_id LIMIT 5;
 
 For every customer, display the number of completed orders, total revenue, average revenue per completed order, and date of the most recent completed order. Include customers with no completed orders, showing zero for the count and revenue and NULL for the average and date. Completed orders with zero revenue still count.
 
-<details><summary>Question 2 — Customer metrics</summary><p>Consider calculating revenue per order before summarizing per customer. How will you keep a customer with no completed orders, and distinguish zero revenue from an unknown average?</p></details>
+<details><summary>Question 2 — Thinking guide</summary><ul>
+<li>We need one result per customer, but an order can have several item lines. First, think about how to calculate one revenue value per completed order.</li>
+<li>We need every customer, including those without completed orders, so consider which table should be on the left side of a <code>LEFT JOIN</code>.</li>
+<li>If an order has no item lines or its revenue is zero, it is still a completed order. Count orders rather than item lines.</li>
+<li>If a customer has no completed orders, what should be zero, and which values should remain <code>NULL</code>? Check the count, total, average and latest date separately.</li>
+</ul></details>
 
 <div class="lab01-editor">
 <label for="lab01-sql-2">Your SQL for question 2</label>
@@ -143,7 +131,12 @@ GROUP BY c.customer_id,c.full_name ORDER BY c.customer_id;
 
 Find customers who purchased from both the books and electronics categories in completed orders and have no returned orders anywhere in the dataset. The categories may occur in the same order or in different orders.
 
-<details><summary>Question 3 — Both categories, no returns</summary><p>Think about the customer's purchases across all completed orders, then separately test whether any returned order exists. The required categories need not appear in the same order.</p></details>
+<details><summary>Question 3 — Thinking guide</summary><ul>
+<li>We need customers who bought from <em>both</em> categories, so check each customer's completed orders across all their item lines.</li>
+<li>If books and electronics appear in different completed orders, the customer can still qualify. Avoid requiring both categories on the same order or item line.</li>
+<li>We also need no returned orders, so test that condition separately across the customer's orders.</li>
+<li>Think about <code>EXISTS</code> and <code>NOT EXISTS</code>: how could each express one of these requirements without duplicating customers?</li>
+</ul></details>
 
 <div class="lab01-editor">
 <label for="lab01-sql-3">Your SQL for question 3</label>

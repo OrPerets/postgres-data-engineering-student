@@ -13,7 +13,7 @@ How can you show an order **and** its customer’s total on the same row? A wind
   <li><strong>Frame</strong><span>Which rows contribute?</span></li>
 </ol>
 
-The interactive examples are **browser simulations** using synthetic data, not live PostgreSQL queries. The [worksheet](https://github.com/OrPerets/postgres-data-engineering-student/blob/main/labs/01-relational-sql/windows/worksheet.sql) lets you try the same ideas on the lab database. The [full lesson and optional challenges](https://github.com/OrPerets/postgres-data-engineering-student/blob/main/labs/01-relational-sql/windows/README.md) provide more detail.
+The function explorers are **browser simulations** using synthetic data; the performance comparison at the end runs SQL in browser-based PostgreSQL. The [worksheet](https://github.com/OrPerets/postgres-data-engineering-student/blob/main/labs/01-relational-sql/windows/worksheet.sql) lets you try the same ideas on the lab database. The [full lesson and optional challenges](https://github.com/OrPerets/postgres-data-engineering-student/blob/main/labs/01-relational-sql/windows/README.md) provide more detail.
 
 ## The shape of a window function
 
@@ -466,3 +466,49 @@ The worksheet creates `window_lab_order_revenue` as a **temporary view**. It exi
 Explain what one row represents, how partition and order affect the result, why the March filter changes `LAG`, and why same-day orders can share a default-frame sum. Then continue to [Tutorial & practice](01-tutorial-practice.md) and apply these ideas in questions 8–11 and 14–15, or return to the [Lab 01 chapters](01-relational-sql.md).
 
 Explore `LAST_VALUE`, missing months, threshold crossings, and the [performance challenge](https://github.com/OrPerets/postgres-data-engineering-student/blob/main/labs/01-relational-sql/benchmarks/README.md) in the full lesson. A window function is not guaranteed to be faster; measure equivalent queries.
+
+
+## Compare performance
+
+The generated `sales` table has one row per sale, with an `id` and an `amount`. For example:
+
+| id | amount |
+|---:|---:|
+| 1 | 27 |
+| 2 | 44 |
+| 3 | 61 |
+
+<div class="performance-comparison" data-performance-comparison>
+<form class="performance-controls">
+<label for="sales-count">Sales rows</label>
+<input id="sales-count" type="number" min="1" max="12000" step="1" value="1000" required>
+<button type="submit" data-perf-run>Run comparison</button>
+<button type="button" data-perf-stop hidden>Stop</button>
+</form>
+<p class="performance-status" data-perf-status role="status" aria-live="polite"></p>
+<p>The subquery runs first, so cache and execution order can affect the comparison. Results also depend on your device and query plan; a window function is not always faster.</p>
+<div class="performance-results" data-perf-results></div>
+</div>
+
+<details markdown="1">
+<summary>See the two queries</summary>
+
+**Correlated subquery**
+
+```sql
+SELECT s1.id, s1.amount,
+       (SELECT SUM(s2.amount) FROM sales s2 WHERE s2.id <= s1.id) AS running_total
+FROM sales s1 ORDER BY s1.id;
+```
+
+**Window function**
+
+```sql
+SELECT id, amount,
+       SUM(amount) OVER (ORDER BY id ROWS UNBOUNDED PRECEDING) AS running_total
+FROM sales ORDER BY id;
+```
+
+</details>
+
+The correlated subquery can repeatedly scan earlier rows. The window query can calculate the sum as it processes the ordered rows. Actual execution depends on the optimizer and data.

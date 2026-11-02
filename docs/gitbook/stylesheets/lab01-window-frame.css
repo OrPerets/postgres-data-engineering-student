@@ -119,3 +119,25 @@
 .md-typeset .wf-explorer__note { margin: .8rem 0 0; color: #554d4b; font-size: .7rem; }
 @media (max-width: 640px) { .md-typeset .wf-explorer__rows { grid-template-columns: repeat(2, minmax(0, 1fr)); } .md-typeset .wf-explorer__label { width: 100%; } .md-typeset .wf-explorer select { width: 100%; } }
 @media (prefers-reduced-motion: no-preference) { .md-typeset .wf-explorer__row { transition: background-color .25s ease, border-color .25s ease, color .25s ease, transform .25s ease; } .md-typeset .wf-explorer__row.is-current { transform: translateY(-3px); } }
+
+/* Browser-local performance comparison */
+.md-typeset .performance-comparison { margin: 1.2rem 0; padding: 1rem; border: 1px solid #ded7d3; border-top: 3px solid #8b2029; background: #faf8f5; }
+.md-typeset .performance-controls { display: flex; flex-wrap: wrap; align-items: center; gap: .6rem; }
+.md-typeset .performance-controls label { font-weight: 700; }
+.md-typeset .performance-controls input { width: 7rem; padding: .45rem; border: 1px solid #a99e99; background: white; }
+.md-typeset .performance-controls button { padding: .5rem .85rem; border: 1px solid #8b2029; border-radius: 3px; background: #8b2029; color: white; cursor: pointer; font-weight: 700; }
+.md-typeset .performance-controls button:disabled { opacity: .55; }
+.md-typeset .performance-controls button[hidden] { display: none; }
+.md-typeset .performance-status { font-weight: 700; }
+.md-typeset .performance-results { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 15rem), 1fr)); gap: 1rem; }
+.md-typeset .performance-results section { min-width: 0; overflow-x: auto; }
+.md-typeset .performance-results h4 { margin: .5rem 0; }
+.md-typeset .performance-results table { display: table; width: 100%; font-size: .7rem; }
+
+.md-typeset .useful-runner { margin: -.4rem 0 1.3rem; }
+.md-typeset .useful-runner button { padding: .45rem .85rem; border: 1px solid #8b2029; border-radius: 3px; background: #8b2029; color: white; font-weight: 700; cursor: pointer; }
+.md-typeset .useful-runner button:disabled { opacity: .55; }
+.md-typeset .useful-runner button:focus-visible { outline: 3px solid #2354a4; outline-offset: 3px; }
+.md-typeset .useful-runner p { margin: .5rem 0; font-size: .7rem; }
+.md-typeset .useful-results { overflow: auto; max-height: 24rem; }
+.md-typeset .useful-results table { display: table; font-size: .7rem; }
