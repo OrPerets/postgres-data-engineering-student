@@ -292,6 +292,10 @@ def filter_docs(directory: Path, enabled: dict[str, bool]) -> None:
 
 def filtered_config(text: str, enabled: dict[str, bool]) -> str:
     text = require_replace(text, "docs_dir: docs/gitbook", "docs_dir: docs", "MkDocs docs_dir")
+    # Refresh shared styling when its content changes, including in local previews.
+    stylesheet = "stylesheets/extra.css"
+    version = hashlib.sha256((ROOT / "docs/gitbook" / stylesheet).read_bytes()).hexdigest()[:12]
+    text = require_replace(text, f"  - {stylesheet}\n", f"  - {stylesheet}?v={version}\n", "Shared course stylesheet")
     for number, is_enabled in enabled.items():
         if not is_enabled:
             text, count = re.subn(r"^\s{6}- Lab " + number + r"[^\n]*\n", "", text, flags=re.MULTILINE)

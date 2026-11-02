@@ -1,8 +1,6 @@
-<div class="course-hero course-home-hero" markdown="1">
+<div class="course-hero course-home-hero" id="data-engineering-in-practice" markdown="1">
 
-<p class="course-kicker">DATA ENGINEERING &nbsp; / &nbsp; HANDS-ON LABORATORY</p>
-
-<a id="data-engineering-in-practice"></a>
+<p class="course-kicker">Hands-on laboratory</p>
 
 # Data engineering course
 
@@ -11,7 +9,7 @@ From relational databases to distributed data processing. Learn by building, tes
 
 <div class="course-actions" markdown="1">
 
-[Start learning](labs/01-relational-sql.md){: .course-action-primary } [Explore the course](#explore-the-course){: .course-action-secondary }
+[Start learning](labs/01-relational-sql.md){: .course-action-primary } [Explore the course →](#explore-the-course){: .course-action-secondary }
 
 </div>
 </div>

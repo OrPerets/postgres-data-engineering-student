@@ -185,19 +185,55 @@ body {
 
 /* A quieter course introduction leaves the lab choices closer to the top. */
 .md-typeset .course-hero.course-home-hero {
-  margin-bottom: 1.6rem;
-  padding: clamp(1.2rem, 3vw, 2rem);
+  overflow: visible;
+  margin-bottom: 1rem;
+  padding: .2rem 0 1.2rem;
+  border-bottom: 1px solid #e2ddda;
+  color: var(--md-default-fg-color);
+  background: transparent;
 }
-.md-typeset .course-home-hero .course-kicker { margin-bottom: .55rem; }
+.md-typeset .course-home-hero::after { content: none; }
+.md-typeset .course-home-hero :is(h1, p, strong) { color: var(--md-default-fg-color); }
+.md-typeset .course-home-hero .course-kicker {
+  margin-bottom: .5rem;
+  color: var(--md-primary-fg-color);
+  font-size: .6rem;
+  font-weight: 600;
+  letter-spacing: .1em;
+}
 .md-typeset .course-hero.course-home-hero h1 {
   max-width: none;
-  margin-bottom: .5rem;
-  font-size: clamp(1.8rem, 3.6vw, 2.65rem);
-  line-height: 1.1;
+  margin: 0 0 .45rem;
+  font-size: clamp(1.45rem, 2.7vw, 1.7rem);
+  font-weight: 600;
+  line-height: 1.2;
+  letter-spacing: -.03em;
 }
-.md-typeset .course-home-hero .course-hero__lead { font-size: .9rem; }
-.md-typeset .course-home-hero .course-actions { margin-top: 1rem; }
-.md-typeset .course-home-hero .course-actions a { min-height: 2.2rem; padding: .45rem .8rem; }
+.md-typeset .course-home-hero .course-hero__lead {
+  max-width: 60ch;
+  color: #555;
+  font-size: .8rem;
+  line-height: 1.6;
+}
+.md-typeset .course-home-hero .course-actions { margin-top: .8rem; gap: .5rem 1rem; }
+.md-typeset .course-home-hero .course-actions a {
+  min-height: 1.9rem;
+  padding: .35rem .7rem;
+  border: 1px solid transparent;
+  border-radius: .2rem;
+  font-size: .68rem;
+  font-weight: 600;
+}
+.md-typeset .course-home-hero .course-action-primary {
+  color: var(--md-primary-bg-color);
+  background: var(--md-primary-fg-color);
+}
+.md-typeset .course-home-hero .course-action-primary:hover { background: var(--md-primary-fg-color--dark); }
+.md-typeset .course-home-hero .course-actions .course-action-secondary { padding-inline: .1rem; color: var(--md-primary-fg-color); background: transparent; }
+.md-typeset .course-home-hero .course-action-secondary:hover { text-decoration: underline; }
+.md-typeset .course-home-hero .course-actions a:focus-visible { outline-color: var(--md-accent-fg-color); }
+.md-typeset .course-home-hero + h2 { margin-top: 1.3rem; }
+@media (pointer: coarse) { .md-typeset .course-home-hero .course-actions a { min-height: 44px; } }
 
 @media (prefers-reduced-motion: reduce) {
   .md-typeset .course-actions a { transition: none; }
