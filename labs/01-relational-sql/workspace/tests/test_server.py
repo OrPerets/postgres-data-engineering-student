@@ -66,6 +66,8 @@ class WorkspaceTests(unittest.TestCase):
         self.assertIn('SELECT c.customer_id, COUNT(*) AS completed_orders,', questions[5]['question'])
         self.assertIn('LEFT JOIN order_items', questions[5]['question'])
         self.assertIn('WHERE city NOT IN (', questions[6]['question'])
+        self.assertIn('comparison average', questions[3]['hint'])
+        self.assertIn('customer and order grains', questions[4]['hint'])
         self.assertIn('WHERE filter', questions[5]['hint'])
         self.assertTrue(all(question['hint'] for question in questions))
         self.assertIn('parentheses', questions[0]['hint'])

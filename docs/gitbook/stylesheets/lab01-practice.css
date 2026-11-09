@@ -100,7 +100,25 @@
 .md-typeset .lab01-answer .lab01-copy-feedback { color: #514a47; font-size: .65rem; }
 .md-typeset .lab01-editor { margin-top: 1rem; padding: 1rem; border: 1px solid #ded7d3; background: #f9f6f3; }
 .md-typeset .lab01-editor label { display: block; margin-bottom: .4rem; color: #342f2f; font-size: .8rem; font-weight: 700; }
-.md-typeset .lab01-editor textarea { display: block; width: 100%; min-height: 8rem; resize: vertical; padding: .75rem; border: 1px solid #aaa09a; border-radius: 2px; background: #fff; color: #232020; font: .75rem/1.55 ui-monospace, SFMono-Regular, Consolas, monospace; tab-size: 2; }
+.md-typeset .lab01-editor textarea { display: block; box-sizing: border-box; width: 100%; min-height: 13rem; resize: vertical; padding: .8rem; border: 1px solid #aaa09a; border-radius: 3px; background: #fff; color: #232020; font: .8rem/1.6 ui-monospace, SFMono-Regular, Consolas, monospace; letter-spacing: normal; tab-size: 2; }
+.md-typeset .lab01-sql-input { position: relative; min-width: 0; }
+.md-typeset .lab01-question .lab01-sql-highlight {
+  position: absolute; inset: 0; box-sizing: border-box; width: 100%; height: 100%;
+  margin: 0; padding: .8rem; border: 1px solid transparent; border-radius: 3px;
+  overflow: hidden; white-space: pre-wrap; overflow-wrap: break-word;
+  background: #fff; color: #232020; font: .8rem/1.6 ui-monospace, SFMono-Regular, Consolas, monospace;
+  letter-spacing: normal; tab-size: 2; pointer-events: none;
+}
+.md-typeset .lab01-sql-input textarea { position: relative; background: transparent; color: transparent; caret-color: #232020; -webkit-text-fill-color: transparent; }
+.md-typeset .lab01-sql-input textarea::placeholder { color: #777; -webkit-text-fill-color: #777; }
+.md-typeset .lab01-sql-highlight .sql-keyword { color: #174aa5; font-weight: 600; }
+.md-typeset .lab01-sql-highlight .sql-string { color: #17683b; }
+.md-typeset .lab01-sql-highlight .sql-comment { color: #6c6663; }
+.md-typeset .lab01-sql-highlight .sql-number { color: #9c3e22; }
+.md-typeset .lab01-practice button.lab01-insert-column { min-height: 0; padding: .1rem .3rem; border: 1px solid #e0d2ce; border-radius: 3px; background: #fff; color: #751d27; font: .68rem/1.4 ui-monospace, SFMono-Regular, Consolas, monospace; }
+.md-typeset .lab01-practice button.lab01-insert-column:hover { background: #f3e9e8; color: #66151c; }
+.md-typeset .lab01-column-feedback { font-size: .65rem; }
+@media (forced-colors: active) { .md-typeset .lab01-sql-highlight { display: none; } .md-typeset .lab01-sql-input textarea { color: CanvasText; -webkit-text-fill-color: CanvasText; } }
 .md-typeset .lab01-practice button { min-height: 2.3rem; padding: .45rem .85rem; border: 1px solid #8b2029; border-radius: 2px; background: #fff; color: #751d27; font: inherit; font-size: .72rem; font-weight: 700; cursor: pointer; }
 .md-typeset .lab01-practice [data-run] { background: #8b2029; color: white; }
 .md-typeset .lab01-practice button:hover:not(:disabled) { background: #66151c; color: #fff; }
@@ -144,7 +162,7 @@
 .md-typeset .lab01-editor, .md-typeset .lab01-reference { min-width: 0; }
 @media screen and (max-width: 600px) {
   .md-typeset .lab01-editor { padding: .75rem; }
-  .md-typeset .lab01-editor textarea { min-height: 9rem; font-size: .8rem; }
+  .md-typeset .lab01-editor textarea { min-height: 12rem; }
   .md-typeset .lab01-reference { padding: .8rem; }
   .md-typeset .lab01-reference-actions button { min-height: 2.4rem; }
 }

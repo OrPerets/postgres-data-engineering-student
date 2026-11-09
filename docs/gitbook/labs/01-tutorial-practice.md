@@ -1,6 +1,6 @@
 # Tutorial & practice — Lab 01
 
-[Jump to the 15 questions and SQL editors ↓](#lab01-practice)
+[Jump to the questions and SQL editors ↓](#lab01-practice)
 
 <a id="1-meet-the-data"></a><a id="business-rules-for-the-questions"></a>
 
@@ -165,59 +165,19 @@ ORDER BY c.customer_id;
 
 </section>
 
-<section class="lab01-question" data-question="4" markdown="1">
+<section class="lab01-question" data-question="4" data-storage-question="5" markdown="1">
 
 ### Question 04
 
-For every completed order, calculate its revenue and the average revenue of the other completed orders belonging to the same customer. Return only orders whose revenue is strictly greater than that average. Exclude customers with only one completed order.
+For each city, display the number of customers, total number of orders, number of orders in each status, and percentage of orders that were completed. Include customers with no orders. Display missing cities as Unknown and return NULL for the percentage when a city has no orders.
 
-<details><summary>Question 4 — Compare with other orders</summary><p>First work at the order grain. When forming the comparison average, exclude the current order and consider what happens when there are no other completed orders.</p></details>
+**Before you begin:** First search and learn what `FILTER` is in SQL.
+
+<details><summary>Question 4 — City summaries</summary><p>Build counts at the appropriate customer and order grains before combining them by city. Keep customers with no orders and consider a city with a zero-order denominator.</p></details>
 
 <div class="lab01-editor">
 <label for="lab01-sql-4">Your SQL for question 4</label>
 <textarea id="lab01-sql-4" data-sql rows="6" spellcheck="false" placeholder="Write your SQL here"></textarea>
-<div class="lab01-editor-actions"><button type="button" data-run>Run query</button></div>
-<p class="lab01-status" data-status role="status" aria-live="polite"></p>
-<div class="lab01-result" data-result></div>
-</div>
-
-
-<details class="lab01-answer" markdown="1">
-<summary>See answer</summary>
-
-```sql
-WITH instructor_order_revenue AS (
-    SELECT o.order_id, o.customer_id, o.order_date,
-           COALESCE(SUM(i.quantity * i.unit_price *
-               (1 - COALESCE(i.discount_pct, 0) / 100.0)), 0)::numeric AS revenue
-    FROM orders o LEFT JOIN order_items i USING (order_id)
-    WHERE o.status = 'completed'
-    GROUP BY o.order_id, o.customer_id, o.order_date
-),
-w AS (
-SELECT r.*,count(*) OVER(PARTITION BY customer_id) n,
- sum(revenue) OVER(PARTITION BY customer_id) AS customer_total
-FROM instructor_order_revenue r)
-SELECT order_id,customer_id,revenue,
- (customer_total-revenue)/(n-1) AS avg_other_orders
-FROM w WHERE n>1 AND revenue>(customer_total-revenue)/(n-1) ORDER BY customer_id,order_id;
-```
-
-</details>
-
-</section>
-
-<section class="lab01-question" data-question="5" markdown="1">
-
-### Question 05
-
-For each city, display the number of customers, total number of orders, number of orders in each status, and percentage of orders that were completed. Include customers with no orders. Display missing cities as Unknown and return NULL for the percentage when a city has no orders.
-
-<details><summary>Question 5 — City summaries</summary><p>Build counts at the appropriate customer and order grains before combining them by city. Keep customers with no orders and consider a city with a zero-order denominator.</p></details>
-
-<div class="lab01-editor">
-<label for="lab01-sql-5">Your SQL for question 5</label>
-<textarea id="lab01-sql-5" data-sql rows="6" spellcheck="false" placeholder="Write your SQL here"></textarea>
 <div class="lab01-editor-actions"><button type="button" data-run>Run query</button></div>
 <p class="lab01-status" data-status role="status" aria-live="polite"></p>
 <div class="lab01-result" data-result></div>
@@ -243,9 +203,9 @@ GROUP BY coalesce(c.city,'Unknown') ORDER BY city;
 
 </section>
 
-<section class="lab01-question" data-question="6" markdown="1">
+<section class="lab01-question" data-question="5" data-storage-question="6" markdown="1">
 
-### Question 06
+### Question 05
 
 The following query is intended to count completed orders and calculate average revenue per completed order for every customer, including customers with no activity. Identify three logical errors and correct them. Then return only customers with at least two completed orders and total revenue of at least 500.
 
@@ -260,13 +220,13 @@ WHERE o.status = 'completed'
 GROUP BY c.customer_id;
 ```
 
-<details><summary>Question 6 — Debug an aggregate</summary><p>Trace what the WHERE filter does to unmatched customers, what each joined row represents, and whether the average is over order lines or orders. Check the requested output and final thresholds separately.</p></details>
+<details><summary>Question 5 — Debug an aggregate</summary><p>Trace what the WHERE filter does to unmatched customers, what each joined row represents, and whether the average is over order lines or orders. Check the requested output and final thresholds separately.</p></details>
 
 You can include your written explanation as SQL comments, using `--`.
 
 <div class="lab01-editor">
-<label for="lab01-sql-6">Your SQL for question 6</label>
-<textarea id="lab01-sql-6" data-sql rows="6" spellcheck="false" placeholder="Write your SQL here"></textarea>
+<label for="lab01-sql-5">Your SQL for question 5</label>
+<textarea id="lab01-sql-5" data-sql rows="6" spellcheck="false" placeholder="Write your SQL here"></textarea>
 <div class="lab01-editor-actions"><button type="button" data-run>Run query</button></div>
 <p class="lab01-status" data-status role="status" aria-live="polite"></p>
 <div class="lab01-result" data-result></div>
@@ -298,9 +258,9 @@ HAVING count(r.order_id)>=2 AND coalesce(sum(r.revenue),0)>=500 ORDER BY c.custo
 
 </section>
 
-<section class="lab01-question" data-question="7" markdown="1">
+<section class="lab01-question" data-question="6" data-storage-question="7" markdown="1">
 
-### Question 07
+### Question 06
 
 Find customers whose city is known and whose city has no customer with a returned order. Customers without orders may qualify. Predict the result of the following query on the supplied data, explain its behavior, and correct it.
 
@@ -317,13 +277,13 @@ WHERE o.status = 'returned'
 );
 ```
 
-<details><summary>Question 7 — Missing cities and NOT IN</summary><p>What happens if the subquery produces a NULL city? Consider a way to test for the absence of a matching returned-order city while separately requiring the outer city to be known.</p></details>
+<details><summary>Question 6 — Missing cities and NOT IN</summary><p>What happens if the subquery produces a NULL city? Consider a way to test for the absence of a matching returned-order city while separately requiring the outer city to be known.</p></details>
 
 You can include your written explanation as SQL comments, using `--`.
 
 <div class="lab01-editor">
-<label for="lab01-sql-7">Your SQL for question 7</label>
-<textarea id="lab01-sql-7" data-sql rows="6" spellcheck="false" placeholder="Write your SQL here"></textarea>
+<label for="lab01-sql-6">Your SQL for question 6</label>
+<textarea id="lab01-sql-6" data-sql rows="6" spellcheck="false" placeholder="Write your SQL here"></textarea>
 <div class="lab01-editor-actions"><button type="button" data-run>Run query</button></div>
 <p class="lab01-status" data-status role="status" aria-live="polite"></p>
 <div class="lab01-result" data-result></div>
@@ -347,17 +307,17 @@ ORDER BY c.customer_id;
 
 </section>
 
-<section class="lab01-question" data-question="8" markdown="1">
+<section class="lab01-question" data-question="7" data-storage-question="8" markdown="1">
 
-### Question 08
+### Question 07
 
 Calculate total revenue for each customer with at least one completed order. Within each city, return all customers at the two highest distinct revenue levels, including ties. Display ROW_NUMBER, RANK, and DENSE_RANK. Break ties in ROW_NUMBER by ascending customer_id, while preserving revenue ties in the other rankings.
 
-<details><summary>Question 8 — Revenue ranks</summary><p>Compute each customer's revenue first. Compare what ROW_NUMBER, RANK and DENSE_RANK do with equal revenue; a tie-breaker used for row numbering should not break revenue ties in the other rankings.</p></details>
+<details><summary>Question 7 — Revenue ranks</summary><p>Compute each customer's revenue first. Compare what ROW_NUMBER, RANK and DENSE_RANK do with equal revenue; a tie-breaker used for row numbering should not break revenue ties in the other rankings.</p></details>
 
 <div class="lab01-editor">
-<label for="lab01-sql-8">Your SQL for question 8</label>
-<textarea id="lab01-sql-8" data-sql rows="6" spellcheck="false" placeholder="Write your SQL here"></textarea>
+<label for="lab01-sql-7">Your SQL for question 7</label>
+<textarea id="lab01-sql-7" data-sql rows="6" spellcheck="false" placeholder="Write your SQL here"></textarea>
 <div class="lab01-editor-actions"><button type="button" data-run>Run query</button></div>
 <p class="lab01-status" data-status role="status" aria-live="polite"></p>
 <div class="lab01-result" data-result></div>
@@ -393,17 +353,17 @@ SELECT * FROM ranks WHERE dense_rank<=2 ORDER BY city,dense_rank,customer_id;
 
 </section>
 
-<section class="lab01-question" data-question="9" markdown="1">
+<section class="lab01-question" data-question="8" data-storage-question="9" markdown="1">
 
-### Question 09
+### Question 08
 
 For every completed order, display its revenue, the previous completed order’s revenue, the percentage change, cumulative revenue, and a moving average over up to the three most recent completed orders, including the current order. Calculate these separately for each customer, ordered by date and then order ID. Return NULL for percentage change when there is no previous order or its revenue is zero.
 
-<details><summary>Question 9 — Order history</summary><p>Compute one revenue value per completed order, then consider windows partitioned by customer and ordered by date and order ID. Define the moving frame and protect percentage calculations when the previous value is absent or zero.</p></details>
+<details><summary>Question 8 — Order history</summary><p>Compute one revenue value per completed order, then consider windows partitioned by customer and ordered by date and order ID. Define the moving frame and protect percentage calculations when the previous value is absent or zero.</p></details>
 
 <div class="lab01-editor">
-<label for="lab01-sql-9">Your SQL for question 9</label>
-<textarea id="lab01-sql-9" data-sql rows="6" spellcheck="false" placeholder="Write your SQL here"></textarea>
+<label for="lab01-sql-8">Your SQL for question 8</label>
+<textarea id="lab01-sql-8" data-sql rows="6" spellcheck="false" placeholder="Write your SQL here"></textarea>
 <div class="lab01-editor-actions"><button type="button" data-run>Run query</button></div>
 <p class="lab01-status" data-status role="status" aria-live="polite"></p>
 <div class="lab01-result" data-result></div>
@@ -436,19 +396,19 @@ FROM w ORDER BY customer_id,order_date,order_id;
 
 </section>
 
-<section class="lab01-question" data-question="10" markdown="1">
+<section class="lab01-question" data-question="9" data-storage-question="10" markdown="1">
 
-### Question 10
+### Question 09
 
 For each customer with a completed order, identify the category in which they spent the most. Break ties alphabetically by category name. Display the category’s revenue and its percentage of the customer’s total revenue. Return NULL for the percentage when total revenue is zero.
 
 The schema permits completed orders without item lines. If a customer has no categories in their completed orders, the question does not specify how to represent their result; ask your instructor for clarification.
 
-<details><summary>Question 10 — Top category</summary><p>Summarize revenue at customer-and-category grain, then choose one category per customer with a deterministic tie-break. Compare that amount with the customer's total, including the zero-total case.</p></details>
+<details><summary>Question 9 — Top category</summary><p>Summarize revenue at customer-and-category grain, then choose one category per customer with a deterministic tie-break. Compare that amount with the customer's total, including the zero-total case.</p></details>
 
 <div class="lab01-editor">
-<label for="lab01-sql-10">Your SQL for question 10</label>
-<textarea id="lab01-sql-10" data-sql rows="6" spellcheck="false" placeholder="Write your SQL here"></textarea>
+<label for="lab01-sql-9">Your SQL for question 9</label>
+<textarea id="lab01-sql-9" data-sql rows="6" spellcheck="false" placeholder="Write your SQL here"></textarea>
 <div class="lab01-editor-actions"><button type="button" data-run>Run query</button></div>
 <p class="lab01-status" data-status role="status" aria-live="polite"></p>
 <div class="lab01-result" data-result></div>
@@ -477,17 +437,17 @@ FROM w WHERE rn=1 ORDER BY customer_id;
 
 </section>
 
-<section class="lab01-question" data-question="11" markdown="1">
+<section class="lab01-question" data-question="10" data-storage-question="11" markdown="1">
 
-### Question 11
+### Question 10
 
 Produce exactly three rows for every customer, covering January, February, and March 2026. Display monthly revenue, the previous month’s revenue, and the percentage change. Show zero revenue for months without purchases. For January, return NULL for the previous month’s revenue and percentage change. Also return NULL for percentage change when the previous month’s revenue is zero.
 
-<details><summary>Question 11 — Complete months</summary><p>Make sure each customer has a row for each of the three months before comparing adjacent months. Distinguish the first month from a previous month with zero revenue.</p></details>
+<details><summary>Question 10 — Complete months</summary><p>Make sure each customer has a row for each of the three months before comparing adjacent months. Distinguish the first month from a previous month with zero revenue.</p></details>
 
 <div class="lab01-editor">
-<label for="lab01-sql-11">Your SQL for question 11</label>
-<textarea id="lab01-sql-11" data-sql rows="6" spellcheck="false" placeholder="Write your SQL here"></textarea>
+<label for="lab01-sql-10">Your SQL for question 10</label>
+<textarea id="lab01-sql-10" data-sql rows="6" spellcheck="false" placeholder="Write your SQL here"></textarea>
 <div class="lab01-editor-actions"><button type="button" data-run>Run query</button></div>
 <p class="lab01-status" data-status role="status" aria-live="polite"></p>
 <div class="lab01-result" data-result></div>
@@ -524,17 +484,17 @@ ORDER BY customer_id,month_start;
 
 </section>
 
-<section class="lab01-question" data-question="12" markdown="1">
+<section class="lab01-question" data-question="11" data-storage-question="12" markdown="1">
 
-### Question 12
+### Question 11
 
 Find customers who purchased from every category sold in a completed order anywhere in the dataset. Determine the required categories from the data. Purchases with a 100 percent discount still count. If no category has been sold, return an empty result. Provide two different solutions.
 
-<details><summary>Question 12 — Every sold category</summary><p>Derive the required category set from completed orders, and compare each customer's coverage with that set. A free purchase still counts; handle an empty required set explicitly.</p></details>
+<details><summary>Question 11 — Every sold category</summary><p>Derive the required category set from completed orders, and compare each customer's coverage with that set. A free purchase still counts; handle an empty required set explicitly.</p></details>
 
 <div class="lab01-editor">
-<label for="lab01-sql-12">Your SQL for question 12</label>
-<textarea id="lab01-sql-12" data-sql rows="6" spellcheck="false" placeholder="Write your SQL here"></textarea>
+<label for="lab01-sql-11">Your SQL for question 11</label>
+<textarea id="lab01-sql-11" data-sql rows="6" spellcheck="false" placeholder="Write your SQL here"></textarea>
 <div class="lab01-editor-actions"><button type="button" data-run>Run query</button></div>
 <p class="lab01-status" data-status role="status" aria-live="polite"></p>
 <div class="lab01-result" data-result></div>
@@ -574,17 +534,17 @@ SELECT p.customer_id FROM purchased p CROSS JOIN required r WHERE r.n>0 AND p.n=
 
 </section>
 
-<section class="lab01-question" data-question="13" markdown="1">
+<section class="lab01-question" data-question="12" data-storage-question="13" markdown="1">
 
-### Question 13
+### Question 12
 
 Find pairs of different products purchased together in at least two completed orders. Count each order once per pair, even when a product appears on multiple lines. Display each pair once, with the alphabetically smaller product name first, together with the number of orders containing the pair.
 
-<details><summary>Question 13 — Product pairs</summary><p>Start with unique products per completed order, then form pairs in a consistent alphabetical order. What must you count so repeated lines in one order cannot inflate the result?</p></details>
+<details><summary>Question 12 — Product pairs</summary><p>Start with unique products per completed order, then form pairs in a consistent alphabetical order. What must you count so repeated lines in one order cannot inflate the result?</p></details>
 
 <div class="lab01-editor">
-<label for="lab01-sql-13">Your SQL for question 13</label>
-<textarea id="lab01-sql-13" data-sql rows="6" spellcheck="false" placeholder="Write your SQL here"></textarea>
+<label for="lab01-sql-12">Your SQL for question 12</label>
+<textarea id="lab01-sql-12" data-sql rows="6" spellcheck="false" placeholder="Write your SQL here"></textarea>
 <div class="lab01-editor-actions"><button type="button" data-run>Run query</button></div>
 <p class="lab01-status" data-status role="status" aria-live="polite"></p>
 <div class="lab01-result" data-result></div>
@@ -607,17 +567,17 @@ GROUP BY 1,2 HAVING count(*)>=2 ORDER BY orders_together DESC,1,2;
 
 </section>
 
-<section class="lab01-question" data-question="14" markdown="1">
+<section class="lab01-question" data-question="13" data-storage-question="14" markdown="1">
 
-### Question 14
+### Question 13
 
 For each customer whose cumulative revenue from completed orders reached at least 500, return the first order at which they reached or exceeded that threshold. Determine the sequence by order date and then order ID. Include the cumulative revenue at that point and exclude customers who never reached the threshold.
 
-<details><summary>Question 14 — First threshold crossing</summary><p>Build cumulative revenue in the specified order first. Only then determine which qualifying order is earliest for each customer.</p></details>
+<details><summary>Question 13 — First threshold crossing</summary><p>Build cumulative revenue in the specified order first. Only then determine which qualifying order is earliest for each customer.</p></details>
 
 <div class="lab01-editor">
-<label for="lab01-sql-14">Your SQL for question 14</label>
-<textarea id="lab01-sql-14" data-sql rows="6" spellcheck="false" placeholder="Write your SQL here"></textarea>
+<label for="lab01-sql-13">Your SQL for question 13</label>
+<textarea id="lab01-sql-13" data-sql rows="6" spellcheck="false" placeholder="Write your SQL here"></textarea>
 <div class="lab01-editor-actions"><button type="button" data-run>Run query</button></div>
 <p class="lab01-status" data-status role="status" aria-live="polite"></p>
 <div class="lab01-result" data-result></div>
@@ -650,19 +610,19 @@ SELECT customer_id,order_id,order_date,revenue,cumulative FROM crossing WHERE fi
 
 </section>
 
-<section class="lab01-question" data-question="15" markdown="1">
+<section class="lab01-question" data-question="14" data-storage-question="15" markdown="1">
 
-### Question 15
+### Question 14
 
 For customer 1, calculate completed-order revenue and two cumulative sums. The first uses ORDER BY order_date, order_id with a ROWS frame from the beginning through the current row. The second uses ORDER BY order_date with a RANGE frame from the beginning through the current row. Predict both cumulative values for each order dated 2026-02-05 and explain the difference.
 
-<details><summary>Question 15 — ROWS and RANGE</summary><p>Identify the ordering columns and frame for each cumulative calculation. Under a date-only ordering, consider whether same-day orders are peers and how that affects each result.</p></details>
+<details><summary>Question 14 — ROWS and RANGE</summary><p>Identify the ordering columns and frame for each cumulative calculation. Under a date-only ordering, consider whether same-day orders are peers and how that affects each result.</p></details>
 
 You can include your written explanation as SQL comments, using `--`.
 
 <div class="lab01-editor">
-<label for="lab01-sql-15">Your SQL for question 15</label>
-<textarea id="lab01-sql-15" data-sql rows="6" spellcheck="false" placeholder="Write your SQL here"></textarea>
+<label for="lab01-sql-14">Your SQL for question 14</label>
+<textarea id="lab01-sql-14" data-sql rows="6" spellcheck="false" placeholder="Write your SQL here"></textarea>
 <div class="lab01-editor-actions"><button type="button" data-run>Run query</button></div>
 <p class="lab01-status" data-status role="status" aria-live="polite"></p>
 <div class="lab01-result" data-result></div>

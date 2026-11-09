@@ -141,16 +141,21 @@ class SiteVisibilityTests(unittest.TestCase):
                 self.assertIn('data-journey-fallback', tutorial)
                 self.assertNotIn('data-journey-example', tutorial)
                 self.assertIn('id="lab01-practice"', tutorial)
-                self.assertEqual(re.findall(r'<section\b[^>]*\bdata-question="(\d+)"', tutorial), [str(n) for n in range(1, 16)])
+                self.assertEqual(re.findall(r'<section\b[^>]*\bdata-question="(\d+)"', tutorial), [str(n) for n in range(1, 15)])
+                self.assertEqual(
+                    re.findall(r'<section\b[^>]*\bdata-question="(\d+)"\s+data-storage-question="(\d+)"', tutorial),
+                    [(str(n), str(n + 1)) for n in range(4, 15)],
+                )
+                self.assertIn('First search and learn what', tutorial)
                 for section in re.findall(r'<section\b[^>]*\bdata-question="\d+"[^>]*>(.*?)</section>', tutorial, re.DOTALL):
                     self.assertIn('<summary>See answer</summary>', section)
-                self.assertEqual(len(re.findall(r'<textarea\b[^>]*\bdata-sql(?:\s|=|>)', tutorial)), 15)
-                self.assertEqual(len(re.findall(r'<button\b[^>]*\bdata-run(?:\s|=|>)', tutorial)), 15)
+                self.assertEqual(len(re.findall(r'<textarea\b[^>]*\bdata-sql(?:\s|=|>)', tutorial)), 14)
+                self.assertEqual(len(re.findall(r'<button\b[^>]*\bdata-run(?:\s|=|>)', tutorial)), 14)
                 structure = PracticeStructure()
                 structure.feed(tutorial)
                 self.assertEqual(structure.errors, [])
                 self.assertEqual(structure.tables, ['customers', 'orders', 'order_items'])
-                self.assertEqual(structure.questions, [str(n) for n in range(1, 16)])
+                self.assertEqual(structure.questions, [str(n) for n in range(1, 15)])
                 self.assertEqual(len(structure.ids), len(set(structure.ids)), 'Duplicate IDs in the practice layout')
                 for number in structure.questions:
                     self.assertEqual(structure.question_actions[number], {'actions': 1, 'runs': 1}, number)

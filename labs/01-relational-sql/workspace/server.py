@@ -39,9 +39,19 @@ def questions_from_worksheet(path: Path = WORKSHEET, hints_path: Path = HINTS_FI
     try:
         hint_source = hints_path.read_text(encoding="utf-8")
         pattern_hint = re.compile(r"<details>\s*<summary>Question\s+(\d+)\b.*?</summary>\s*(.*?)</details>", re.S)
-        for number, content in pattern_hint.findall(hint_source):
+        # The worksheet keeps its original 15 question IDs. The browser
+        # practice removes question 4 and retains the original ID on each
+        # subsequent section so hints continue to match the worksheet.
+        sections = re.compile(r'<section\b[^>]*data-question="(\d+)"(?:\s+data-storage-question="(\d+)")?[^>]*>(.*?)</section>', re.S)
+        for number, original, section in sections.findall(hint_source):
+            match = pattern_hint.search(section)
+            if not match:
+                continue
+            content = match.group(2)
             content = re.sub(r"</(?:li|p)\s*>", "\n", content)
-            hints[int(number)] = html.unescape(re.sub(r"<[^>]*>", "", content)).strip()
+            hints[int(original or number)] = html.unescape(re.sub(r"<[^>]*>", "", content)).strip()
+        if sections.search(hint_source):
+            hints.setdefault(4, "First work at the order grain. Exclude the current order from the comparison average and consider customers with no other completed orders.")
     except OSError:
         # Hints are optional; the worksheet remains the source of truth.
         pass

@@ -4,7 +4,16 @@ const assert = require('node:assert/strict');
 const fs = require('node:fs/promises');
 const path = require('node:path');
 const { pathToFileURL } = require('node:url');
-const { formatDownload, sampleQuery } = require('../docs/gitbook/javascripts/lab01-practice.js');
+const { formatDownload, sampleQuery, sqlTokens } = require('../docs/gitbook/javascripts/lab01-practice.js');
+
+test('SQL highlighting preserves text and keeps keywords inside strings and comments uncolored', () => {
+  const sql = "SELECT 'from', \"order\", 42 -- WHERE\nFROM orders /* SELECT */";
+  const tokens = sqlTokens(sql);
+  assert.equal(tokens.map(token => token.text).join(''), sql);
+  assert.deepEqual(tokens.filter(token => token.kind === 'keyword').map(token => token.text), ['SELECT', 'FROM']);
+  assert.deepEqual(tokens.filter(token => token.kind === 'comment').map(token => token.text), ['-- WHERE', '/* SELECT */']);
+  assert.deepEqual(tokens.filter(token => token.kind === 'string').map(token => token.text), ["'from'", '"order"']);
+});
 
 const assets = path.resolve(__dirname, '../docs/gitbook/assets/lab01-practice');
 

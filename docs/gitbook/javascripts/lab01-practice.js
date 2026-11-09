@@ -12,7 +12,21 @@
     };
     return Object.prototype.hasOwnProperty.call(queries, table) ? queries[table] + (allRows ? '' : ' LIMIT 5') : null;
   }
-  if (typeof module !== 'undefined' && module.exports) module.exports = { formatDownload, sampleQuery };
+  function sqlTokens(sql) {
+    const pattern = /--[^\n]*|\/\*[\s\S]*?(?:\*\/|$)|'(?:''|[^'])*(?:'|$)|"(?:""|[^"])*(?:"|$)|\b(?:select|from|where|and|or|not|in|is|null|as|join|left|right|inner|outer|full|on|using|group|by|order|having|limit|offset|with|recursive|union|all|distinct|case|when|then|else|end|exists|between|like|ilike|asc|desc|nulls|first|last|over|partition|rows|range|unbounded|preceding|following|current|row|filter|within|true|false|date|interval|cast)\b|\b\d+(?:\.\d+)?\b/gi;
+    const tokens = [];
+    let pos = 0;
+    for (const match of sql.matchAll(pattern)) {
+      if (match.index > pos) tokens.push({ text: sql.slice(pos, match.index), kind: '' });
+      const text = match[0];
+      const kind = text.startsWith('--') || text.startsWith('/*') ? 'comment' : text[0] === "'" || text[0] === '"' ? 'string' : /^\d/.test(text) ? 'number' : 'keyword';
+      tokens.push({ text, kind });
+      pos = match.index + text.length;
+    }
+    if (pos < sql.length) tokens.push({ text: sql.slice(pos), kind: '' });
+    return tokens;
+  }
+  if (typeof module !== 'undefined' && module.exports) module.exports = { formatDownload, sampleQuery, sqlTokens };
   if (typeof document === 'undefined') return;
   const script = document.currentScript;
   if (!script || !script.src) return;
@@ -185,11 +199,34 @@
         reference.removeAttribute('aria-labelledby');
         reference.setAttribute('aria-label', `Tables and schema for question ${section.dataset.question}`);
         reference.querySelectorAll('[id]').forEach((element) => element.removeAttribute('id'));
+        const instruction = document.createElement('p');
+        instruction.textContent = 'Select a column name to insert it into your SQL.';
+        reference.querySelector('.lab01-reference-legend').after(instruction);
+        const feedback = document.createElement('p');
+        feedback.className = 'lab01-column-feedback';
+        feedback.setAttribute('role', 'status');
+        feedback.setAttribute('aria-live', 'polite');
+        reference.appendChild(feedback);
         reference.querySelectorAll('[data-reference-table]').forEach((table) => {
           const name = table.dataset.referenceTable;
           table.querySelector('summary').setAttribute('aria-label', `${name} table`);
           table.querySelector('[data-sample]').setAttribute('aria-label', `Sample rows from ${name}`);
           table.querySelector('[data-view-all]').setAttribute('aria-label', `View all rows from ${name}`);
+          table.querySelectorAll('li > code').forEach((column) => {
+            const insert = document.createElement('button');
+            insert.type = 'button';
+            insert.className = 'lab01-insert-column';
+            insert.textContent = column.textContent;
+            insert.setAttribute('aria-label', `Insert ${column.textContent} from ${name}`);
+            insert.addEventListener('click', () => {
+              const input = section.querySelector('[data-sql]');
+              input.setRangeText(column.textContent, input.selectionStart, input.selectionEnd, 'end');
+              input.dispatchEvent(new Event('input', { bubbles: true }));
+              feedback.textContent = `Inserted ${column.textContent}.`;
+              input.focus();
+            });
+            column.replaceWith(insert);
+          });
         });
         disclosure.append(summary, reference);
         actions.appendChild(disclosure);
@@ -208,6 +245,8 @@
     let storageAvailable = true;
     sections.forEach((section) => {
       const number = section.dataset.question;
+      // Keep existing browser drafts attached to their original question.
+      const storageNumber = section.dataset.storageQuestion || number;
       const input = section.querySelector('[data-sql]');
       const button = section.querySelector('[data-run]');
       const output = section.querySelector('[data-result]');
@@ -243,10 +282,34 @@
           }
         });
       });
-      try { input.value = localStorage.getItem(storagePrefix + number) || ''; }
+      try { input.value = localStorage.getItem(storagePrefix + storageNumber) || ''; }
       catch (_) { storageAvailable = false; status.textContent = 'Browser storage is unavailable. Download your work before leaving.'; }
+      const editorWrap = document.createElement('div');
+      editorWrap.className = 'lab01-sql-input';
+      const highlight = document.createElement('pre');
+      highlight.className = 'lab01-sql-highlight';
+      highlight.setAttribute('aria-hidden', 'true');
+      input.before(editorWrap);
+      editorWrap.append(highlight, input);
+      function updateHighlight() {
+        const fragment = document.createDocumentFragment();
+        sqlTokens(input.value).forEach(({ text, kind }) => {
+          if (!kind) { fragment.append(document.createTextNode(text)); return; }
+          const span = document.createElement('span');
+          span.className = `sql-${kind}`;
+          span.textContent = text;
+          fragment.append(span);
+        });
+        fragment.append(document.createTextNode('\n'));
+        highlight.replaceChildren(fragment);
+        highlight.scrollTop = input.scrollTop;
+        highlight.scrollLeft = input.scrollLeft;
+      }
+      input.addEventListener('scroll', () => { highlight.scrollTop = input.scrollTop; highlight.scrollLeft = input.scrollLeft; });
+      input.addEventListener('input', updateHighlight);
+      updateHighlight();
       input.addEventListener('input', () => {
-        try { localStorage.setItem(storagePrefix + number, input.value); }
+        try { localStorage.setItem(storagePrefix + storageNumber, input.value); }
         catch (_) { storageAvailable = false; status.textContent = 'Could not save in this browser. Download your work before leaving.'; }
       });
       button.addEventListener('click', () => {

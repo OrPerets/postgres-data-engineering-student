@@ -59,4 +59,4 @@ One customer can have many orders, and one order can have many item lines. A cus
 - Calculate line revenue as `quantity * unit_price * (1 - COALESCE(discount_pct, 0) / 100.0)`.
 - A completed order without lines has zero revenue when included in an order-level calculation.
 
-Use SQL to connect the tables, calculate customer and order metrics, identify trends and rankings, and explain how your query handles missing values, ties, and row counts. Open [tutorial and practice](01-tutorial-practice.md#lab01-practice) to explore sample rows and answer the 15 questions.
+Use SQL to connect the tables, calculate customer and order metrics, identify trends and rankings, and explain how your query handles missing values, ties, and row counts. Open [tutorial and practice](01-tutorial-practice.md#lab01-practice) to explore sample rows and answer the practice questions.
